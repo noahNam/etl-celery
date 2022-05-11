@@ -18,10 +18,10 @@ from exceptions.base import (
 
 class AsyncDatabase:
     def __init__(
-            self,
-            engine_list: List[AsyncEngine | None],
-            session_factory: async_scoped_session,
-            mapper_list: List[Type[DeclarativeMeta]]
+        self,
+        engine_list: List[AsyncEngine | None],
+        session_factory: async_scoped_session,
+        mapper_list: List[Type[DeclarativeMeta]],
     ):
         self._engines: List[AsyncEngine | None] = engine_list
         self._session_factory: async_scoped_session | None = session_factory

@@ -9,7 +9,9 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_scoped_session,
-    AsyncSession, AsyncEngine, AsyncConnection,
+    AsyncSession,
+    AsyncEngine,
+    AsyncConnection,
 )
 from sqlalchemy.orm import sessionmaker, DeclarativeMeta
 from starlette.testclient import TestClient
@@ -19,8 +21,11 @@ from modules.adapter.infrastructure.fastapi.app import create_app
 from modules.adapter.infrastructure.fastapi.config import TestConfig
 from modules.adapter.infrastructure.sqlalchemy.connection import AsyncDatabase
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
-from modules.adapter.infrastructure.sqlalchemy.database import get_db_config
-from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base, warehouse_base
+from modules.adapter.infrastructure.sqlalchemy.database import get_db_config, db
+from modules.adapter.infrastructure.sqlalchemy.mapper import (
+    datalake_base,
+    warehouse_base,
+)
 
 
 @pytest.fixture(scope="session")
@@ -57,48 +62,57 @@ async def async_client(running_app) -> AsyncGenerator:
 @pytest.fixture(scope="session")
 def async_config() -> dict:
     config: TestConfig = TestConfig()
-    config.USE_ASYNC_DB = True
     return config.dict()
 
 
 @pytest.fixture(scope="session")
 def sync_config() -> dict:
     config: TestConfig = TestConfig()
-    config.USE_ASYNC_DB = False
-    config.DB_URL = "sqlite:///:memory:"
+    config.DATA_LAKE_URL = "sqlite:///:memory:"
+    config.DATA_WAREHOUSE_URL = "sqlite:///:memory:"
     return config.dict()
 
 
 @pytest.fixture(scope="session")
 async def async_db(async_config):
-    test_datalake_engine: AsyncEngine = create_async_engine(
-        url="sqlite+aiosqlite:///:memory:", **get_db_config(async_config)
-    )
-    test_warehouse_engine: AsyncEngine = create_async_engine(
-        url="sqlite+aiosqlite:///:memory:", **get_db_config(async_config)
-    )
-    test_session_factory = async_scoped_session(
-        sessionmaker(
-            autocommit=False,
-            autoflush=False,
-            bind={
-                datalake_base: test_datalake_engine,
-                warehouse_base: test_warehouse_engine
-            },
-            class_=AsyncSession,
-        ),
-        scopefunc=SessionContextManager.get_context,
-    )
-    db: AsyncDatabase = AsyncDatabase(
-        engine_list=[test_datalake_engine, test_warehouse_engine],
-        session_factory=test_session_factory,
-        mapper_list=[datalake_base, warehouse_base]
-    )
+    _is_local_db_used(database_url=async_config.get("DATA_LAKE_URL"))
+    _is_local_db_used(database_url=async_config.get("DATA_WAREHOUSE_URL"))
 
-    yield db
+    if is_sqlite_used(async_config.get("DATA_LAKE_URL")) or is_sqlite_used(
+        async_config.get("DATA_WAREHOUSE_URL")
+    ):
+
+        test_datalake_engine: AsyncEngine = create_async_engine(
+            url="sqlite+aiosqlite:///:memory:", **get_db_config(async_config)
+        )
+        test_warehouse_engine: AsyncEngine = create_async_engine(
+            url="sqlite+aiosqlite:///:memory:", **get_db_config(async_config)
+        )
+        test_session_factory = async_scoped_session(
+            sessionmaker(
+                autocommit=False,
+                autoflush=False,
+                bind={
+                    datalake_base: test_datalake_engine,
+                    warehouse_base: test_warehouse_engine,
+                },
+                class_=AsyncSession,
+            ),
+            scopefunc=SessionContextManager.get_context,
+        )
+        _db: AsyncDatabase = AsyncDatabase(
+            engine_list=[test_datalake_engine, test_warehouse_engine],
+            session_factory=test_session_factory,
+            mapper_list=[datalake_base, warehouse_base],
+        )
+    else:
+        # local async db, not memory db
+        _db = db
+
+    yield _db
 
     # tear_down
-    await db.disconnect()
+    await _db.disconnect()
 
 
 @pytest_asyncio.fixture

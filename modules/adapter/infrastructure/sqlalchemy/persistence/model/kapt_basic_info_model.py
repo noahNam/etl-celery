@@ -1,7 +1,9 @@
 from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import Base
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import TimestampMixin
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
+    TimestampMixin,
+)
 
 
 class KaptBasicInfosModel(Base, TimestampMixin):
@@ -64,4 +66,3 @@ class KaptBasicInfosModel(Base, TimestampMixin):
     manage_office_contact = Column(String(16), nullable=True)
     manage_office_fax = Column(String(16), nullable=True)
     welfare = Column(String(200), nullable=True)
-
