@@ -1,7 +1,8 @@
 from sqlalchemy.ext.asyncio import (
     async_scoped_session,
     create_async_engine,
-    AsyncSession, AsyncEngine,
+    AsyncSession,
+    AsyncEngine,
 )
 from sqlalchemy.orm import sessionmaker
 
@@ -9,7 +10,10 @@ from exceptions.base import InvalidConfigErrorException
 from modules.adapter.infrastructure.fastapi.config import fastapi_config
 from modules.adapter.infrastructure.sqlalchemy.connection import AsyncDatabase
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
-from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base, warehouse_base
+from modules.adapter.infrastructure.sqlalchemy.mapper import (
+    datalake_base,
+    warehouse_base,
+)
 
 
 def get_db_config(config: dict) -> dict:
@@ -56,22 +60,17 @@ db: SyncDatabase = SyncDatabase(
 )
 """
 datalake_engine: AsyncEngine = create_async_engine(
-    url=fastapi_config.DATA_LAKE_URL,
-    **get_db_config(fastapi_config.dict())
+    url=fastapi_config.DATA_LAKE_URL, **get_db_config(fastapi_config.dict())
 )
 warehouse_engine: AsyncEngine = create_async_engine(
-    url=fastapi_config.DATA_WAREHOUSE_URL,
-    **get_db_config(fastapi_config.dict())
+    url=fastapi_config.DATA_WAREHOUSE_URL, **get_db_config(fastapi_config.dict())
 )
 
 session_factory: async_scoped_session = async_scoped_session(
     sessionmaker(
         autocommit=False,
         autoflush=False,
-        bind={
-            datalake_base: datalake_engine,
-            warehouse_base: warehouse_engine
-        },
+        bind={datalake_base: datalake_engine, warehouse_base: warehouse_engine},
         class_=AsyncSession,
     ),
     scopefunc=SessionContextManager.get_context,
@@ -79,5 +78,5 @@ session_factory: async_scoped_session = async_scoped_session(
 db: AsyncDatabase = AsyncDatabase(
     engine_list=[datalake_engine, warehouse_engine],
     session_factory=session_factory,
-    mapper_list=[datalake_base, warehouse_base]
+    mapper_list=[datalake_base, warehouse_base],
 )
