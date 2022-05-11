@@ -1,5 +1,5 @@
 import os
-from typing import Generator, AsyncGenerator
+from typing import Generator, AsyncGenerator, List, Type
 
 import pytest
 import pytest_asyncio
@@ -9,9 +9,9 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_scoped_session,
-    AsyncSession,
+    AsyncSession, AsyncEngine, AsyncConnection,
 )
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, DeclarativeMeta
 from starlette.testclient import TestClient
 from uvloop import new_event_loop
 
@@ -20,6 +20,7 @@ from modules.adapter.infrastructure.fastapi.config import TestConfig
 from modules.adapter.infrastructure.sqlalchemy.connection import AsyncDatabase
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
 from modules.adapter.infrastructure.sqlalchemy.database import get_db_config
+from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base, warehouse_base
 
 
 @pytest.fixture(scope="session")
@@ -70,17 +71,29 @@ def sync_config() -> dict:
 
 @pytest.fixture(scope="session")
 async def async_db(async_config):
-    test_engine = create_async_engine(**get_db_config(async_config))
+    test_datalake_engine: AsyncEngine = create_async_engine(
+        url="sqlite+aiosqlite:///:memory:", **get_db_config(async_config)
+    )
+    test_warehouse_engine: AsyncEngine = create_async_engine(
+        url="sqlite+aiosqlite:///:memory:", **get_db_config(async_config)
+    )
     test_session_factory = async_scoped_session(
         sessionmaker(
             autocommit=False,
             autoflush=False,
-            bind=test_engine,
+            bind={
+                datalake_base: test_datalake_engine,
+                warehouse_base: test_warehouse_engine
+            },
             class_=AsyncSession,
         ),
         scopefunc=SessionContextManager.get_context,
     )
-    db = AsyncDatabase(engine=test_engine, session_factory=test_session_factory)
+    db: AsyncDatabase = AsyncDatabase(
+        engine_list=[test_datalake_engine, test_warehouse_engine],
+        session_factory=test_session_factory,
+        mapper_list=[datalake_base, warehouse_base]
+    )
 
     yield db
 
@@ -89,12 +102,11 @@ async def async_db(async_config):
 
 
 @pytest_asyncio.fixture
-async def async_session(async_db, async_config) -> AsyncGenerator:
-    mapper = async_db.mapper
+async def async_session(async_db) -> AsyncGenerator:
     # Start Connection
-    connection = await async_db.get_connection()
+    connections: List[AsyncConnection] = await async_db.get_connections()
 
-    if is_sqlite_used(async_config.get("DB_URL")):
+    for connection, engine, mapper in (connections, async_db.engines, async_db.mappers):
         await connection.run_sync(mapper.metadata.drop_all)
         await connection.run_sync(mapper.metadata.create_all)
 
@@ -105,9 +117,10 @@ async def async_session(async_db, async_config) -> AsyncGenerator:
         await async_db.session_factory.rollback()
         print(f"session rollback due to error: {e}")
 
-    # tear_down connection
-    await connection.rollback()
-    await connection.close()
+    for connection in connections:
+        # tear_down connection
+        await connection.rollback()
+        await connection.close()
 
 
 def is_sqlite_used(database_url: str):

@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import Callable, AsyncContextManager
+from typing import Callable, AsyncContextManager, List, Type
 
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -14,20 +14,24 @@ from exceptions.base import (
     NotFoundMapperErrorException,
     NotFoundSessionFactoryErrorException,
 )
-from modules.adapter.infrastructure.sqlalchemy.mapper import Base
 
 
 class AsyncDatabase:
-    def __init__(self, engine: AsyncEngine, session_factory: async_scoped_session):
-        self._engine: AsyncEngine | None = engine
+    def __init__(
+            self,
+            engine_list: List[AsyncEngine | None],
+            session_factory: async_scoped_session,
+            mapper_list: List[Type[DeclarativeMeta]]
+    ):
+        self._engines: List[AsyncEngine | None] = engine_list
         self._session_factory: async_scoped_session | None = session_factory
-        self._mapper: DeclarativeMeta = Base
+        self._mappers: List[Type[DeclarativeMeta]] = mapper_list
 
     @property
-    def engine(self) -> AsyncEngine | None:
-        if not self._engine:
+    def engines(self) -> List[AsyncEngine | None]:
+        if not self._engines:
             raise NotFoundEngineErrorException
-        return self._engine
+        return self._engines
 
     @property
     def session_factory(self) -> async_scoped_session | None:
@@ -36,20 +40,30 @@ class AsyncDatabase:
         return self._session_factory
 
     @property
-    def mapper(self) -> DeclarativeMeta:
-        if not self._mapper:
+    def mappers(self) -> List[Type[DeclarativeMeta]]:
+        if not self._mappers:
             raise NotFoundMapperErrorException
-        return self._mapper
+        return self._mappers
 
     async def create_all(self) -> None:
-        async with self._engine.begin() as connection:
-            await connection.run_sync(self._mapper.metadata.create_all)
+        if not self._engines:
+            raise NotFoundEngineErrorException
+        if not self._mappers:
+            raise NotFoundMapperErrorException
+
+        for engine, mapper in zip(self._engines, self._mappers):
+            async with engine.begin() as connection:
+                await connection.run_sync(mapper.metadata.create_all)
 
     async def disconnect(self) -> None:
-        await self._engine.dispose()
+        for engine in self._engines:
+            await engine.dispose()
 
-    async def get_connection(self) -> AsyncConnection:
-        return await self._engine.connect()
+    async def get_connection_list(self) -> List[AsyncConnection]:
+        connection_list = list()
+        for engine in self._engines:
+            connection_list.append(await engine.connect())
+        return connection_list
 
     @asynccontextmanager
     async def session(self) -> Callable[..., AsyncContextManager[AsyncSession]]:

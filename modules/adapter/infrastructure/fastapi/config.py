@@ -16,10 +16,10 @@ class Config(BaseSettings):
     RELOAD: bool = False
 
     # Sqlalchemy
-    DB_URL: str = "sqlite+aiosqlite:///:memory:"
+    DATA_WAREHOUSE_URL: str = "sqlite+aiosqlite:///:memory:"
+    DATA_LAKE_URL: str = "sqlite+aiosqlite:///:memory:"
     DB_ECHO: bool = True
     DB_PRE_PING: bool = True
-    USE_ASYNC_DB: bool = True
 
     # Redis
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379")
@@ -45,7 +45,8 @@ class TestConfig(Config):
 
 class DevelopmentConfig(Config):
     ENV: str = "development"
-    DB_URL: str = os.getenv("DEV_DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+    DATA_WAREHOUSE_URL: str = os.getenv("DEV_DATA_WAREHOUSE_URL", "sqlite+aiosqlite:///:memory:")
+    DATA_LAKE_URL: str = os.getenv("DEV_DATA_WAREHOUSE_URL", "sqlite+aiosqlite:///:memory:")
     RELOAD: bool = True
     SENTRY_ENVIRONMENT: str = "development"
     SENTRY_KEY: str | None = os.getenv("SENTRY_KEY")
@@ -56,7 +57,8 @@ class ProductionConfig(Config):
     DOCS_URL: str | None = None
     REDOC_URL: str | None = None
 
-    DB_URL: str | None = os.getenv("PROD_DATABASE_URL")
+    DATA_WAREHOUSE_URL: str | None = os.getenv("PROD_DATA_WAREHOUSE_URL")
+    DATA_LAKE_URL: str | None = os.getenv("PROD_DATA_WAREHOUSE_URL")
 
     SENTRY_ENVIRONMENT: str = "production"
     SENTRY_KEY: str | None = os.getenv("SENTRY_KEY")
