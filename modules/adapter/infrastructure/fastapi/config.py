@@ -34,8 +34,11 @@ class Config(BaseSettings):
 
 class LocalConfig(Config):
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or "!xhemgha@#%2214"
-    DB_URL: str = os.getenv(
-        "DEV_DATABASE_URL", "mysql+aiomysql://antgirl:1234@localhost:3306"
+    DATA_LAKE_URL: str = os.getenv(
+        "DEV_DATA_LAKE_URL", "mysql+aiomysql://antgirl:1234@localhost:3306"
+    )
+    DATA_WAREHOUSE_URL: str = os.getenv(
+        "DEV_WAREHOUSE_URL", "mysql+aiomysql://antgirl:1234@localhost:3306"
     )
 
 
@@ -47,12 +50,13 @@ class TestConfig(Config):
 
 class DevelopmentConfig(Config):
     ENV: str = "development"
+    DATA_LAKE_URL: str = os.getenv(
+        "DEV_DATA_LAKE_URL", "sqlite+aiosqlite:///:memory:"
+    )
     DATA_WAREHOUSE_URL: str = os.getenv(
         "DEV_DATA_WAREHOUSE_URL", "sqlite+aiosqlite:///:memory:"
     )
-    DATA_LAKE_URL: str = os.getenv(
-        "DEV_DATA_WAREHOUSE_URL", "sqlite+aiosqlite:///:memory:"
-    )
+
     RELOAD: bool = True
     SENTRY_ENVIRONMENT: str = "development"
     SENTRY_KEY: str | None = os.getenv("SENTRY_KEY")
@@ -63,8 +67,8 @@ class ProductionConfig(Config):
     DOCS_URL: str | None = None
     REDOC_URL: str | None = None
 
+    DATA_LAKE_URL: str | None = os.getenv("PROD_DATA_LAKE_URL")
     DATA_WAREHOUSE_URL: str | None = os.getenv("PROD_DATA_WAREHOUSE_URL")
-    DATA_LAKE_URL: str | None = os.getenv("PROD_DATA_WAREHOUSE_URL")
 
     SENTRY_ENVIRONMENT: str = "production"
     SENTRY_KEY: str | None = os.getenv("SENTRY_KEY")
