@@ -1,0 +1,28 @@
+version: '3.7'
+
+volumes:
+  db_local: {}
+  redis_local: {}
+
+services:
+  redis:
+    image: redis:latest
+    container_name: antgirl-redis
+    volumes:
+      - redis_local:/var/lib/redis
+    ports:
+      - "6379:6379"
+
+  mysql:
+    image: mysql:5.7
+    container_name: antgirl-mysql
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - db_local:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DB=antgirl
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_USER=antgirl
+      - MYSQL_PASSWORD=1234
