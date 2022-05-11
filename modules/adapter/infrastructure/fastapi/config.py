@@ -34,6 +34,7 @@ class Config(BaseSettings):
 
 class LocalConfig(Config):
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or "!xhemgha@#%2214"
+    DB_URL: str = os.getenv("DEV_DATABASE_URL", "mysql+aiomysql://antgirl:1234@localhost:3306")
 
 
 class TestConfig(Config):
