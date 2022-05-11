@@ -1,5 +1,5 @@
 import os
-from typing import Generator, AsyncGenerator, List, Type
+from typing import Generator, AsyncGenerator, List
 
 import pytest
 import pytest_asyncio
@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncConnection,
 )
-from sqlalchemy.orm import sessionmaker, DeclarativeMeta
+from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 from uvloop import new_event_loop
 

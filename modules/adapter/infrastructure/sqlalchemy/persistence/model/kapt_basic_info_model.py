@@ -1,12 +1,12 @@
 from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger
 
-from modules.adapter.infrastructure.sqlalchemy.mapper import Base
+from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
 )
 
 
-class KaptBasicInfosModel(Base, TimestampMixin):
+class KaptBasicInfosModel(datalake_base, TimestampMixin):
     __tablename__ = "kapt_basic_infos"
 
     house_id = Column(
