@@ -5,7 +5,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 
 
 class KaptBasicInfosModel(Base, TimestampMixin):
-    __tablename__ = "users"
+    __tablename__ = "kapt_basic_infos"
 
     house_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), primary_key=True, nullable=False
