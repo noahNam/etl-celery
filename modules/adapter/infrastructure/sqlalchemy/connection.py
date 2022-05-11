@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import (
     AsyncConnection,
     AsyncSession,
 )
-from sqlalchemy.orm import DeclarativeMeta
+from sqlalchemy.future import Engine as SyncEngine
+from sqlalchemy.orm import DeclarativeMeta, scoped_session
 
 from exceptions.base import (
     NotFoundEngineErrorException,
@@ -35,7 +36,7 @@ class AsyncDatabase:
 
     @property
     def session_factory(self) -> async_scoped_session | None:
-        if not self._session_factory:
+        if not self._session_factory or not isinstance(self._session_factory, async_scoped_session):
             raise NotFoundSessionFactoryErrorException
         return self._session_factory
 
@@ -75,3 +76,43 @@ class AsyncDatabase:
             raise
         finally:
             await session.close()
+
+
+class SyncDatabase:
+    def __init__(
+        self,
+        engine_list: List[SyncEngine | None],
+        session_factory: scoped_session,
+        mapper_list: List[Type[DeclarativeMeta]],
+    ):
+        self._engines: List[SyncEngine | None] = engine_list
+        self._session_factory: scoped_session | None = session_factory
+        self._mappers: List[Type[DeclarativeMeta]] = mapper_list
+
+    @property
+    def engines(self) -> List[SyncEngine | None]:
+        if not self._engines:
+            raise NotFoundEngineErrorException
+        return self._engines
+
+    @property
+    def session_factory(self) -> scoped_session | None:
+        if not self._session_factory or not isinstance(self._session_factory, scoped_session):
+            raise NotFoundSessionFactoryErrorException
+        return self._session_factory
+
+    @property
+    def mappers(self) -> List[Type[DeclarativeMeta]]:
+        if not self._mappers:
+            raise NotFoundMapperErrorException
+        return self._mappers
+
+    async def create_all(self) -> None:
+        if not self._engines:
+            raise NotFoundEngineErrorException
+        if not self._mappers:
+            raise NotFoundMapperErrorException
+
+        for engine, mapper in zip(self._engines, self._mappers):
+            with engine.begin():
+                mapper.metadata.create_all()
