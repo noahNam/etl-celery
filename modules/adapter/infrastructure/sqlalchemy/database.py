@@ -30,12 +30,12 @@ def get_db_config(config: dict) -> dict:
 
 
 """SyncDatabase를 사용해야 하는 경우 (Alembic 등)
-datalake_engine: AsyncEngine = create_engine(
+datalake_engine: SyncEngine = create_engine(
     url=fastapi_config.DATA_LAKE_URL,
     future=True,
     **get_db_config(fastapi_config.dict())
 )
-warehouse_engine: AsyncEngine = create_engine(
+warehouse_engine: SyncEngine = create_engine(
     url=fastapi_config.DATA_WAREHOUSE_URL,
     **get_db_config(fastapi_config.dict())
 )

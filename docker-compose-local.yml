@@ -22,7 +22,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_DB=antgirl
+      - MYSQL_DATABASE=antgirl
       - MYSQL_ROOT_PASSWORD=1234
       - MYSQL_USER=antgirl
       - MYSQL_PASSWORD=1234
