@@ -107,7 +107,7 @@ class SyncDatabase:
             raise NotFoundMapperErrorException
         return self._mappers
 
-    async def create_all(self) -> None:
+    def create_all(self) -> None:
         if not self._engines:
             raise NotFoundEngineErrorException
         if not self._mappers:
@@ -115,4 +115,8 @@ class SyncDatabase:
 
         for engine, mapper in zip(self._engines, self._mappers):
             with engine.begin():
-                mapper.metadata.create_all()
+                mapper.metadata.create_all(engine)
+
+    def disconnect(self) -> None:
+        for engine in self._engines:
+            engine.dispose()

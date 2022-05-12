@@ -35,10 +35,10 @@ class Config(BaseSettings):
 class LocalConfig(Config):
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or "!xhemgha@#%2214"
     DATA_LAKE_URL: str = os.getenv(
-        "DEV_DATA_LAKE_URL", "mysql+aiomysql://antgirl:1234@localhost:3306"
+        "DEV_DATA_LAKE_URL", "mysql+aiomysql://antgirl:1234@localhost:3306/antgirl"
     )
     DATA_WAREHOUSE_URL: str = os.getenv(
-        "DEV_WAREHOUSE_URL", "mysql+aiomysql://antgirl:1234@localhost:3306"
+        "DEV_WAREHOUSE_URL", "mysql+aiomysql://antgirl:1234@localhost:3306/antgirl"
     )
 
 

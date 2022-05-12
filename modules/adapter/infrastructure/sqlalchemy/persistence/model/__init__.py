@@ -1,2 +1,2 @@
 # users reference tables
-from .user_model import UserModel
+from .datalake.kapt_basic_info_model import KaptBasicInfosModel
