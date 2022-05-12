@@ -60,7 +60,7 @@ db: SyncDatabase = SyncDatabase(
 )
 
 ** 추가로 변경해야 할 부분
-    app.py -> startup, shutdown event function await 제거
+    task_queue.py -> startup, shutdown event function await 제거
 """
 datalake_engine: AsyncEngine = create_async_engine(
     url=fastapi_config.DATA_LAKE_URL, **get_db_config(fastapi_config.dict())

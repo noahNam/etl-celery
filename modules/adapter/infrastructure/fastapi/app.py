@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from modules.adapter.infrastructure.cache.redis import redis
 from modules.adapter.infrastructure.fastapi.config import fastapi_config
 from modules.adapter.infrastructure.fastapi.middleware import init_middleware
 from modules.adapter.infrastructure.sqlalchemy.database import db
@@ -29,12 +30,11 @@ app = create_app()
 
 
 @app.on_event("startup")
-async def init_db():
+async def init_infrastructure():
     await db.create_all()
-    logger.info("Database is ready")
 
 
 @app.on_event("shutdown")
 async def tear_down_db():
     await db.disconnect()
-    logger.info("Database is disconnected")
+    redis.disconnect()

@@ -15,6 +15,9 @@ from exceptions.base import (
     NotFoundMapperErrorException,
     NotFoundSessionFactoryErrorException,
 )
+from modules.adapter.infrastructure.utils.log_helper import logger_
+
+logger = logger_.getLogger(__name__)
 
 
 class AsyncDatabase:
@@ -36,7 +39,9 @@ class AsyncDatabase:
 
     @property
     def session_factory(self) -> async_scoped_session | None:
-        if not self._session_factory or not isinstance(self._session_factory, async_scoped_session):
+        if not self._session_factory or not isinstance(
+            self._session_factory, async_scoped_session
+        ):
             raise NotFoundSessionFactoryErrorException
         return self._session_factory
 
@@ -55,10 +60,12 @@ class AsyncDatabase:
         for engine, mapper in zip(self._engines, self._mappers):
             async with engine.begin() as connection:
                 await connection.run_sync(mapper.metadata.create_all)
+        logger.info("Database is ready")
 
     async def disconnect(self) -> None:
         for engine in self._engines:
             await engine.dispose()
+        logger.info("Database is disconnected")
 
     async def get_connection_list(self) -> List[AsyncConnection]:
         connection_list = list()
@@ -97,7 +104,9 @@ class SyncDatabase:
 
     @property
     def session_factory(self) -> scoped_session | None:
-        if not self._session_factory or not isinstance(self._session_factory, scoped_session):
+        if not self._session_factory or not isinstance(
+            self._session_factory, scoped_session
+        ):
             raise NotFoundSessionFactoryErrorException
         return self._session_factory
 

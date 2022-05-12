@@ -23,10 +23,17 @@ class Config(BaseSettings):
 
     # Redis
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379")
+    REDIS_NODE_HOST_1: str | None = os.environ.get("REDIS_NODE_HOST_1")
+    REDIS_NODE_HOST_2: str | None = os.environ.get("REDIS_NODE_HOST_2")
 
     # Jwt
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or "hawaii"
     JWT_ALGORITHM = os.environ.get("JWT_ALGORITHMS") or "HS256"
+
+    # Celery
+    BACKEND_RESULT = "db+mysql+pymysql://antgirl:1234@localhost:3306/antgirl"
+    TIMEZONE = "Asia/Seoul"
+    CELERY_ENABLE_UTC = False
 
     class Config:
         validate_assignment = True
@@ -50,9 +57,7 @@ class TestConfig(Config):
 
 class DevelopmentConfig(Config):
     ENV: str = "development"
-    DATA_LAKE_URL: str = os.getenv(
-        "DEV_DATA_LAKE_URL", "sqlite+aiosqlite:///:memory:"
-    )
+    DATA_LAKE_URL: str = os.getenv("DEV_DATA_LAKE_URL", "sqlite+aiosqlite:///:memory:")
     DATA_WAREHOUSE_URL: str = os.getenv(
         "DEV_DATA_WAREHOUSE_URL", "sqlite+aiosqlite:///:memory:"
     )
@@ -67,9 +72,11 @@ class ProductionConfig(Config):
     DOCS_URL: str | None = None
     REDOC_URL: str | None = None
 
+    # Sqlalchemy
     DATA_LAKE_URL: str | None = os.getenv("PROD_DATA_LAKE_URL")
     DATA_WAREHOUSE_URL: str | None = os.getenv("PROD_DATA_WAREHOUSE_URL")
 
+    # Sentry
     SENTRY_ENVIRONMENT: str = "production"
     SENTRY_KEY: str | None = os.getenv("SENTRY_KEY")
 
