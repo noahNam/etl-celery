@@ -1,0 +1,16 @@
+version: "3"
+services:
+  prod-antgirl-cron:
+    image: __ECR_ADDRESS__
+    ports:
+      - "5000:5000"
+    command:  "celery -A celery_app.celery worker -B --loglevel=info -P threads -c 2"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: toadhome/prod-antgirl-cron-logs
+        awslogs-region: ap-northeast-2
+        awslogs-stream-prefix: toadhome/prod-antgirl-cron-logs
+        awslogs-create-group: "true"
+    environment:
+      # environment
