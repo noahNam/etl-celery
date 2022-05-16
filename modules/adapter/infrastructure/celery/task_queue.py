@@ -30,7 +30,7 @@ def setup_periodic_tasks(sender, **kwargs):
     #     name='set-redis',
     # )
 
-    tasks.start_worker.delay(topic=TopicEnum.SET_REDIS.value)
+    tasks.start_worker.delay(topic=TopicEnum.CRAWL_KAPT.value)
 
 
 # celery -A modules.adapter.infrastructure.celery.task_queue.celery flower --address=localhost --port=5555
