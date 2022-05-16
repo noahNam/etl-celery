@@ -6,7 +6,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 )
 
 
-class KaptBasicInfosModel(datalake_base, TimestampMixin):
+class KaptBasicInfoModel(datalake_base, TimestampMixin):
     __tablename__ = "kapt_basic_infos"
 
     house_id = Column(
