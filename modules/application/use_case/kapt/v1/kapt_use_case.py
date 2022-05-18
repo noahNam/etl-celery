@@ -11,6 +11,9 @@ from modules.adapter.infrastructure.crawler.crawler.spiders.kapt_spider import (
     KaptSpider,
 )
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
+from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
+    KaptOpenApiInputEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     AsyncKaptRepository,
 )
@@ -30,7 +33,6 @@ class BaseKaptUseCase:
         self._topic: str = topic
         self._repo: AsyncKaptRepository = kapt_repo
         self._redis: Cache = cache
-        self._crawler: Crawler = Crawler(spidercls=KaptSpider)
         self._scrapy_settings: Settings = (
             scrapy_settings if scrapy_settings else get_project_settings()
         )
@@ -41,18 +43,26 @@ class BaseKaptUseCase:
 
 
 class KaptOpenApiUseCase(BaseKaptUseCase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._crawler: Crawler = Crawler(spidercls=KaptSpider)
+        self._spider_input_params: list[KaptOpenApiInputEntity] = list()
+
     async def execute(self):
         session_id = str(uuid4())
         context = SessionContextManager.set_context_value(session_id)
 
-        result = await self._repo.find_by_id(house_id=1)
+        self._spider_input_params: list[
+            KaptOpenApiInputEntity
+        ] = await self._repo.find_all()
 
         SessionContextManager.reset_context(context=context)
-        logger.info(f"result- {result}")
 
     def run_crawling(self):
         process = CrawlerProcess(settings=self._scrapy_settings)
-        process.crawl(crawler_or_spidercls=self._crawler)
+        process.crawl(
+            crawler_or_spidercls=self._crawler, params=self._spider_input_params
+        )
         process.start()
         self.teardown()
 
