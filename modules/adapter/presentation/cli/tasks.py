@@ -1,6 +1,9 @@
 from asyncio import run
 from functools import wraps
 
+from billiard.context import Process
+from scrapy.settings import Settings
+
 from modules.adapter.infrastructure.cache.redis import redis
 from modules.adapter.infrastructure.celery.task_queue import celery
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import AsyncKaptRepository
@@ -28,5 +31,8 @@ async def get_task(topic: str):
 @celery.task
 @async_run
 async def start_worker(topic):
-    us = await get_task(topic=topic)
-    await us.execute()
+    uc = await get_task(topic=topic)
+    await uc.execute()
+    process = Process(target=uc.run_crawling)
+    process.start()
+    process.join()

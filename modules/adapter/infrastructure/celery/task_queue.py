@@ -25,13 +25,12 @@ def setup_periodic_tasks(sender, **kwargs):
     from modules.adapter.presentation.cli import tasks
 
     # sender.add_periodic_task(
-    #     20.0,
-    #     tasks.start_worker.s(topic=TopicEnum.SET_REDIS.value),
-    #     name='set-redis',
+    #     10.0,
+    #     tasks.start_worker.s(topic=TopicEnum.CRAWL_KAPT.value),
+    #     name='kapt',
     # )
 
-    tasks.start_worker.delay(topic=TopicEnum.CRAWL_KAPT.value)
-
+    tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
 
 # celery -A modules.adapter.infrastructure.celery.task_queue.celery flower --address=localhost --port=5555
 # celery -A modules.adapter.infrastructure.celery.task_queue.celery worker -B --loglevel=info -P threads -c 3
