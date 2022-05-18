@@ -6,8 +6,24 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+from scrapy import Spider
+
+from modules.adapter.infrastructure.utils.log_helper import logger_
+
+logger = logger_.getLogger(__name__)
 
 
-class CrawlerPipeline:
-    def process_item(self, item, spider):
+class BasePipeline:
+    def open_spider(self, spider: Spider):
+        logger.info(f"{spider.name} pipline Opened")
+
+    def close_spider(self, spider: Spider):
+        logger.info(f"{spider.name} pipline Closed")
+
+
+class KaptPipeline(BasePipeline):
+    def process_item(self, item, spider: Spider):
+        logger.info(f"item : {item}, !!!!!!!!!!!!!!!!")
         return item
+
+
