@@ -73,7 +73,7 @@ session_factory: async_scoped_session = async_scoped_session(
     sessionmaker(
         autocommit=False,
         autoflush=False,
-        bind={datalake_base: datalake_engine, warehouse_base: warehouse_engine},
+        binds={datalake_base: datalake_engine, warehouse_base: warehouse_engine},
         class_=AsyncSession,
     ),
     scopefunc=SessionContextManager.get_context,

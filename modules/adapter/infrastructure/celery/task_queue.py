@@ -1,7 +1,17 @@
 from celery import Celery
 
+from modules.adapter.infrastructure.cache.redis import redis
 from modules.adapter.infrastructure.fastapi.config import Config, fastapi_config
 from modules.adapter.presentation.cli.enum import TopicEnum
+from modules.adapter.infrastructure.utils.log_helper import logger_
+
+logger = logger_.getLogger(__name__)
+
+
+def init_broker():
+    redis.connect()
+    if redis.is_available():
+        logger.info("Redis is ready")
 
 
 def make_celery(app_config: Config):
@@ -13,6 +23,7 @@ def make_celery(app_config: Config):
         enable_utc=app_config.CELERY_ENABLE_UTC,
         include=["modules.adapter.presentation.cli.tasks"],
     )
+    init_broker()
 
     return app
 
@@ -31,6 +42,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # )
 
     tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
+
 
 # celery -A modules.adapter.infrastructure.celery.task_queue.celery flower --address=localhost --port=5555
 # celery -A modules.adapter.infrastructure.celery.task_queue.celery worker -B --loglevel=info -P threads -c 3

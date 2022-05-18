@@ -93,6 +93,3 @@ class RedisClient(Cache):
 
 
 redis: RedisClient = RedisClient(fastapi_config)
-redis.connect()
-if redis.is_available():
-    logger.info("Redis is ready")

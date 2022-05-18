@@ -18,12 +18,14 @@ class KaptSpider(Spider):
         ]
 
         yield Request(
-            url=urls[0] + f"?kaptCode=A15876402&ServiceKey={KaptEnum.SERVICE_KEY.value}",
+            url=urls[0]
+            + f"?kaptCode=A15876402&ServiceKey={KaptEnum.SERVICE_KEY.value}",
             callback=self.parse_kapt_base_info,
         )
 
         yield Request(
-            url=urls[1] + f"?kaptCode=A15876402&ServiceKey={KaptEnum.SERVICE_KEY.value}",
+            url=urls[1]
+            + f"?kaptCode=A15876402&ServiceKey={KaptEnum.SERVICE_KEY.value}",
             callback=self.parse_kapt_detail_info,
         )
 

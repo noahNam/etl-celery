@@ -31,7 +31,8 @@ class Config(BaseSettings):
     JWT_ALGORITHM = os.environ.get("JWT_ALGORITHMS") or "HS256"
 
     # Celery
-    BACKEND_RESULT = "db+mysql+pymysql://antgirl:1234@localhost:3306/antgirl"
+    # BACKEND_RESULT = "db+mysql+pymysql://antgirl:1234@localhost:3306/antgirl"
+    BACKEND_RESULT = "db+mysql+pymysql://apartalk_admin:!wjstngks117@localhost:3306/apartalk_data_lake"
     TIMEZONE = "Asia/Seoul"
     CELERY_ENABLE_UTC = False
 
@@ -42,10 +43,12 @@ class Config(BaseSettings):
 class LocalConfig(Config):
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or "!xhemgha@#%2214"
     DATA_LAKE_URL: str = os.getenv(
-        "DEV_DATA_LAKE_URL", "mysql+aiomysql://antgirl:1234@localhost:3306/antgirl"
+        "DEV_DATA_LAKE_URL",
+        "mysql+aiomysql://apartalk_admin:!wjstngks117@localhost:3306/apartalk_data_lake",
     )
     DATA_WAREHOUSE_URL: str = os.getenv(
-        "DEV_WAREHOUSE_URL", "mysql+aiomysql://antgirl:1234@localhost:3306/antgirl"
+        "DEV_WAREHOUSE_URL",
+        "mysql+aiomysql://apartalk_admin:!wjstngks117@localhost:3306/apartalk_data_warehouse",
     )
 
 
