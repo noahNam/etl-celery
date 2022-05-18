@@ -23,7 +23,5 @@ class BasePipeline:
 
 class KaptPipeline(BasePipeline):
     def process_item(self, item, spider: Spider):
-        logger.info(f"item : {item}, !!!!!!!!!!!!!!!!")
+        logger.info(f"item :  !!!!!!!!!!!!!!!!")
         return item
-
-

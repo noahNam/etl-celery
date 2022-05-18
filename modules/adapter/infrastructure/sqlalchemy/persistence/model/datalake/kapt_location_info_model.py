@@ -1,7 +1,9 @@
 from sqlalchemy import Column, String
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import TimestampMixin
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
+    TimestampMixin,
+)
 
 
 class KaptLocationInfoModel(datalake_base, TimestampMixin):

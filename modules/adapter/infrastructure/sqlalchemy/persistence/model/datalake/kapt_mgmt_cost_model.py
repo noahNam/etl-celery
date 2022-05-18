@@ -51,6 +51,8 @@ class KaptMgmtCostModel(datalake_base, TimestampMixin):
     nec_oper_cost = Column(Integer, nullable=True)
     public_part_imp_cost = Column(Integer, nullable=True)
     public_part_usage_cost = Column(Integer, nullable=True)
-    public_part_total_amount = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
+    public_part_total_amount = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=True
+    )
     public_part_save_rate = Column(Integer, nullable=True)
     etc_income_amount = Column(Integer, nullable=True)

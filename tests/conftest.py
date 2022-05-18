@@ -92,7 +92,7 @@ async def async_db(async_config):
             sessionmaker(
                 autocommit=False,
                 autoflush=False,
-                bind={
+                binds={
                     datalake_base: test_datalake_engine,
                     warehouse_base: test_warehouse_engine,
                 },
@@ -118,9 +118,11 @@ async def async_db(async_config):
 @pytest_asyncio.fixture
 async def async_session(async_db) -> AsyncGenerator:
     # Start Connection
-    connections: List[AsyncConnection] = await async_db.get_connections()
+    connections: List[AsyncConnection] = await async_db.get_connection_list()
 
-    for connection, engine, mapper in (connections, async_db.engines, async_db.mappers):
+    for connection, engine, mapper in zip(
+        connections, async_db.engines, async_db.mappers
+    ):
         await connection.run_sync(mapper.metadata.drop_all)
         await connection.run_sync(mapper.metadata.create_all)
 

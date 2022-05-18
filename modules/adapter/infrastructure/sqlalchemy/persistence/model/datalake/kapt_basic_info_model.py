@@ -1,5 +1,8 @@
 from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger
 
+from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
+    KaptOpenApiInputEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
@@ -50,7 +53,7 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     ele_manager_yn = Column(String(4), nullable=True)
     fire_reception_system = Column(String(4), nullable=True)
     water_supply_system = Column(String(8), nullable=True)
-    ele_manage_type = Column(String(16), nullable=True)
+    elv_manage_type = Column(String(16), nullable=True)
     elv_passenger = Column(SmallInteger, nullable=True)
     elv_freight = Column(SmallInteger, nullable=True)
     elv_merge = Column(SmallInteger, nullable=True)
@@ -66,3 +69,8 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     manage_office_contact = Column(String(16), nullable=True)
     manage_office_fax = Column(String(16), nullable=True)
     welfare = Column(String(200), nullable=True)
+
+    def to_open_api_input_entity(self) -> KaptOpenApiInputEntity:
+        return KaptOpenApiInputEntity(
+            house_id=self.house_id, kapt_code=self.kapt_code, name=self.name
+        )
