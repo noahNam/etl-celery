@@ -36,3 +36,35 @@ async def test_find_by_id(async_session):
     assert isinstance(get_kapt, KaptOpenApiInputEntity)
     assert house_id == get_kapt.house_id
     assert name == get_kapt.name
+
+
+async def test_find_all(async_session):
+    repo: KaptRepository = AsyncKaptRepository(async_session)
+    house_ids = [1, 2]
+    names = ["test_apt_1", "test_api_2"]
+    test_kapt_1 = KaptBasicInfoModel(
+        house_id=house_ids[0],
+        kapt_code="EXAMPLE_KAPT_1",
+        name=names[0],
+        place_id=10,
+    )
+    test_kapt_2 = KaptBasicInfoModel(
+        house_id=house_ids[1],
+        kapt_code="EXAMPLE_KAPT_2",
+        name=names[1],
+        place_id=20,
+    )
+
+    session_id = str(uuid4())
+    context = SessionContextManager.set_context_value(session_id)
+
+    async with async_session() as session:
+        session.add_all([test_kapt_1, test_kapt_2])
+        await session.commit()
+    get_kapts: list[KaptOpenApiInputEntity] | None = await repo.find_all()
+
+    SessionContextManager.reset_context(context=context)
+    for kapt, house_id, name in zip(get_kapts, house_ids, names):
+        assert isinstance(kapt, KaptOpenApiInputEntity)
+        assert kapt.house_id == house_id
+        assert kapt.name == name
