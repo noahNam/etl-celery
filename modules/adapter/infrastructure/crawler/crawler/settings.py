@@ -16,6 +16,20 @@ NEWSPIDER_MODULE = "crawler.spiders"
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'crawler (+http://www.yourdomain.com)'
 
+
+FAKEUSERAGENT_PROVIDERS = [
+    "scrapy_fake_useragent.providers.FakeUserAgentProvider",
+    # this is the first provider we'll try
+    "scrapy_fake_useragent.providers.FakerProvider",
+    # if FakeUserAgentProvider fails, we'll use faker to generate a user-agent string for us
+    "scrapy_fake_useragent.providers.FixedUserAgentProvider",
+    # fall back to USER_AGENT value
+]
+USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/101.0.4951.64 Safari/537.36"
+)
+
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
