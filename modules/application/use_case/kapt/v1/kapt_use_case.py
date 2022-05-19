@@ -52,9 +52,18 @@ class KaptOpenApiUseCase(BaseKaptUseCase):
         session_id = str(uuid4())
         context = SessionContextManager.set_context_value(session_id)
 
-        self._spider_input_params: list[
-            KaptOpenApiInputEntity
-        ] = await self._repo.find_all()
+        test_item_1 = await self._repo.find_by_id(house_id=1)
+        test_item_2 = await self._repo.find_by_id(house_id=2)
+        test_item_3 = await self._repo.find_by_id(house_id=3)
+
+        # self._spider_input_params: list[
+        #     KaptOpenApiInputEntity
+        # ] = await self._repo.find_all()
+        self._spider_input_params: list[KaptOpenApiInputEntity] = [
+            test_item_1,
+            test_item_2,
+            test_item_3,
+        ]
 
         SessionContextManager.reset_context(context=context)
 

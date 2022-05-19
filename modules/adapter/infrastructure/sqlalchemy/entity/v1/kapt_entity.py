@@ -65,3 +65,31 @@ class KaptOpenApiInputEntity(BaseModel):
     house_id: int
     kapt_code: str | None
     name: str | None
+
+
+class KaptAreaInfoEntity(BaseModel):
+    kapt_code: str
+    name: str | None
+    kapt_tarea: str | None
+    kapt_marea: str | None
+    kapt_mparea_60: str | None
+    kapt_mparea_85: str | None
+    kapt_mparea_135: str | None
+    kapt_mparea_136: str | None
+    priv_area: str | None
+    bjd_code: str | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class KaptLocationInfoEntity(BaseModel):
+    kapt_code: str
+    name: str | None
+    kaptd_wtimebus: str | None
+    subway_line: str | None
+    subway_station: str | None
+    kaptd_wtimesub: str | None
+    convenient_facility: str | None
+    education_facility: str | None
+    created_at: datetime
+    updated_at: datetime
