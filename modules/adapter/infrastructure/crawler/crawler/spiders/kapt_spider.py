@@ -1,9 +1,6 @@
 from scrapy import Spider, Request
 
 from modules.adapter.infrastructure.crawler.crawler.enum.kapt_enum import KaptEnum
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
-    KaptOpenApiInputEntity,
-)
 
 
 class KaptSpider(Spider):
@@ -27,12 +24,14 @@ class KaptSpider(Spider):
                 url=urls[0]
                 + f"?kaptCode={param.kapt_code}&ServiceKey={KaptEnum.SERVICE_KEY.value}",
                 callback=self.parse_kapt_base_info,
+                errback=self.error_callback_kapt_base_info,
             )
 
             yield Request(
                 url=urls[1]
                 + f"?kaptCode={param.kapt_code}&ServiceKey={KaptEnum.SERVICE_KEY.value}",
                 callback=self.parse_kapt_detail_info,
+                errback=self.error_callback_kapt_detail_info,
             )
 
     def parse_kapt_base_info(self, response, **kwargs):
@@ -42,3 +41,11 @@ class KaptSpider(Spider):
     def parse_kapt_detail_info(self, response, **kwargs):
         print("detail info parse")
         print(response.text)
+
+    def error_callback_kapt_base_info(self, response, **kwargs):
+        print("base info error callback")
+        print(f"-->{response}")
+
+    def error_callback_kapt_detail_info(self, response, **kwargs):
+        print("detail info error callback")
+        print(f"-->{response}")
