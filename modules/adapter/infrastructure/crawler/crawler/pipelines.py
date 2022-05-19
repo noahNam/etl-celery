@@ -8,6 +8,10 @@
 from itemadapter import ItemAdapter
 from scrapy import Spider
 
+from modules.adapter.infrastructure.crawler.crawler.items import (
+    KaptBasisInfoItem,
+    KaptLocationInfoItem,
+)
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
@@ -23,6 +27,13 @@ class BasePipeline:
 
 class KaptPipeline(BasePipeline):
     def process_item(self, item, spider: Spider):
-        logger.info(f"item :  !!!!!!!!!!!!!!!!")
-        print(item)
+
+        print(type(item))
+
+        # if isinstance(item, KaptBasisInfoItem):
+        #     pass
+        #     # to save
+        # if isinstance(item, KaptLocationInfoItem):
+        #     pass
+        #     # to save
         return item
