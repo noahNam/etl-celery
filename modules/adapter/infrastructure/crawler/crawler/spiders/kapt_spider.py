@@ -1,6 +1,11 @@
+import json
+
+from itemadapter import ItemAdapter
 from scrapy import Spider, Request
+from xmltodict import parse
 
 from modules.adapter.infrastructure.crawler.crawler.enum.kapt_enum import KaptEnum
+from modules.adapter.infrastructure.crawler.crawler.items import KaptBasisInfoItem
 
 
 class KaptSpider(Spider):
@@ -35,8 +40,14 @@ class KaptSpider(Spider):
             )
 
     def parse_kapt_base_info(self, response, **kwargs):
-        print("base info parse")
-        print(response.text)
+        xml_to_dict = parse(response.text)
+        item: KaptBasisInfoItem = KaptBasisInfoItem(
+            url=response.url,
+            kapt_code=xml_to_dict["response"]["body"]["item"].get("kaptCode"),
+            kapt_name=xml_to_dict["response"]["body"]["item"].get("kaptName"),
+            kapt_addr=xml_to_dict["response"]["body"]["item"].get("kaptAddr"),
+        )
+        yield item
 
     def parse_kapt_detail_info(self, response, **kwargs):
         print("detail info parse")

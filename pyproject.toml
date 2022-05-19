@@ -18,6 +18,7 @@ celery = "^5.2.6"
 flower = "^1.0.0"
 redis = "^4.3.1"
 scrapy-fake-useragent = "^1.4.4"
+xmltodict = "^0.13.0"
 
 [tool.poetry.dev-dependencies]
 aiosqlite = "^0.17.0"
