@@ -1,16 +1,13 @@
 import os
-from uuid import uuid4
+from asyncio import run
 
 from scrapy.crawler import Crawler, CrawlerProcess
 from scrapy.settings import Settings
 from scrapy.utils.project import get_project_settings
 
-from modules.adapter.infrastructure.cache.interface import Cache
-from modules.adapter.infrastructure.cache.redis import RedisClient
 from modules.adapter.infrastructure.crawler.crawler.spiders.kapt_spider import (
     KaptSpider,
 )
-from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
 from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
     KaptOpenApiInputEntity,
 )
@@ -27,12 +24,10 @@ class BaseKaptUseCase:
         self,
         topic: str,
         kapt_repo: AsyncKaptRepository,
-        cache: RedisClient,
         scrapy_settings: Settings | None = None,
     ):
         self._topic: str = topic
         self._repo: AsyncKaptRepository = kapt_repo
-        self._redis: Cache = cache
         self._scrapy_settings: Settings = (
             scrapy_settings if scrapy_settings else get_project_settings()
         )
@@ -48,10 +43,10 @@ class KaptOpenApiUseCase(BaseKaptUseCase):
         self._crawler: Crawler = Crawler(spidercls=KaptSpider)
         self._spider_input_params: list[KaptOpenApiInputEntity] = list()
 
-    async def execute(self):
-        session_id = str(uuid4())
-        context = SessionContextManager.set_context_value(session_id)
+    def execute(self):
+        run(self.setup())
 
+    async def setup(self):
         test_item_1 = await self._repo.find_by_id(house_id=1)
         test_item_2 = await self._repo.find_by_id(house_id=2)
         test_item_3 = await self._repo.find_by_id(house_id=3)
@@ -65,12 +60,11 @@ class KaptOpenApiUseCase(BaseKaptUseCase):
             test_item_3,
         ]
 
-        SessionContextManager.reset_context(context=context)
-
     def run_crawling(self):
         process = CrawlerProcess(settings=self._scrapy_settings)
         process.crawl(
-            crawler_or_spidercls=self._crawler, params=self._spider_input_params
+            crawler_or_spidercls=self._crawler,
+            params=self._spider_input_params,
         )
         process.start()
         self.teardown()
