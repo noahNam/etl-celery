@@ -1,13 +1,10 @@
-import json
-
-from itemadapter import ItemAdapter
 from scrapy import Spider, Request
 from xmltodict import parse
 
 from modules.adapter.infrastructure.crawler.crawler.enum.kapt_enum import KaptEnum
 from modules.adapter.infrastructure.crawler.crawler.items import (
-    KaptBasisInfoItem,
     KaptLocationInfoItem,
+    KaptAreaInfoItem,
 )
 
 
@@ -15,7 +12,10 @@ class KaptSpider(Spider):
     name = "kapt_infos"
     custom_settings = {
         "ITEM_PIPELINES": {
-            "modules.adapter.infrastructure.crawler.crawler.pipelines.KaptPipeline": 300,
+            "modules.adapter.infrastructure.crawler.crawler.pipelines.KaptPipeline": 300
+        },
+        "ASYNCIO_EVENT_LOOP": {
+            "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
         },
     }
 
@@ -44,7 +44,7 @@ class KaptSpider(Spider):
 
     def parse_kapt_base_info(self, response, **kwargs):
         xml_to_dict = parse(response.text)
-        item: KaptBasisInfoItem = KaptBasisInfoItem(
+        item: KaptAreaInfoItem = KaptAreaInfoItem(
             kapt_code=xml_to_dict["response"]["body"]["item"].get("kaptCode"),
             name=xml_to_dict["response"]["body"]["item"].get("kaptName"),
             kapt_tarea=xml_to_dict["response"]["body"]["item"].get("kaptTarea"),
@@ -60,7 +60,6 @@ class KaptSpider(Spider):
             priv_area=xml_to_dict["response"]["body"]["item"].get("privArea"),
             bjd_code=xml_to_dict["response"]["body"]["item"].get("bjdCode"),
         )
-        # to KaptPipeline class
         yield item
 
     def parse_kapt_detail_info(self, response, **kwargs):

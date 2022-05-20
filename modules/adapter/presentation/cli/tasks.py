@@ -1,10 +1,16 @@
 from asyncio import run
 from functools import wraps
+from multiprocessing import Manager
+from uuid import uuid4
 
 from billiard.context import Process
 
-from modules.adapter.infrastructure.cache.redis import redis
 from modules.adapter.infrastructure.celery.task_queue import celery
+from modules.adapter.infrastructure.crawler.crawler.items import (
+    KaptAreaInfoItem,
+    KaptLocationInfoItem,
+)
+from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
 from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     AsyncKaptRepository,
@@ -21,22 +27,26 @@ def async_run(f):
     return wrapper
 
 
-async def get_task(topic: str):
+def get_task(topic: str):
     # if topic == TopicEnum.SET_REDIS.value:
     #     return SetRedisUseCase()
     if topic == TopicEnum.CRAWL_KAPT.value:
         return KaptOpenApiUseCase(
             topic=topic,
-            cache=redis,
             kapt_repo=AsyncKaptRepository(session_factory=db.session),
         )
 
 
 @celery.task
-@async_run
-async def start_worker(topic):
-    uc = await get_task(topic=topic)
-    await uc.execute()
+def start_worker(topic):
+    session_id = str(uuid4())
+    context = SessionContextManager.set_context_value(session_id)
+
+    uc = get_task(topic=topic)
+    uc.execute()
+
     process = Process(target=uc.run_crawling)
     process.start()
     process.join()
+
+    SessionContextManager.reset_context(context=context)

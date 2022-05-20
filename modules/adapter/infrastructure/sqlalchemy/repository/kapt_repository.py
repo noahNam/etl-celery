@@ -7,8 +7,14 @@ from core.domain.kapt.interface.kapt_repository import KaptRepository
 from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
     KaptOpenApiInputEntity,
 )
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_area_info_model import (
+    KaptAreaInfoModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_basic_info_model import (
     KaptBasicInfoModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_location_info_model import (
+    KaptLocationInfoModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository import BaseAsyncRepository
 from modules.adapter.infrastructure.utils.log_helper import logger_
@@ -39,3 +45,15 @@ class AsyncKaptRepository(KaptRepository, BaseAsyncRepository):
             return list()
 
         return [query.to_open_api_input_entity() for query in queryset.scalars().all()]
+
+    async def save(
+        self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None
+    ) -> None:
+        if not kapt_orm:
+            return None
+
+        async with self.session_factory() as session:
+            session.add(kapt_orm)
+            await session.commit()
+
+        return None
