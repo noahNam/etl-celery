@@ -14,9 +14,6 @@ class KaptSpider(Spider):
         "ITEM_PIPELINES": {
             "modules.adapter.infrastructure.crawler.crawler.pipelines.KaptPipeline": 300
         },
-        "ASYNCIO_EVENT_LOOP": {
-            "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
-        },
     }
 
     def start_requests(self):
