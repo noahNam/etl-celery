@@ -1,15 +1,10 @@
 from asyncio import run
 from functools import wraps
-from multiprocessing import Manager
 from uuid import uuid4
 
 from billiard.context import Process
 
 from modules.adapter.infrastructure.celery.task_queue import celery
-from modules.adapter.infrastructure.crawler.crawler.items import (
-    KaptAreaInfoItem,
-    KaptLocationInfoItem,
-)
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
 from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
