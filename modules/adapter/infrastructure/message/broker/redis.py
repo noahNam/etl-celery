@@ -1,11 +1,11 @@
 from datetime import timedelta
-from typing import Any, Type, Set
+from typing import Any, Type
 
 from redis.client import Redis
 from redis.cluster import RedisCluster
 from redis.exceptions import RedisError
 
-from modules.adapter.infrastructure.message_broker.cache import Cache
+from modules.adapter.infrastructure.message.broker.interface import Cache
 from modules.adapter.infrastructure.fastapi.config import Config, fastapi_config
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
