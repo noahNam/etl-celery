@@ -93,4 +93,3 @@ class RedisClient(Cache):
 
 
 redis: RedisClient = RedisClient(fastapi_config)
-
