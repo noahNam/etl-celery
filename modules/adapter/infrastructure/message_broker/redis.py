@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any, Type
+from typing import Any, Type, Set
 
 from redis.client import Redis
 from redis.cluster import RedisCluster
@@ -88,7 +88,7 @@ class RedisClient(Cache):
     def sismember(self, set_name: str, value: str) -> bool:
         return self._client.sismember(name=set_name, value=value)
 
-    def smembers(self, set_name: str) -> list:
+    def smembers(self, set_name: str) -> set[Any]:
         return self._client.smembers(name=set_name)
 
 
