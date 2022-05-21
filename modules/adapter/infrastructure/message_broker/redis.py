@@ -1,110 +1,96 @@
-import abc
 from datetime import timedelta
-from typing import Union, Optional, Any
+from typing import Any, Type
 
-import redis
-from redis import RedisError
+from redis.client import Redis
+from redis.cluster import RedisCluster
+from redis.exceptions import RedisError
 
+from modules.adapter.infrastructure.cache.interface import Cache
+from modules.adapter.infrastructure.fastapi.config import Config, fastapi_config
+from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
 
 
-class Cache:
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def scan(self, pattern: str) -> None:
-        pass
-
-    @abc.abstractmethod
-    def get_after_scan(self) -> Optional[dict]:
-        pass
-
-    @abc.abstractmethod
-    def set(self, key: Any, value: Any, ex: Union[int, timedelta] = None,) -> None:
-        pass
-
-    @abc.abstractmethod
-    def clear_cache(self) -> None:
-        pass
-
-    @abc.abstractmethod
-    def get_by_key(self, key: str) -> str:
-        pass
-
-    @abc.abstractmethod
-    def flushall(self) -> None:
-        pass
-
-    @abc.abstractmethod
-    def is_available(self) -> None:
-        pass
-
-
 class RedisClient(Cache):
-    CONFIG_NAME = "REDIS_URL"
-    CLUSTER_NODE_1 = "REDIS_NODE_HOST_1"
-    CLUSTER_NODE_2 = "REDIS_NODE_HOST_2"
+    def __init__(self, app_config: Config):
+        self._client: Type[Redis] | RedisCluster | None = Redis
+        self._keys: Any = None
+        self._copied_keys: list = list()
+        self._redis_url: str = app_config.REDIS_URL
+        self._cluster_nodes: list = [
+            app_config.REDIS_NODE_HOST_1,
+            app_config.REDIS_NODE_HOST_2,
+        ]
 
-    def __init__(self):
-        self._redis_client = redis.Redis
-        self.keys = None
-        self.copied_keys = []
-
-    def get_cluster_nodes(self, app: Flask):
-        cluster_nodes = [RedisClient.CLUSTER_NODE_1, RedisClient.CLUSTER_NODE_2]
-        startup_node_list = list()
-        for node_host in cluster_nodes:
+    def get_cluster_nodes(self):
+        for node_host in self._cluster_nodes:
             node = dict()
-            node["host"] = app.config.get(node_host)
+            node["host"] = node_host
             node["port"] = 6379
-            startup_node_list.append(node)
-        return startup_node_list
+            self._cluster_nodes.append(node)
+        return self._cluster_nodes
 
-    def init_app(self, app: Flask, url=None):
-        if app.config.get("REDIS_NODE_HOST_1"):
-            startup_nodes = self.get_cluster_nodes(app=app)
-            self._redis_client: RedisCluster = RedisCluster(
+    def connect(self):
+        if self._cluster_nodes[0] is not None and self._cluster_nodes[1] is not None:
+            startup_nodes = self.get_cluster_nodes()
+            self._client: RedisCluster = RedisCluster(
                 startup_nodes=startup_nodes,
                 decode_responses=False,
                 skip_full_coverage_check=True,
             )
+            logger.info("Redis Cluster is connected")
         else:
-            redis_url = url if url else app.config.get(RedisClient.CONFIG_NAME)
-            self._redis_client = self._redis_client.from_url(redis_url)
-            test = 1
+            self._client: Type[Redis] = self._client.from_url(self._redis_url)
+            logger.info("Redis is connected")
+
+    def disconnect(self) -> None:
+        self._client.connection_pool.disconnect()
+        logger.info("Redis is disconnected")
 
     def scan(self, pattern: str) -> None:
-        self.keys = self._redis_client.scan_iter(match=pattern)
+        self._keys = self._client.scan_iter(pattern)
 
-    def get_after_scan(self) -> Optional[dict]:
+    def get_after_scan(self) -> dict | None:
         try:
-            key = next(self.keys)
-            value = self._redis_client.get(key).decode("utf-8")
-            self.copied_keys.append(key)
+            key = next(self._keys)
+            value = self._client.get(key)
+            self._copied_keys.append(key)
             return {"key": key, "value": value}
-        except StopIteration:
+        except StopIteration as e:
             return None
 
-    def set(self, key: Any, value: Any, ex: Union[int, timedelta] = None,) -> None:
-        self._redis_client.set(name=key, value=value, ex=ex)
+    def set(
+        self, key: Any, value: Any, ex: int | timedelta | None = None
+    ) -> bool | None:
+        return self._client.set(name=key, value=value, ex=ex)
 
     def clear_cache(self) -> None:
-        for key in self.copied_keys:
-            self._redis_client.delete(key)
-        self.keys = None
-        self.copied_keys = []
+        for key in self._copied_keys:
+            self._client.delete(key)
+        self._keys = None
+        self._copied_keys = list()
 
     def get_by_key(self, key: str) -> str:
-        return self._redis_client.get(name=key).decode("utf-8")
+        return self._client.get(name=key)
 
     def flushall(self) -> None:
-        self._redis_client.flushall()
+        self._client.flushall()
 
-    def is_available(self):
+    def is_available(self) -> bool:
         try:
-            self._redis_client.ping()
+            self._client.ping()
         except RedisError:
             logger.error(f"[RedisClient][is_available] ping error")
             return False
         return True
+
+    def sismember(self, set_name: str, value: str) -> bool:
+        return self._client.sismember(name=set_name, value=value)
+
+    def smembers(self, set_name: str) -> list:
+        return self._client.smembers(name=set_name)
+
+
+redis: RedisClient = RedisClient(fastapi_config)
+
