@@ -49,7 +49,7 @@ class RedisClient(Cache):
         logger.info("Redis is disconnected")
 
     def scan(self, pattern: str) -> None:
-        self._keys = self._client.scan_iter(pattern)
+        self._keys = self._client.scan_iter(match=pattern)
 
     def get_after_scan(self) -> dict | None:
         try:
