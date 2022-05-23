@@ -22,7 +22,9 @@ class KaptPipeline:
         self._collected_area_infos: list[KaptAreaInfoItem] = list()
         self._collected_location_infos: list[KaptLocationInfoItem] = list()
 
-    def process_item(self, item: KaptAreaInfoItem | KaptLocationInfoItem, spider: Spider):
+    def process_item(
+        self, item: KaptAreaInfoItem | KaptLocationInfoItem, spider: Spider
+    ):
         """spder parameter 사용하지 않지만 남겨두어야 제대로 작동합니다."""
         new_model = None
         if isinstance(item, KaptAreaInfoItem):

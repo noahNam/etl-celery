@@ -66,6 +66,7 @@ class KaptOpenApiUseCase(BaseKaptUseCase):
         process.crawl(
             crawler_or_spidercls=self._crawler,
             params=self._spider_input_params,
+            repo=self._repo
         )
         process.start()
         self.teardown()

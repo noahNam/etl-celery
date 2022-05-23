@@ -62,11 +62,10 @@ class KaptSpider(Spider):
         )
 
         if (
-                KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value
-            and KaptSpider.change_flag
+            KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value
         ):
             self.change_service_key()
-            KaptSpider.change_flag = False
+            KaptSpider.request_count = 0
         else:
             KaptSpider.request_count += KaptSpider.request_count
 
@@ -90,18 +89,20 @@ class KaptSpider(Spider):
         )
 
         if (
-                KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value
-            and KaptSpider.change_flag
+            KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value
         ):
             self.change_service_key()
-            KaptSpider.change_flag = False
+            KaptSpider.request_count = 0
         else:
             KaptSpider.request_count += KaptSpider.request_count
 
         yield item
 
     def change_service_key(self):
-        KaptSpider.open_api_service_key = KaptEnum.SERVICE_KEY_2.value
+        if KaptSpider.open_api_service_key == KaptEnum.SERVICE_KEY_2.value:
+            KaptSpider.open_api_service_key = KaptEnum.SERVICE_KEY_1.value
+        else:
+            KaptSpider.open_api_service_key = KaptEnum.SERVICE_KEY_2.value
 
     def error_callback_kapt_base_info(self, response):
         print("base info error callback")

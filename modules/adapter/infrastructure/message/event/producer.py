@@ -25,6 +25,4 @@ class RedisMessageProducer(MessageProducer):
             return
 
         if logging:
-            logger.info(
-                "🚀[RedisMessageProducer][Send] {0}".format(msg.to_dict())
-            )
+            logger.info("🚀[RedisMessageProducer][Send] {0}".format(msg.to_dict()))
