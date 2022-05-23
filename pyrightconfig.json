@@ -2,6 +2,9 @@
   "include" : ["core", "exceptions", "modules", "tests"],
   "exclude" : [
     "modules/adapter/infrastructure/sqlalchemy",
+    "modules/adapter/infrastructure/cache",
+    "modules/adapter/infrastructure/crawler",
+    "tests",
     "modules/adapter/infrastructure/container",
     "modules/adapter/infrastructure/fastapi"
   ]

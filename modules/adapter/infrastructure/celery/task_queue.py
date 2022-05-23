@@ -2,8 +2,9 @@ from celery import Celery
 
 from modules.adapter.infrastructure.cache.redis import redis
 from modules.adapter.infrastructure.fastapi.config import Config, fastapi_config
-from modules.adapter.presentation.cli.enum import TopicEnum
+from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.utils.log_helper import logger_
+from modules.adapter.presentation.cli.enum import TopicEnum
 
 logger = logger_.getLogger(__name__)
 
@@ -12,6 +13,11 @@ def init_broker():
     redis.connect()
     if redis.is_available():
         logger.info("Redis is ready")
+
+
+def init_db():
+    db.create_all()
+    logger.info("Database is ready")
 
 
 def make_celery(app_config: Config):
@@ -24,6 +30,7 @@ def make_celery(app_config: Config):
         include=["modules.adapter.presentation.cli.tasks"],
     )
     init_broker()
+    init_db()
 
     return app
 

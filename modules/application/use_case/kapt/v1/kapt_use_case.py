@@ -1,5 +1,4 @@
 import os
-from asyncio import run
 
 from scrapy.crawler import Crawler, CrawlerProcess
 from scrapy.settings import Settings
@@ -12,7 +11,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
     KaptOpenApiInputEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
-    AsyncKaptRepository,
+    SyncKaptRepository,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
@@ -23,11 +22,11 @@ class BaseKaptUseCase:
     def __init__(
         self,
         topic: str,
-        kapt_repo: AsyncKaptRepository,
+        kapt_repo: SyncKaptRepository,
         scrapy_settings: Settings | None = None,
     ):
         self._topic: str = topic
-        self._repo: AsyncKaptRepository = kapt_repo
+        self._repo: SyncKaptRepository = kapt_repo
         self._scrapy_settings: Settings = (
             scrapy_settings if scrapy_settings else get_project_settings()
         )
@@ -44,12 +43,13 @@ class KaptOpenApiUseCase(BaseKaptUseCase):
         self._spider_input_params: list[KaptOpenApiInputEntity] = list()
 
     def execute(self):
-        run(self.setup())
+        self.setup()
 
-    async def setup(self):
-        test_item_1 = await self._repo.find_by_id(house_id=1)
-        test_item_2 = await self._repo.find_by_id(house_id=2)
-        test_item_3 = await self._repo.find_by_id(house_id=3)
+    def setup(self):
+
+        test_item_1 = self._repo.find_by_id(house_id=1)
+        test_item_2 = self._repo.find_by_id(house_id=2)
+        test_item_3 = self._repo.find_by_id(house_id=3)
 
         # self._spider_input_params: list[
         #     KaptOpenApiInputEntity
