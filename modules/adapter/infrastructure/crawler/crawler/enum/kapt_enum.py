@@ -6,6 +6,7 @@ class KaptEnum(Enum):
     - SERVICE_KEY(1,2...) 다수 활용 이유: 공공데이터 수집시 하루 1만건 request 제한
     - 활용처 : KaptSpider
     """
+
     BASE_INFO_END_POINT = (
         "http://apis.data.go.kr/1613000/AptBasisInfoService1/getAphusBassInfo"
     )
