@@ -4,6 +4,7 @@ from scrapy.crawler import Crawler, CrawlerProcess
 from scrapy.settings import Settings
 from scrapy.utils.project import get_project_settings
 
+from modules.adapter.infrastructure.crawler.crawler.enum.kapt_enum import KaptEnum
 from modules.adapter.infrastructure.crawler.crawler.spiders.kapt_spider import (
     KaptSpider,
 )

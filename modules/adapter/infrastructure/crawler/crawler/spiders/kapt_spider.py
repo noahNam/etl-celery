@@ -15,6 +15,9 @@ class KaptSpider(Spider):
             "modules.adapter.infrastructure.crawler.crawler.pipelines.KaptPipeline": 300
         },
     }
+    open_api_service_key = KaptEnum.SERVICE_KEY_1.value
+    request_count = 0
+    change_flag = True
 
     def start_requests(self):
         """self.params : list[KaptOpenApiInputEntity] from KaptOpenApiUseCase class"""
@@ -27,14 +30,14 @@ class KaptSpider(Spider):
         for param in self.params:
             yield Request(
                 url=urls[0]
-                + f"?kaptCode={param.kapt_code}&ServiceKey={KaptEnum.SERVICE_KEY.value}",
+                + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
                 callback=self.parse_kapt_base_info,
                 errback=self.error_callback_kapt_base_info,
             )
 
             yield Request(
                 url=urls[1]
-                + f"?kaptCode={param.kapt_code}&ServiceKey={KaptEnum.SERVICE_KEY.value}",
+                + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
                 callback=self.parse_kapt_detail_info,
                 errback=self.error_callback_kapt_detail_info,
             )
@@ -57,6 +60,16 @@ class KaptSpider(Spider):
             priv_area=xml_to_dict["response"]["body"]["item"].get("privArea"),
             bjd_code=xml_to_dict["response"]["body"]["item"].get("bjdCode"),
         )
+
+        if (
+                KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value
+            and KaptSpider.change_flag
+        ):
+            self.change_service_key()
+            KaptSpider.change_flag = False
+        else:
+            KaptSpider.request_count += KaptSpider.request_count
+
         yield item
 
     def parse_kapt_detail_info(self, response):
@@ -76,7 +89,19 @@ class KaptSpider(Spider):
             ),
         )
 
+        if (
+                KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value
+            and KaptSpider.change_flag
+        ):
+            self.change_service_key()
+            KaptSpider.change_flag = False
+        else:
+            KaptSpider.request_count += KaptSpider.request_count
+
         yield item
+
+    def change_service_key(self):
+        KaptSpider.open_api_service_key = KaptEnum.SERVICE_KEY_2.value
 
     def error_callback_kapt_base_info(self, response):
         print("base info error callback")
