@@ -1,14 +1,9 @@
-from sqlalchemy.ext.asyncio import (
-    async_scoped_session,
-    create_async_engine,
-    AsyncSession,
-    AsyncEngine,
-)
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.future import Engine as SyncEngine, create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session, Session
 
 from exceptions.base import InvalidConfigErrorException
 from modules.adapter.infrastructure.fastapi.config import fastapi_config
-from modules.adapter.infrastructure.sqlalchemy.connection import AsyncDatabase
+from modules.adapter.infrastructure.sqlalchemy.connection import SyncDatabase
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
 from modules.adapter.infrastructure.sqlalchemy.mapper import (
     datalake_base,
@@ -29,39 +24,7 @@ def get_db_config(config: dict) -> dict:
     return db_config
 
 
-"""SyncDatabase를 사용해야 하는 경우 (Alembic 등)
-datalake_engine: SyncEngine = create_engine(
-    url=fastapi_config.DATA_LAKE_URL,
-    future=True,
-    **get_db_config(fastapi_config.dict())
-)
-warehouse_engine: SyncEngine = create_engine(
-    url=fastapi_config.DATA_WAREHOUSE_URL,
-    **get_db_config(fastapi_config.dict())
-)
-
-session_factory: scoped_session = scoped_session(
-    sessionmaker(
-        autocommit=False,
-        autoflush=False,
-        bind={
-            datalake_base: datalake_engine,
-            warehouse_base: warehouse_engine
-        },
-        class_=Session,
-        future=True
-    ),
-    scopefunc=SessionContextManager.get_context,
-)
-db: SyncDatabase = SyncDatabase(
-    engine_list=[datalake_engine, warehouse_engine],
-    session_factory=session_factory,
-    mapper_list=[datalake_base, warehouse_base]
-)
-
-** 추가로 변경해야 할 부분
-    task_queue.py -> startup, shutdown event function await 제거
-"""
+"""AsyncDatabase를 사용해야 하는 경우
 datalake_engine: AsyncEngine = create_async_engine(
     url=fastapi_config.DATA_LAKE_URL, **get_db_config(fastapi_config.dict())
 )
@@ -72,13 +35,42 @@ warehouse_engine: AsyncEngine = create_async_engine(
 session_factory: async_scoped_session = async_scoped_session(
     sessionmaker(
         autocommit=False,
-        autoflush=False,
+        autoflush=True,
         binds={datalake_base: datalake_engine, warehouse_base: warehouse_engine},
         class_=AsyncSession,
     ),
     scopefunc=SessionContextManager.get_context,
 )
 db: AsyncDatabase = AsyncDatabase(
+    engine_list=[datalake_engine, warehouse_engine],
+    session_factory=session_factory,
+    mapper_list=[datalake_base, warehouse_base],
+)
+
+"""
+
+datalake_engine: SyncEngine = create_engine(
+    url=fastapi_config.DATA_LAKE_URL,
+    future=True,
+    **get_db_config(fastapi_config.dict())
+)
+warehouse_engine: SyncEngine = create_engine(
+    url=fastapi_config.DATA_WAREHOUSE_URL,
+    future=True,
+    **get_db_config(fastapi_config.dict())
+)
+
+session_factory: scoped_session = scoped_session(
+    sessionmaker(
+        autocommit=False,
+        autoflush=True,
+        binds={datalake_base: datalake_engine, warehouse_base: warehouse_engine},
+        class_=Session,
+        future=True,
+    ),
+    scopefunc=SessionContextManager.get_context,
+)
+db: SyncDatabase = SyncDatabase(
     engine_list=[datalake_engine, warehouse_engine],
     session_factory=session_factory,
     mapper_list=[datalake_base, warehouse_base],

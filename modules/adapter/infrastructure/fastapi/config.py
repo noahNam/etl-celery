@@ -44,11 +44,11 @@ class LocalConfig(Config):
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or "***REMOVED***"
     DATA_LAKE_URL: str = os.getenv(
         "DEV_DATA_LAKE_URL",
-        "mysql+aiomysql://apartalk_admin:***REMOVED***@localhost:3306/apartalk_data_lake",
+        "mysql+pymysql://apartalk_admin:***REMOVED***@localhost:3306/apartalk_data_lake",
     )
     DATA_WAREHOUSE_URL: str = os.getenv(
         "DEV_WAREHOUSE_URL",
-        "mysql+aiomysql://apartalk_admin:***REMOVED***@localhost:3306/apartalk_data_warehouse",
+        "mysql+pymysql://apartalk_admin:***REMOVED***@localhost:3306/apartalk_data_warehouse",
     )
 
 

@@ -13,15 +13,19 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_l
 
 class KaptRepository(ABC):
     @abstractmethod
-    async def find_by_id(self, house_id: int) -> KaptOpenApiInputEntity | None:
+    def find_by_id(self, house_id: int) -> KaptOpenApiInputEntity | None:
         pass
 
     @abstractmethod
-    async def find_all(self) -> list[KaptOpenApiInputEntity]:
+    def find_all(self) -> list[KaptOpenApiInputEntity]:
         pass
 
     @abstractmethod
-    async def save(
+    def save(self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None) -> None:
+        pass
+
+    @abstractmethod
+    def exists_by_kapt_code(
         self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None
-    ) -> None:
+    ) -> bool:
         pass

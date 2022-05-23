@@ -1,11 +1,13 @@
 import os
-from typing import Generator, AsyncGenerator, List
+from typing import Generator, AsyncGenerator
+from uuid import uuid4
 
 import pytest
 import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from httpx import AsyncClient
+from sqlalchemy.engine import Transaction
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_scoped_session,
@@ -13,13 +15,21 @@ from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncConnection,
 )
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.future import (
+    Engine as SyncEngine,
+    create_engine,
+    Connection as SyncConnection,
+)
+from sqlalchemy.orm import sessionmaker, scoped_session, Session
 from starlette.testclient import TestClient
 from uvloop import new_event_loop
 
 from modules.adapter.infrastructure.fastapi.app import create_app
 from modules.adapter.infrastructure.fastapi.config import TestConfig
-from modules.adapter.infrastructure.sqlalchemy.connection import AsyncDatabase
+from modules.adapter.infrastructure.sqlalchemy.connection import (
+    AsyncDatabase,
+    SyncDatabase,
+)
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
 from modules.adapter.infrastructure.sqlalchemy.database import get_db_config, db
 from modules.adapter.infrastructure.sqlalchemy.mapper import (
@@ -107,7 +117,7 @@ async def async_db(async_config):
         )
     else:
         # local async db, not memory db
-        _db = db
+        _db: AsyncDatabase = db
 
     yield _db
 
@@ -116,15 +126,18 @@ async def async_db(async_config):
 
 
 @pytest_asyncio.fixture
-async def async_session(async_db) -> AsyncGenerator:
+async def async_session(async_db, async_config):
     # Start Connection
-    connections: List[AsyncConnection] = await async_db.get_connection_list()
+    connections: list[AsyncConnection] = await async_db.get_connection_list()
 
-    for connection, engine, mapper in zip(
-        connections, async_db.engines, async_db.mappers
+    if is_sqlite_used(async_config.get("DATA_LAKE_URL")) or is_sqlite_used(
+        async_config.get("DATA_WAREHOUSE_URL")
     ):
-        await connection.run_sync(mapper.metadata.drop_all)
-        await connection.run_sync(mapper.metadata.create_all)
+        for connection, engine, mapper in zip(
+            connections, async_db.engines, async_db.mappers
+        ):
+            await connection.run_sync(mapper.metadata.drop_all)
+            await connection.run_sync(mapper.metadata.create_all)
 
     try:
         # session context manager 시작
@@ -152,3 +165,75 @@ def _is_local_db_used(database_url: str):
     if ":memory:" not in database_url:
         if os.path.exists(database_url.split("sqlite:///")[-1]):  # :memory:
             os.unlink(database_url.split("sqlite:///")[-1])
+
+
+@pytest.fixture(scope="session")
+def sync_db(sync_config):
+    _is_local_db_used(database_url=sync_config.get("DATA_LAKE_URL"))
+    _is_local_db_used(database_url=sync_config.get("DATA_WAREHOUSE_URL"))
+
+    if is_sqlite_used(sync_config.get("DATA_LAKE_URL")) or is_sqlite_used(
+        sync_config.get("DATA_WAREHOUSE_URL")
+    ):
+
+        test_datalake_engine: SyncEngine = create_engine(
+            url="sqlite:///:memory:", future=True, **get_db_config(sync_config)
+        )
+        test_warehouse_engine: SyncEngine = create_engine(
+            url="sqlite:///:memory:", future=True, **get_db_config(sync_config)
+        )
+        test_session_factory = scoped_session(
+            sessionmaker(
+                autocommit=False,
+                autoflush=True,
+                binds={
+                    datalake_base: test_datalake_engine,
+                    warehouse_base: test_warehouse_engine,
+                },
+                class_=Session,
+                future=True,
+            ),
+            scopefunc=SessionContextManager.get_context,
+        )
+        _db: SyncDatabase = SyncDatabase(
+            engine_list=[test_datalake_engine, test_warehouse_engine],
+            session_factory=test_session_factory,
+            mapper_list=[datalake_base, warehouse_base],
+        )
+    else:
+        # local sync db, not memory db
+        _db: SyncDatabase = db
+
+    yield _db
+
+    # tear_down
+    _db.disconnect()
+
+
+@pytest.fixture
+def sync_session(sync_db, sync_config):
+    # Start Connection
+    connections: list[SyncConnection] = sync_db.get_connection_list()
+
+    if is_sqlite_used(sync_config.get("DATA_LAKE_URL")) or is_sqlite_used(
+        sync_config.get("DATA_WAREHOUSE_URL")
+    ):
+        for connection, engine, mapper in zip(
+            connections, sync_db.engines, sync_db.mappers
+        ):
+            mapper.metadata.drop_all(connection)
+            mapper.metadata.create_all(connection)
+
+    sync_session_factory = sync_db.session_factory
+
+    # middleware session 처리
+    session_id = str(uuid4())
+    SessionContextManager.set_context_value(session_id)
+
+    yield sync_session_factory
+
+    for connection in connections:
+        connection.rollback()
+        connection.close()
+
+    sync_session_factory.remove()

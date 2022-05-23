@@ -1,14 +1,15 @@
-from contextlib import asynccontextmanager
-from typing import Callable, AsyncContextManager, List, Type
+from contextlib import asynccontextmanager, contextmanager
+from typing import Callable, AsyncContextManager, Type, ContextManager
 
+from sqlalchemy.engine import Transaction
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     async_scoped_session,
     AsyncConnection,
     AsyncSession,
 )
-from sqlalchemy.future import Engine as SyncEngine
-from sqlalchemy.orm import DeclarativeMeta, scoped_session
+from sqlalchemy.future import Engine as SyncEngine, Connection as SyncConnection
+from sqlalchemy.orm import DeclarativeMeta, scoped_session, Session
 
 from exceptions.base import (
     NotFoundEngineErrorException,
@@ -23,16 +24,16 @@ logger = logger_.getLogger(__name__)
 class AsyncDatabase:
     def __init__(
         self,
-        engine_list: List[AsyncEngine | None],
+        engine_list: list[AsyncEngine | None],
         session_factory: async_scoped_session,
-        mapper_list: List[Type[DeclarativeMeta]],
+        mapper_list: list[Type[DeclarativeMeta]],
     ):
-        self._engines: List[AsyncEngine | None] = engine_list
+        self._engines: list[AsyncEngine | None] = engine_list
         self._session_factory: async_scoped_session | None = session_factory
-        self._mappers: List[Type[DeclarativeMeta]] = mapper_list
+        self._mappers: list[Type[DeclarativeMeta]] = mapper_list
 
     @property
-    def engines(self) -> List[AsyncEngine | None]:
+    def engines(self) -> list[AsyncEngine | None]:
         if not self._engines:
             raise NotFoundEngineErrorException
         return self._engines
@@ -46,7 +47,7 @@ class AsyncDatabase:
         return self._session_factory
 
     @property
-    def mappers(self) -> List[Type[DeclarativeMeta]]:
+    def mappers(self) -> list[Type[DeclarativeMeta]]:
         if not self._mappers:
             raise NotFoundMapperErrorException
         return self._mappers
@@ -67,7 +68,7 @@ class AsyncDatabase:
             await engine.dispose()
         logger.info("Database is disconnected")
 
-    async def get_connection_list(self) -> List[AsyncConnection]:
+    async def get_connection_list(self) -> list[AsyncConnection]:
         connection_list = list()
         for engine in self._engines:
             connection_list.append(await engine.connect())
@@ -88,16 +89,16 @@ class AsyncDatabase:
 class SyncDatabase:
     def __init__(
         self,
-        engine_list: List[SyncEngine | None],
+        engine_list: list[SyncEngine | None],
         session_factory: scoped_session,
-        mapper_list: List[Type[DeclarativeMeta]],
+        mapper_list: list[Type[DeclarativeMeta]],
     ):
-        self._engines: List[SyncEngine | None] = engine_list
+        self._engines: list[SyncEngine | None] = engine_list
         self._session_factory: scoped_session | None = session_factory
-        self._mappers: List[Type[DeclarativeMeta]] = mapper_list
+        self._mappers: list[Type[DeclarativeMeta]] = mapper_list
 
     @property
-    def engines(self) -> List[SyncEngine | None]:
+    def engines(self) -> list[SyncEngine | None]:
         if not self._engines:
             raise NotFoundEngineErrorException
         return self._engines
@@ -111,7 +112,7 @@ class SyncDatabase:
         return self._session_factory
 
     @property
-    def mappers(self) -> List[Type[DeclarativeMeta]]:
+    def mappers(self) -> list[Type[DeclarativeMeta]]:
         if not self._mappers:
             raise NotFoundMapperErrorException
         return self._mappers
@@ -126,6 +127,29 @@ class SyncDatabase:
             with engine.begin():
                 mapper.metadata.create_all(engine)
 
+    def get_connection_list(self) -> list[SyncConnection]:
+        connection_list = list()
+        for engine in self._engines:
+            connection_list.append(engine.connect())
+        return connection_list
+
+    def get_transaction_list(self) -> list[Transaction]:
+        transaction_list = list()
+        for engine in self._engines:
+            transaction_list.append(engine.connect().get_transaction())
+        return transaction_list
+
     def disconnect(self) -> None:
         for engine in self._engines:
             engine.dispose()
+
+    @contextmanager
+    def session(self) -> Callable[..., ContextManager[Session]]:
+        session: Session = self._session_factory()
+        try:
+            yield session
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
