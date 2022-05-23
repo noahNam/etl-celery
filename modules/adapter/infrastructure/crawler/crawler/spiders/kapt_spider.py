@@ -39,7 +39,7 @@ class KaptSpider(Spider):
                 errback=self.error_callback_kapt_detail_info,
             )
 
-    def parse_kapt_base_info(self, response, **kwargs):
+    def parse_kapt_base_info(self, response):
         xml_to_dict = parse(response.text)
         item: KaptAreaInfoItem = KaptAreaInfoItem(
             kapt_code=xml_to_dict["response"]["body"]["item"].get("kaptCode"),
@@ -59,7 +59,7 @@ class KaptSpider(Spider):
         )
         yield item
 
-    def parse_kapt_detail_info(self, response, **kwargs):
+    def parse_kapt_detail_info(self, response):
         xml_to_dict = parse(response.text)
         item: KaptLocationInfoItem = KaptLocationInfoItem(
             kapt_code=xml_to_dict["response"]["body"]["item"].get("kaptCode"),
@@ -78,10 +78,10 @@ class KaptSpider(Spider):
 
         yield item
 
-    def error_callback_kapt_base_info(self, response, **kwargs):
+    def error_callback_kapt_base_info(self, response):
         print("base info error callback")
         print(f"-->{response}")
 
-    def error_callback_kapt_detail_info(self, response, **kwargs):
+    def error_callback_kapt_detail_info(self, response):
         print("detail info error callback")
         print(f"-->{response}")

@@ -1,6 +1,6 @@
 from typing import Callable, AsyncContextManager, ContextManager
 
-from sqlalchemy import exc, exists
+from sqlalchemy import exc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
