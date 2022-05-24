@@ -46,19 +46,9 @@ class KaptOpenApiUseCase(BaseKaptUseCase):
         self.setup()
 
     def setup(self):
-
-        test_item_1 = self._repo.find_by_id(house_id=1)
-        test_item_2 = self._repo.find_by_id(house_id=2)
-        test_item_3 = self._repo.find_by_id(house_id=3)
-
-        # self._spider_input_params: list[
-        #     KaptOpenApiInputEntity
-        # ] = await self._repo.find_all()
-        self._spider_input_params: list[KaptOpenApiInputEntity] = [
-            test_item_1,
-            test_item_2,
-            test_item_3,
-        ]
+        self._spider_input_params: list[
+            KaptOpenApiInputEntity
+        ] = self._repo.find_all()
 
     def run_crawling(self):
         process = CrawlerProcess(settings=self._scrapy_settings)
