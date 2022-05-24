@@ -80,12 +80,12 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
 
     def find_all(self) -> list[KaptOpenApiInputEntity]:
         with self.session_factory() as session:
-            queryset = session.execute(select(KaptBasicInfoModel))
+            queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
 
         if not queryset:
             return list()
 
-        return [query.to_open_api_input_entity() for query in queryset.scalars().all()]
+        return [query.to_open_api_input_entity() for query in queryset]
 
     def save(self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None) -> None:
         if not kapt_orm:

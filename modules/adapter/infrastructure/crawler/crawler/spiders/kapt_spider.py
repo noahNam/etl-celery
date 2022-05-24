@@ -34,13 +34,18 @@ class KaptSpider(Spider):
         ]
 
         for param in self.params:
-
             yield Request(
                 url=urls[0]
                 + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
                 callback=self.parse_kapt_base_info,
                 errback=self.error_callback_kapt_base_info,
-                cb_kwargs={
+                # cb_kwargs={
+                #     "house_id": param.house_id,
+                #     "kapt_code": param.kapt_code,
+                #     "url": urls[0]
+                #     + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
+                # },
+                meta={
                     "house_id": param.house_id,
                     "kapt_code": param.kapt_code,
                     "url": urls[0]
@@ -53,7 +58,13 @@ class KaptSpider(Spider):
                 + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
                 callback=self.parse_kapt_detail_info,
                 errback=self.error_callback_kapt_detail_info,
-                cb_kwargs={
+                # cb_kwargs={
+                #     "house_id": param.house_id,
+                #     "kapt_code": param.kapt_code,
+                #     "url": urls[1]
+                #     + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
+                # },
+                meta={
                     "house_id": param.house_id,
                     "kapt_code": param.kapt_code,
                     "url": urls[1]
@@ -120,9 +131,9 @@ class KaptSpider(Spider):
             KaptSpider.open_api_service_key = KaptEnum.SERVICE_KEY_2.value
 
     def error_callback_kapt_base_info(self, failure):
-        current_house_id = failure.request.cb_kwargs["house_id"]
-        current_kapt_code = failure.request.cb_kwargs["kapt_code"]
-        current_url = failure.request.cb_kwargs["url"]
+        current_house_id = failure.request.meta["house_id"]
+        current_kapt_code = failure.request.meta["kapt_code"]
+        current_url = failure.request.meta["url"]
 
         fail_orm = CallFailureHistoryModel(
             ref_id=current_house_id,
@@ -133,9 +144,9 @@ class KaptSpider(Spider):
         self.__save_crawling_failure(fail_orm=fail_orm)
 
     def error_callback_kapt_detail_info(self, failure):
-        current_house_id = failure.request.cb_kwargs["house_id"]
-        current_kapt_code = failure.request.cb_kwargs["kapt_code"]
-        current_url = failure.request.cb_kwargs["url"]
+        current_house_id = failure.request.meta["house_id"]
+        current_kapt_code = failure.request.meta["kapt_code"]
+        current_url = failure.request.meta["url"]
 
         fail_orm = CallFailureHistoryModel(
             ref_id=current_house_id,
