@@ -21,7 +21,7 @@ class CallFailureHistoryModel(datalake_base, TimestampMixin):
     )
     ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
     ref_table = Column(String(20), nullable=True)
-    reason = Column(LONGTEXT)
+    reason = Column(String().with_variant(LONGTEXT, "mysql"), nullable=True)
     is_solved = Column(Boolean, default=False)
 
     def to_entity(self) -> CallFailureHistoryEntity:
@@ -31,4 +31,6 @@ class CallFailureHistoryModel(datalake_base, TimestampMixin):
             ref_table=self.ref_table,
             reason=self.reason,
             is_solved=self.is_solved,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
         )

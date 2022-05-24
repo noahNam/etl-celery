@@ -6,6 +6,13 @@ from modules.adapter.infrastructure.crawler.crawler.items import (
     KaptLocationInfoItem,
     KaptAreaInfoItem,
 )
+from modules.adapter.infrastructure.pypubsub.enum.call_failure_history_enum import (
+    CallFailureTopicEnum,
+)
+from modules.adapter.infrastructure.pypubsub.event_observer import send_message
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.call_failure_history_model import (
+    CallFailureHistoryModel,
+)
 
 
 class KaptSpider(Spider):
@@ -17,7 +24,6 @@ class KaptSpider(Spider):
     }
     open_api_service_key = KaptEnum.SERVICE_KEY_1.value
     request_count = 0
-    change_flag = True
 
     def start_requests(self):
         """self.params : list[KaptOpenApiInputEntity] from KaptOpenApiUseCase class"""
@@ -28,11 +34,18 @@ class KaptSpider(Spider):
         ]
 
         for param in self.params:
+
             yield Request(
                 url=urls[0]
                 + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
                 callback=self.parse_kapt_base_info,
                 errback=self.error_callback_kapt_base_info,
+                cb_kwargs={
+                    "house_id": param.house_id,
+                    "kapt_code": param.kapt_code,
+                    "url": urls[0]
+                    + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
+                },
             )
 
             yield Request(
@@ -40,6 +53,12 @@ class KaptSpider(Spider):
                 + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
                 callback=self.parse_kapt_detail_info,
                 errback=self.error_callback_kapt_detail_info,
+                cb_kwargs={
+                    "house_id": param.house_id,
+                    "kapt_code": param.kapt_code,
+                    "url": urls[1]
+                    + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
+                },
             )
 
     def parse_kapt_base_info(self, response):
@@ -61,9 +80,7 @@ class KaptSpider(Spider):
             bjd_code=xml_to_dict["response"]["body"]["item"].get("bjdCode"),
         )
 
-        if (
-            KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value
-        ):
+        if KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value:
             self.change_service_key()
             KaptSpider.request_count = 0
         else:
@@ -88,9 +105,7 @@ class KaptSpider(Spider):
             ),
         )
 
-        if (
-            KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value
-        ):
+        if KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value:
             self.change_service_key()
             KaptSpider.request_count = 0
         else:
@@ -104,10 +119,34 @@ class KaptSpider(Spider):
         else:
             KaptSpider.open_api_service_key = KaptEnum.SERVICE_KEY_2.value
 
-    def error_callback_kapt_base_info(self, response):
-        print("base info error callback")
-        print(f"-->{response}")
+    def error_callback_kapt_base_info(self, failure):
+        current_house_id = failure.request.cb_kwargs["house_id"]
+        current_kapt_code = failure.request.cb_kwargs["kapt_code"]
+        current_url = failure.request.cb_kwargs["url"]
 
-    def error_callback_kapt_detail_info(self, response):
-        print("detail info error callback")
-        print(f"-->{response}")
+        fail_orm = CallFailureHistoryModel(
+            ref_id=current_house_id,
+            ref_table="kapt_area_infos",
+            reason=f"url: {current_url}, kapt_code: {current_kapt_code}",
+        )
+
+        self.__save_crawling_failure(fail_orm=fail_orm)
+
+    def error_callback_kapt_detail_info(self, failure):
+        current_house_id = failure.request.cb_kwargs["house_id"]
+        current_kapt_code = failure.request.cb_kwargs["kapt_code"]
+        current_url = failure.request.cb_kwargs["url"]
+
+        fail_orm = CallFailureHistoryModel(
+            ref_id=current_house_id,
+            ref_table="kapt_location_infos",
+            reason=f"url: {current_url}, kapt_code: {current_kapt_code}",
+        )
+
+        self.__save_crawling_failure(fail_orm=fail_orm)
+
+    def __save_crawling_failure(self, fail_orm) -> None:
+        send_message(
+            topic_name=CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value,
+            fail_orm=fail_orm,
+        )
