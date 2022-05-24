@@ -39,12 +39,6 @@ class KaptSpider(Spider):
                 + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
                 callback=self.parse_kapt_base_info,
                 errback=self.error_callback_kapt_base_info,
-                # cb_kwargs={
-                #     "house_id": param.house_id,
-                #     "kapt_code": param.kapt_code,
-                #     "url": urls[0]
-                #     + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
-                # },
                 meta={
                     "house_id": param.house_id,
                     "kapt_code": param.kapt_code,
@@ -58,12 +52,6 @@ class KaptSpider(Spider):
                 + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
                 callback=self.parse_kapt_detail_info,
                 errback=self.error_callback_kapt_detail_info,
-                # cb_kwargs={
-                #     "house_id": param.house_id,
-                #     "kapt_code": param.kapt_code,
-                #     "url": urls[1]
-                #     + f"?kaptCode={param.kapt_code}&ServiceKey={KaptSpider.open_api_service_key}",
-                # },
                 meta={
                     "house_id": param.house_id,
                     "kapt_code": param.kapt_code,
