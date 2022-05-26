@@ -1,3 +1,6 @@
+from typing import Type
+
 from sqlalchemy.orm import declarative_base, DeclarativeMeta
 
-Base: DeclarativeMeta = declarative_base()
+datalake_base: Type[DeclarativeMeta] = declarative_base()
+warehouse_base: Type[DeclarativeMeta] = declarative_base()
