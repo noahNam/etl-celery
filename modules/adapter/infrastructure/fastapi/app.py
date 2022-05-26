@@ -29,12 +29,10 @@ app = create_app()
 
 
 @app.on_event("startup")
-async def init_db():
-    await db.create_all()
-    logger.info("Database is ready")
+async def init_infrastructure():
+    db.create_all()
 
 
 @app.on_event("shutdown")
 async def tear_down_db():
-    await db.disconnect()
-    logger.info("Database is disconnected")
+    db.disconnect()
