@@ -30,6 +30,9 @@ class KaptBasicInfoEntity(BaseModel):
     general_manage_type: str | None
     general_people: int | None
     security_manage_type: str | None
+    security_people: int | None
+    security_company: str | None
+    cleaning_manage_type: str | None
     cleaning_people: int | None
     dispose_food: str | None
     disinfection_manage_type: str | None
