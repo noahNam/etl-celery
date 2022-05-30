@@ -8,12 +8,13 @@ from modules.adapter.infrastructure.sqlalchemy.context import SessionContextMana
 from modules.adapter.infrastructure.sqlalchemy.mapper import (
     datalake_base,
     warehouse_base,
+    datamart_base
 )
 
 
 def get_db_config(config: dict) -> dict:
     """SQLAlchemy 관련 parameter가 더 추가되는 경우 아래 db_config에 추가하여 사용"""
-    if not config.get("DATA_WAREHOUSE_URL") or not config.get("DATA_LAKE_URL"):
+    if not config.get("DATA_WAREHOUSE_URL") or not config.get("DATA_LAKE_URL") or not config.get("DATA_MART_URL"):
         raise InvalidConfigErrorException
 
     db_config = {
@@ -31,20 +32,23 @@ datalake_engine: AsyncEngine = create_async_engine(
 warehouse_engine: AsyncEngine = create_async_engine(
     url=fastapi_config.DATA_WAREHOUSE_URL, **get_db_config(fastapi_config.dict())
 )
+datamart_engine: AsyncEngine = create_async_engine(
+    url=fastapi_config.DATA_MART_URL, **get_db_config(fastapi_config.dict())
+)
 
 session_factory: async_scoped_session = async_scoped_session(
     sessionmaker(
         autocommit=False,
         autoflush=True,
-        binds={datalake_base: datalake_engine, warehouse_base: warehouse_engine},
+        binds={datalake_base: datalake_engine, warehouse_base: warehouse_engine, datamart_base: datamart_engine},
         class_=AsyncSession,
     ),
     scopefunc=SessionContextManager.get_context,
 )
 db: AsyncDatabase = AsyncDatabase(
-    engine_list=[datalake_engine, warehouse_engine],
+    engine_list=[datalake_engine, warehouse_engine, datamart_engine],
     session_factory=session_factory,
-    mapper_list=[datalake_base, warehouse_base],
+    mapper_list=[datalake_base, warehouse_base, datamart_base],
 )
 
 """
@@ -59,19 +63,24 @@ warehouse_engine: SyncEngine = create_engine(
     future=True,
     **get_db_config(fastapi_config.dict())
 )
+datamart_engine: SyncEngine = create_engine(
+    url=fastapi_config.DATA_MART_URL,
+    future=True,
+    **get_db_config(fastapi_config.dict())
+)
 
 session_factory: scoped_session = scoped_session(
     sessionmaker(
         autocommit=False,
         autoflush=True,
-        binds={datalake_base: datalake_engine, warehouse_base: warehouse_engine},
+        binds={datalake_base: datalake_engine, warehouse_base: warehouse_engine, datamart_base: datamart_engine},
         class_=Session,
         future=True,
     ),
     scopefunc=SessionContextManager.get_context,
 )
 db: SyncDatabase = SyncDatabase(
-    engine_list=[datalake_engine, warehouse_engine],
+    engine_list=[datalake_engine, warehouse_engine, datamart_engine],
     session_factory=session_factory,
-    mapper_list=[datalake_base, warehouse_base],
+    mapper_list=[datalake_base, warehouse_base, datamart_base],
 )

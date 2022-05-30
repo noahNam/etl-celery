@@ -18,6 +18,7 @@ class Config(BaseSettings):
     # Sqlalchemy
     DATA_WAREHOUSE_URL: str = "sqlite+aiosqlite:///:memory:"
     DATA_LAKE_URL: str = "sqlite+aiosqlite:///:memory:"
+    DATA_MART_URL: str = "sqlite+aiosqlite:///:memory:"
     DB_ECHO: bool = True
     DB_PRE_PING: bool = True
 
@@ -47,10 +48,13 @@ class LocalConfig(Config):
         "mysql+pymysql://apartalk_admin:!wjstngks117@localhost:3306/apartalk_data_lake",
     )
     DATA_WAREHOUSE_URL: str = os.getenv(
-        "DEV_WAREHOUSE_URL",
+        "DEV_DATA_WAREHOUSE_URL",
         "mysql+pymysql://apartalk_admin:!wjstngks117@localhost:3306/apartalk_data_warehouse",
     )
-
+    DATA_MART_URL: str = os.getenv(
+        "DEV_DATA_MART_URL",
+        "mysql+pymysql://apartalk_admin:!wjstngks117@localhost:3306/apartalk_data_mart",
+    )
 
 class TestConfig(Config):
     ENV: str = "testing"
@@ -63,6 +67,9 @@ class DevelopmentConfig(Config):
     DATA_LAKE_URL: str = os.getenv("DEV_DATA_LAKE_URL", "sqlite+aiosqlite:///:memory:")
     DATA_WAREHOUSE_URL: str = os.getenv(
         "DEV_DATA_WAREHOUSE_URL", "sqlite+aiosqlite:///:memory:"
+    )
+    DATA_MART_URL: str = os.getenv(
+        "DEV_DATA_MART_URL", "sqlite+aiosqlite:///:memory:"
     )
 
     RELOAD: bool = True
@@ -78,6 +85,7 @@ class ProductionConfig(Config):
     # Sqlalchemy
     DATA_LAKE_URL: str | None = os.getenv("PROD_DATA_LAKE_URL")
     DATA_WAREHOUSE_URL: str | None = os.getenv("PROD_DATA_WAREHOUSE_URL")
+    DATA_MART_URL: str | None = os.getenv("PROD_DATA_MART_URL")
 
     # Sentry
     SENTRY_ENVIRONMENT: str = "production"
