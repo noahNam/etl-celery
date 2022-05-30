@@ -9,9 +9,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class GovtBldTopInfoModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_bld_top_infos"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
-    house_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
-    mgm_bldrgst_pk = Column(String(33), nullable=True)
+    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True)
+    house_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True)
+    mgm_bldrgst_pk = Column(String(33), nullable=False, index=True, unique=True)
     itg_bld_grade = Column(String(1), nullable=True)
     itg_bld_cert = Column(Numeric(5), nullable=True)
     crtn_day = Column(String(8), nullable=True)
@@ -58,8 +58,8 @@ class GovtBldTopInfoModel(datalake_base, TimestampMixin):
     gn_bld_cert = Column(Numeric(5), nullable=True)
     rnum = Column(Numeric(8), nullable=True)
     plat_plc = Column(String(200), nullable=True)
-    sigungu_cd = Column(String(5), nullable=True)
-    bjdong_cd = Column(String(5), nullable=True)
+    sigungu_cd = Column(String(5), nullable=True, index=True)
+    bjdong_cd = Column(String(5), nullable=True, index=True)
     plat_gb_cd = Column(String(1), nullable=True)
     bun = Column(String(4), nullable=True)
     ji = Column(String(4), nullable=True)
