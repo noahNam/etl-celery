@@ -9,8 +9,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class SubscriptionInfoModel(datalake_base, TimestampMixin):
     __tablename__ = "subscription_infos"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True)
-    subs_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True)
+    id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+    )
+    subs_id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
+    )
     offer_date = Column(String(10), nullable=True)
     notice_winner_date = Column(String(10), nullable=True)
     name = Column(String(100), nullable=True)

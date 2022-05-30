@@ -18,8 +18,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class SubscriptionManualInfoModel(datalake_base, TimestampMixin):
     __tablename__ = "subscription_manual_infos"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True)
-    subs_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True)
+    id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+    )
+    subs_id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
+    )
     heat_type = Column(String(10), nullable=True)
     vl_rat = Column(Numeric(19, 9), nullable=True)
     bc_rat = Column(Numeric(19, 9), nullable=True)

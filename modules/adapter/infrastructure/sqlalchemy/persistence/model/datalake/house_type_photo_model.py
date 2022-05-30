@@ -15,8 +15,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class HouseTypePhotoModel(datalake_base, TimestampMixin):
     __tablename__ = "house_type_photos"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True)
-    house_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True)
+    id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+    )
+    house_id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
+    )
     type_name = Column(String(20), nullable=True)
     file_name = Column(String(20), nullable=True)
     path = Column(String(150), nullable=True)
