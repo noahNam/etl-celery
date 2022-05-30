@@ -15,8 +15,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class PublicSaleDetailPhotoModel(datalake_base, TimestampMixin):
     __tablename__ = "public_sale_detail_photos"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True)
-    subs_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True)
+    id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+    )
+    subs_id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
+    )
     area_type = Column(String(10), nullable=True)
     file_name = Column(String(20), nullable=True)
     path = Column(String(150), nullable=True)

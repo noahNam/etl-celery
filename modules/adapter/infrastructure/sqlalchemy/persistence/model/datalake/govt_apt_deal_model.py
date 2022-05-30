@@ -9,7 +9,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class GovtAptDealModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_apt_deals"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True)
+    id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+    )
     deal_amount = Column(Integer, nullable=True)
     build_year = Column(String(4), nullable=True)
     deal_year = Column(String(4), nullable=True)

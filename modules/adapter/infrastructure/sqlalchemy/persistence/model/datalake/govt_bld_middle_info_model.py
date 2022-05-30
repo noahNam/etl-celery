@@ -9,8 +9,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class GovtBldMiddleInfoModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_bld_middle_infos"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True)
-    house_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True)
+    id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+    )
+    house_id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
+    )
     mgm_bldrgst_pk = Column(String(33), nullable=True, index=True, unique=True)
     main_purps_cd_nm = Column(String(100), nullable=True)
     etc_purps = Column(String(500), nullable=True)

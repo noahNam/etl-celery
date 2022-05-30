@@ -3,7 +3,8 @@ from sqlalchemy import (
     String,
     BigInteger,
     Integer,
-    Boolean, SmallInteger,
+    Boolean,
+    SmallInteger,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
@@ -15,8 +16,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class PublicSalePhotoModel(datalake_base, TimestampMixin):
     __tablename__ = "public_sale_photos"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True)
-    subs_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True)
+    id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+    )
+    subs_id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
+    )
     file_name = Column(String(20), nullable=True)
     path = Column(String(150), nullable=True)
     extension = Column(String(4), nullable=True)
