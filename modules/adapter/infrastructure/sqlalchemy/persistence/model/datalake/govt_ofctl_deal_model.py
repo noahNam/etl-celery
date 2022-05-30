@@ -9,7 +9,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class GovtOfctlDealModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_ofctl_deals"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
+    id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+    )
     deal_amount = Column(Integer, nullable=True)
     deal_year = Column(String(4), nullable=True)
     ofctl_name = Column(String(40), nullable=True)
@@ -19,7 +21,7 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
     deal_day = Column(String(6), nullable=True)
     exclusive_area = Column(String(20), nullable=True)
     jibun = Column(String(10), nullable=True)
-    regional_cd = Column(String(5), nullable=True)
+    regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
     cancel_deal_type = Column(String(1), nullable=True)
     cancel_deal_day = Column(String(8), nullable=True)

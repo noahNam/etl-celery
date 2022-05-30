@@ -9,9 +9,15 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class BldMappingResultModel(datalake_base, TimestampMixin):
     __tablename__ = "bld_mapping_results"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
-    place_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
-    house_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
-    regional_cd = Column(String(5), nullable=True)
+    id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+    )
+    place_id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
+    )
+    house_id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
+    )
+    regional_cd = Column(String(5), nullable=True, index=True)
     dong = Column(String(40), nullable=True)
     bld_name = Column(String(40), nullable=True)
