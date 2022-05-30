@@ -40,9 +40,3 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
     cancel_deal_day = Column(String(8), nullable=True)
     req_gbn = Column(String(10), nullable=True)
     rdealer_lawdnm = Column(String(150), nullable=True)
-
-    subway_line = Column(String(50), nullable=True)
-    subway_station = Column(String(50), nullable=True)
-    kaptd_wtimesub = Column(String(10), nullable=True)
-    convenient_facility = Column(String(500), nullable=True)
-    education_facility = Column(String(500), nullable=True)

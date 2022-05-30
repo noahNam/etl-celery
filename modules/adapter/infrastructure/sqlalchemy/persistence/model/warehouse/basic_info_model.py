@@ -1,16 +1,21 @@
-from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Numeric
-
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
-    KaptOpenApiInputEntity,
+from sqlalchemy import (
+    Column,
+    BigInteger,
+    Integer,
+    String,
+    SmallInteger,
+    Numeric,
+    Boolean,
 )
-from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
+
+from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
 )
 
 
-class KaptBasicInfoModel(datalake_base, TimestampMixin):
-    __tablename__ = "kapt_basic_infos"
+class BasicInfoModel(warehouse_base, TimestampMixin):
+    __tablename__ = "basic_infos"
 
     house_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), primary_key=True, nullable=False
@@ -21,7 +26,7 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     eubmyun = Column(String(4), nullable=True)
     dongri = Column(String(8), nullable=True)
     name = Column(String(32), nullable=True)
-    code_apt_nm = Column(String(16), nullable=True)
+    code_apt_nm = Column(String(16), nullable=True, index=True)
     origin_dong_address = Column(String(100), nullable=True)
     origin_road_address = Column(String(100), nullable=True)
     new_dong_address = Column(String(100), nullable=True)
@@ -72,8 +77,24 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     manage_office_contact = Column(String(16), nullable=True)
     manage_office_fax = Column(String(16), nullable=True)
     welfare = Column(String(200), nullable=True)
-
-    def to_open_api_input_entity(self) -> KaptOpenApiInputEntity:
-        return KaptOpenApiInputEntity(
-            house_id=self.house_id, kapt_code=self.kapt_code, name=self.name
-        )
+    x_vl = Column(Numeric(11, 7), nullable=True)
+    y_vl = Column(Numeric(11, 7), nullable=True)
+    road_number = Column(String(10), nullable=True)
+    road_name = Column(String(30), nullable=True)
+    land_number = Column(String(10), nullable=True)
+    sigungu_cd = Column(String(5), nullable=True, index=True)
+    bjdong_cd = Column(String(5), nullable=True, index=True)
+    bun = Column(String(4), nullable=True)
+    ji = Column(String(4), nullable=True)
+    bc_rat = Column(Numeric(19, 9), nullable=True)
+    vl_rat = Column(Numeric(19, 9), nullable=True)
+    priv_area = Column(String(22), nullable=True)
+    kaptd_wtimebus = Column(String(10), nullable=True)
+    subway_line = Column(String(50), nullable=True)
+    subway_station = Column(String(50), nullable=True)
+    kaptd_wtimesub = Column(String(10), nullable=True)
+    convenient_facility = Column(String(500), nullable=True)
+    education_facility = Column(String(500), nullable=True)
+    public_ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
+    rebuild_ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
+    is_available = Column(Boolean, nullable=True)
