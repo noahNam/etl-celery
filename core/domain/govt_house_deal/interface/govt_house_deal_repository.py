@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_mapping_result_model import (
+    BldMappingResultModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_deal_model import (
     GovtAptDealModel,
 )
@@ -25,6 +28,7 @@ class GovtHouseDealRepository(ABC):
         | GovtAptRentModel
         | GovtOfctlDealModel
         | GovtOfctlRentModel
-        | GovtRightLotOutModel,
+        | GovtRightLotOutModel
+        | BldMappingResultModel,
     ) -> None:
         pass
