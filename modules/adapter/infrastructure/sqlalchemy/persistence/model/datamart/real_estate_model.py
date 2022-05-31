@@ -26,4 +26,4 @@ class RealEstateModel(datamart_base, TimestampMixin):
     y_vl = Column(Numeric(11, 7), nullable=False)
     front_legal_code = Column(String(5), nullable=False, index=True)
     back_legal_code = Column(String(5), nullable=False, index=True)
-    is_available = Column(Boolean, nullable=False, default=True)
+    is_available = Column(Boolean, nullable=False)
