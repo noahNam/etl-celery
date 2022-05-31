@@ -19,7 +19,7 @@ class HouseTypePhotoModel(datamart_base, TimestampMixin):
     id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
     )
-    house_id = Column(BigInteger, ForeignKey(PrivateSaleModel.id), nullable=False, index=True)
+    private_sale_id = Column(BigInteger, ForeignKey(PrivateSaleModel.id), nullable=False, index=True)
     type_name = Column(String(20), nullable=True)
     file_name = Column(String(20), nullable=True)
     path = Column(String(150), nullable=True)
