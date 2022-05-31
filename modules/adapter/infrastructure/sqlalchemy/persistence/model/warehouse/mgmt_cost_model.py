@@ -13,7 +13,7 @@ class MgmtCostModel(warehouse_base, TimestampMixin):
     __tablename__ = "mgmt_costs"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), primary_key=True, nullable=False
+        BigInteger().with_variant(Integer, "sqlite"), primary_key=True, nullable=False, autoincrement=True
     )
     house_id = Column(
         BigInteger, ForeignKey(BasicInfoModel.house_id), nullable=False, index=True

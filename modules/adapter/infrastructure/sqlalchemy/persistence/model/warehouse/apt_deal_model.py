@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer, Float, Boolean
+from sqlalchemy import Column, String, BigInteger, Integer, Float, Boolean, Numeric
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -10,7 +10,7 @@ class AptDealModel(warehouse_base, TimestampMixin):
     __tablename__ = "apt_deals"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
     )
     house_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
@@ -22,8 +22,8 @@ class AptDealModel(warehouse_base, TimestampMixin):
     deal_month = Column(String(2), nullable=True)
     deal_day = Column(String(6), nullable=True)
     serial_no = Column(String(14), nullable=True)
-    private_area = Column(Float, nullable=True)
-    supply_area = Column(Float, nullable=True)
+    private_area = Column(Numeric(6, 2), nullable=True)
+    supply_area = Column(Numeric(6, 2), nullable=True)
     regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
     cancel_deal_type = Column(String(1), nullable=True)
