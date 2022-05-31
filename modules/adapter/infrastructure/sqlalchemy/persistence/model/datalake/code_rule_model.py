@@ -15,7 +15,7 @@ class CodeRuleModel(datalake_base, TimestampMixin):
     __tablename__ = "code_rules"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
     )
     key_div = Column(String(10), nullable=True, index=True)
     last_seq = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
