@@ -10,7 +10,7 @@ class GovtBldTopInfoModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_bld_top_infos"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
     )
     house_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
