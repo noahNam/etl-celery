@@ -10,7 +10,7 @@ class GovtRightLotOutModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_right_lot_outs"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
     )
     deal_amount = Column(Integer, nullable=True)
     classification_owner_ship = Column(String(2), nullable=True)

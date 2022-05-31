@@ -10,7 +10,7 @@ class RightLotOutModel(warehouse_base, TimestampMixin):
     __tablename__ = "right_lot_outs"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
     )
     house_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True

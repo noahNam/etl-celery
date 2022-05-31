@@ -16,7 +16,7 @@ class PublicSaleDetailPhotoModel(datalake_base, TimestampMixin):
     __tablename__ = "public_sale_detail_photos"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
+        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
     )
     subs_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
