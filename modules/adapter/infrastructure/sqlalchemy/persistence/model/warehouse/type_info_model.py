@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Integer, ForeignKey, Float
+from sqlalchemy import Column, BigInteger, Integer, ForeignKey, Float, Numeric
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -18,5 +18,5 @@ class TypeInfoModel(warehouse_base, TimestampMixin):
     dong_id = Column(
         BigInteger, ForeignKey(DongInfoModel.house_id), nullable=False, index=True
     )
-    private_area = Column(Float, nullable=True)
-    supply_area = Column(Float, nullable=True)
+    private_area = Column(Numeric(6, 2), nullable=True)
+    supply_area = Column(Numeric(6, 2), nullable=True)

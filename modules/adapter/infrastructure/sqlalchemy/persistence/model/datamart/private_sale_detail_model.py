@@ -14,8 +14,8 @@ class PrivateSaleDetailModel(datamart_base, TimestampMixin):
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
     )
     private_sale_id = Column(BigInteger, ForeignKey(PrivateSaleModel.id), nullable=False, index=True)
-    private_area = Column(Numeric(3, 2), nullable=True)
-    supply_area = Column(Numeric(3, 2), nullable=True)
+    private_area = Column(Numeric(6, 2), nullable=True)
+    supply_area = Column(Numeric(6, 2), nullable=True)
     contract_date = Column(String(8), nullable=True)
     contract_ym = Column(Numeric(6), nullable=True, index=True)
     deposit_price = Column(Integer, nullable=True)
