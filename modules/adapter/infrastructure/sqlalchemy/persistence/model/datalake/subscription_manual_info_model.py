@@ -6,7 +6,6 @@ from sqlalchemy import (
     Text,
     Float,
     Numeric,
-    SmallInteger,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
@@ -43,5 +42,5 @@ class SubscriptionManualInfoModel(datalake_base, TimestampMixin):
     direct_window = Column(String(1), nullable=True)
     alpha_room = Column(String(1), nullable=True)
     cyber_model_house_link = Column(Text, nullable=True)
-    supply_rate = Column(SmallInteger, nullable=True)
-    supply_rate_etc = Column(SmallInteger, nullable=True)
+    supply_rate = Column(Numeric(3), nullable=True)
+    supply_rate_etc = Column(Numeric(3), nullable=True)
