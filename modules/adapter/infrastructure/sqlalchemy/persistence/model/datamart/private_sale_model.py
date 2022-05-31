@@ -35,4 +35,6 @@ class PrivateSaleModel(datamart_base, TimestampMixin):
     avg_mgmt_cost = Column(SmallInteger, nullable=True)
     public_ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
     rebuild_ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
+    trade_status = Column(Numeric(1), nullable=True, default=0)
+    deposit_status = Column(Numeric(1), nullable=True, default=0)
     is_available = Column(Boolean, nullable=False)
