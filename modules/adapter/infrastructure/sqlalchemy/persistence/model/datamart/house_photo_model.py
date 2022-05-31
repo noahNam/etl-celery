@@ -26,4 +26,4 @@ class HousePhotoModel(datamart_base, TimestampMixin):
     extension = Column(String(4), nullable=True)
     is_thumbnail = Column(Boolean, nullable=True)
     seq = Column(SmallInteger, nullable=True)
-    is_available = Column(Boolean, nullable=False, default=True)
+    is_available = Column(Boolean, nullable=False)

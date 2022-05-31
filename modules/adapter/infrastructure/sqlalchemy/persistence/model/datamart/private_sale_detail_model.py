@@ -23,4 +23,4 @@ class PrivateSaleDetailModel(datamart_base, TimestampMixin):
     trade_price = Column(Integer, nullable=True, index=True)
     floor = Column(Numeric(3), nullable=True)
     trade_type =  Column(String(5), nullable=False)
-    is_available = Column(Boolean, nullable=False, default=True)
+    is_available = Column(Boolean, nullable=False)

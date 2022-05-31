@@ -24,4 +24,4 @@ class HouseTypePhotoModel(datamart_base, TimestampMixin):
     file_name = Column(String(20), nullable=True)
     path = Column(String(150), nullable=True)
     extension = Column(String(4), nullable=True)
-    is_available = Column(Boolean, nullable=False, default=True)
+    is_available = Column(Boolean, nullable=False)
