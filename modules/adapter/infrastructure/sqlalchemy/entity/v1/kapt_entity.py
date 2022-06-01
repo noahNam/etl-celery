@@ -96,3 +96,11 @@ class KaptLocationInfoEntity(BaseModel):
     education_facility: str | None
     created_at: datetime
     updated_at: datetime
+
+
+class KakaoApiInputEntity(BaseModel):
+    house_id: int
+    kapt_code: str | None
+    name: str | None
+    origin_dong_address: str | None
+    origin_road_address: str | None
