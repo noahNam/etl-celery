@@ -10,7 +10,10 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_apt_deals"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
+        BigInteger().with_variant(Integer, "sqlite"),
+        nullable=False,
+        primary_key=True,
+        autoincrement=True,
     )
     deal_amount = Column(Integer, nullable=True)
     build_year = Column(String(4), nullable=True)

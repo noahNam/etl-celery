@@ -56,6 +56,7 @@ class LocalConfig(Config):
         "mysql+pymysql://apartalk_admin:!wjstngks117@localhost:3306/apartalk_data_mart",
     )
 
+
 class TestConfig(Config):
     ENV: str = "testing"
     TESTING: bool = True
@@ -68,9 +69,7 @@ class DevelopmentConfig(Config):
     DATA_WAREHOUSE_URL: str = os.getenv(
         "DEV_DATA_WAREHOUSE_URL", "sqlite+aiosqlite:///:memory:"
     )
-    DATA_MART_URL: str = os.getenv(
-        "DEV_DATA_MART_URL", "sqlite+aiosqlite:///:memory:"
-    )
+    DATA_MART_URL: str = os.getenv("DEV_DATA_MART_URL", "sqlite+aiosqlite:///:memory:")
 
     RELOAD: bool = True
     SENTRY_ENVIRONMENT: str = "development"
