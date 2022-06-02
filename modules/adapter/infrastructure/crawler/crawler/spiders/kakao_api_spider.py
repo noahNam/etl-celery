@@ -1,5 +1,7 @@
 import json
+from http import HTTPStatus
 
+import requests
 from scrapy import Spider, Request
 
 from modules.adapter.infrastructure.crawler.crawler.enum.kakao_enum import KakaoApiEnum
@@ -27,7 +29,9 @@ class KakaoApiSpider(Spider):
 
         for param in self.params:
             yield Request(
-                url=url + param.origin_dong_address,
+                url=url + param.new_dong_address
+                if param.new_dong_address
+                else url + param.origin_dong_address,
                 headers={
                     "Authorization": f"KakaoAK {KakaoApiEnum.KAKAO_API_KEY.value}"
                 },
@@ -39,6 +43,8 @@ class KakaoApiSpider(Spider):
                     "name": param.name,
                     "origin_dong_address": param.origin_dong_address,
                     "origin_road_address": param.origin_road_address,
+                    "new_dong_address": param.new_dong_address,
+                    "new_road_address": param.new_road_address,
                     "url": url,
                 },
             )
@@ -52,14 +58,29 @@ class KakaoApiSpider(Spider):
                 "아파트" in result["category_name"]
                 and "아파트상가" not in result["category_name"]
             ):
-                item: KakaoPlaceInfoItem = KakaoPlaceInfoItem(
-                    x_vl=result["x"],
-                    y_vl=result["y"],
+                item: KakaoPlaceInfoItem | None = self.get_kakao_info_item(
+                    x=result["x"],
+                    y=result["y"],
                     jibun_address=result["address_name"],
                     road_address=result["road_address_name"],
-                    bld_name=result["place_name"],
+                    place_name=result["place_name"],
                 )
             break
+
+        # retry 2 times
+        if not item:
+            keywords: list[str] = [
+                response.request.meta["new_road_address"]
+                if response.request.meta.get("new_road_address")
+                else response.request.meta["origin_road_address"],
+                response.request.meta["name"],
+            ]
+
+            for keyword in keywords:
+                item = self.retry_kakao_infos(keyword=keyword)
+
+                if item:
+                    break
 
         if item:
             # yield item
@@ -78,6 +99,7 @@ class KakaoApiSpider(Spider):
                 )
 
         else:
+            # 못 찾았거나 잘못 찾은 경우
             self.save_failure_info(
                 current_house_id=response.request.meta["house_id"],
                 current_kapt_code=response.request.meta["kapt_code"],
@@ -96,6 +118,43 @@ class KakaoApiSpider(Spider):
             origin_road_address=failure.request.meta["origin_road_address"],
             current_url=failure.request.meta["url"],
         )
+
+    def get_kakao_info_item(
+        self, x: float, y: float, jibun_address: str, road_address: str, place_name: str
+    ) -> KakaoPlaceInfoItem | None:
+        if not x or not y or not jibun_address or not road_address or not place_name:
+            return None
+
+        return KakaoPlaceInfoItem(
+            x_vl=x,
+            y_vl=y,
+            jibun_address=jibun_address,
+            road_address=road_address,
+            bld_name=place_name,
+        )
+
+    def retry_kakao_infos(self, keyword: str | None) -> KakaoPlaceInfoItem | None:
+        response = requests.get(
+            url=KakaoApiEnum.KAKAO_PLACE_API_URL.value + keyword,
+            headers={"Authorization": f"KakaoAK {KakaoApiEnum.KAKAO_API_KEY.value}"},
+        )
+
+        if response.status_code == HTTPStatus.OK:
+            to_json = json.loads(response.text)
+            for result in to_json["documents"]:
+                if (
+                    "아파트" in result["category_name"]
+                    and "아파트상가" not in result["category_name"]
+                ):
+                    return self.get_kakao_info_item(
+                        x=result["x"],
+                        y=result["y"],
+                        jibun_address=result["address_name"],
+                        road_address=result["road_address_name"],
+                        place_name=result["place_name"],
+                    )
+
+        return None
 
     def save_failure_info(
         self,

@@ -104,3 +104,5 @@ class KakaoApiInputEntity(BaseModel):
     name: str | None
     origin_dong_address: str | None
     origin_road_address: str | None
+    new_dong_address: str | None
+    new_road_address: str | None
