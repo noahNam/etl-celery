@@ -1,15 +1,24 @@
+import json
+
 from scrapy import Spider, Request
 
 from modules.adapter.infrastructure.crawler.crawler.enum.kakao_enum import KakaoApiEnum
+from modules.adapter.infrastructure.crawler.crawler.items import KakaoPlaceInfoItem
+from modules.adapter.infrastructure.pypubsub.enum.call_failure_history_enum import (
+    CallFailureTopicEnum,
+)
+from modules.adapter.infrastructure.pypubsub.event_listener import event_listener_dict
+from modules.adapter.infrastructure.pypubsub.event_observer import send_message
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.call_failure_history_model import (
+    CallFailureHistoryModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kakao_api_result_model import (
+    KakaoApiResultModel,
+)
 
 
 class KakaoApiSpider(Spider):
     name = "kakao_place_infos"
-    custom_settings = {
-        "ITEM_PIPELINES": {
-            "modules.adapter.infrastructure.crawler.crawler.pipelines.KakaoApiPipeline": 300
-        },
-    }
 
     def start_requests(self):
         """self.params : list[KaptOpenApiInputEntity] from KaptOpenApiUseCase class"""
@@ -35,7 +44,97 @@ class KakaoApiSpider(Spider):
             )
 
     def parse(self, response, **kwargs):
-        print(response.text)
+        item: KakaoPlaceInfoItem | None = None
+        to_json = json.loads(response.text)
+
+        for result in to_json["documents"]:
+            if (
+                "아파트" in result["category_name"]
+                and "아파트상가" not in result["category_name"]
+            ):
+                item: KakaoPlaceInfoItem = KakaoPlaceInfoItem(
+                    x_vl=result["x"],
+                    y_vl=result["y"],
+                    jibun_address=result["address_name"],
+                    road_address=result["road_address_name"],
+                    bld_name=result["place_name"],
+                )
+            break
+
+        if item:
+            # yield item
+            new_model: KakaoApiResultModel = KakaoApiResultModel(
+                x_vl=item.x_vl,
+                y_vl=item.y_vl,
+                jibun_address=item.jibun_address,
+                road_address=item.road_address,
+                bld_name=item.bld_name,
+            )
+            pk = self.__save_kakao_infos(kakao_orm=new_model)
+
+            if pk:
+                self.update_kapt_place_id(
+                    house_id=response.request.meta["house_id"], place_id=pk
+                )
+
+        else:
+            self.save_failure_info(
+                current_house_id=response.request.meta["house_id"],
+                current_kapt_code=response.request.meta["kapt_code"],
+                current_bld_name=response.request.meta["name"],
+                origin_dong_address=response.request.meta["origin_dong_address"],
+                origin_road_address=response.request.meta["origin_road_address"],
+                current_url=response.request.meta["url"],
+            )
 
     def error_callback_kakao_info(self, failure):
-        print(failure)
+        self.save_failure_info(
+            current_house_id=failure.request.meta["house_id"],
+            current_kapt_code=failure.request.meta["kapt_code"],
+            current_bld_name=failure.request.meta["name"],
+            origin_dong_address=failure.request.meta["origin_dong_address"],
+            origin_road_address=failure.request.meta["origin_road_address"],
+            current_url=failure.request.meta["url"],
+        )
+
+    def save_failure_info(
+        self,
+        current_house_id,
+        current_kapt_code,
+        current_bld_name,
+        origin_dong_address,
+        origin_road_address,
+        current_url,
+    ) -> None:
+        fail_orm = CallFailureHistoryModel(
+            ref_id=current_house_id,
+            ref_table="kakao_api_results",
+            reason=f"url: {current_url}, "
+            f"kapt_code: {current_kapt_code}, "
+            f"current_bld_name: {current_bld_name}, "
+            f"origin_dong_address: {origin_dong_address}, "
+            f"origin_road_address: {origin_road_address}",
+        )
+
+        self.__save_crawling_failure(fail_orm=fail_orm)
+
+    def update_kapt_place_id(self, house_id: int, place_id: int):
+        self.repo.update_place_id(house_id=house_id, place_id=place_id)
+
+    def __save_crawling_failure(self, fail_orm) -> None:
+        send_message(
+            topic_name=CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value,
+            fail_orm=fail_orm,
+        )
+        event_listener_dict.get(
+            f"{CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value}", None
+        )
+
+    def __save_kakao_infos(self, kakao_orm: KakaoApiResultModel) -> int | None:
+        send_message(
+            topic_name=CallFailureTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value,
+            kakao_orm=kakao_orm,
+        )
+        return event_listener_dict.get(
+            f"{CallFailureTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value}"
+        )

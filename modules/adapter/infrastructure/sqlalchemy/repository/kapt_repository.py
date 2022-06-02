@@ -1,6 +1,6 @@
 from typing import Callable, AsyncContextManager, ContextManager
 
-from sqlalchemy import exc
+from sqlalchemy import exc, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
@@ -146,3 +146,14 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
         if result:
             return True
         return False
+
+    def update_place_id(self, house_id: int, place_id) -> None:
+        if not house_id or not place_id:
+            return None
+        with self.session_factory() as session:
+            session.execute(
+                update(KaptBasicInfoModel)
+                .where(KaptBasicInfoModel.house_id == house_id)
+                .values(place_id=place_id)
+            )
+        return None

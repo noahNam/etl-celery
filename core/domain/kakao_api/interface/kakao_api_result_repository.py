@@ -16,7 +16,3 @@ class KakaoApiRepository(ABC):
     @abstractmethod
     def save(self, kakao_orm: KakaoApiResultModel | None) -> None:
         pass
-
-    @abstractmethod
-    def exists_by_id(self, kakao_orm: KakaoApiResultModel | None) -> bool:
-        pass
