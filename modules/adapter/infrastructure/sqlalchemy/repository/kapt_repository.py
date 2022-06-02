@@ -147,7 +147,7 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
             return True
         return False
 
-    def update_place_id(self, house_id: int, place_id) -> None:
+    def update_place_id(self, house_id: int, place_id: int) -> None:
         if not house_id or not place_id:
             return None
         with self.session_factory() as session:
@@ -156,4 +156,5 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
                 .where(KaptBasicInfoModel.house_id == house_id)
                 .values(place_id=place_id)
             )
+            session.commit()
         return None
