@@ -10,7 +10,10 @@ class RealEstateModel(datamart_base, TimestampMixin):
     __tablename__ = "real_estates"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
+        BigInteger().with_variant(Integer, "sqlite"),
+        nullable=False,
+        primary_key=True,
+        autoincrement=True,
     )
     name = Column(String(50), nullable=True)
     jibun_address = Column(String(100), nullable=True)

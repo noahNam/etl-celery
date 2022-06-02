@@ -2,6 +2,7 @@ from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Numeri
 
 from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
     KaptOpenApiInputEntity,
+    KakaoApiInputEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -76,4 +77,15 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     def to_open_api_input_entity(self) -> KaptOpenApiInputEntity:
         return KaptOpenApiInputEntity(
             house_id=self.house_id, kapt_code=self.kapt_code, name=self.name
+        )
+
+    def to_kakao_api_input_entity(self) -> KakaoApiInputEntity:
+        return KakaoApiInputEntity(
+            house_id=self.house_id,
+            kapt_code=self.kapt_code,
+            name=self.name,
+            origin_dong_address=self.origin_dong_address,
+            origin_road_address=self.origin_road_address,
+            new_dong_address=self.new_dong_address,
+            new_road_address=self.new_road_address,
         )

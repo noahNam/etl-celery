@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
     KaptOpenApiInputEntity,
+    KakaoApiInputEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_area_info_model import (
     KaptAreaInfoModel,
@@ -13,19 +14,17 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_l
 
 class KaptRepository(ABC):
     @abstractmethod
-    def find_by_id(self, house_id: int) -> KaptOpenApiInputEntity | None:
+    def find_by_id(
+        self, house_id: int, find_type: int
+    ) -> KaptOpenApiInputEntity | KakaoApiInputEntity | None:
         pass
 
     @abstractmethod
-    def find_all(self) -> list[KaptOpenApiInputEntity]:
+    def find_all(
+        self, find_type: int
+    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity]:
         pass
 
     @abstractmethod
     def save(self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None) -> None:
-        pass
-
-    @abstractmethod
-    def exists_by_kapt_code(
-        self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None
-    ) -> bool:
         pass

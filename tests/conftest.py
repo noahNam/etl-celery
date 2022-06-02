@@ -35,7 +35,7 @@ from modules.adapter.infrastructure.sqlalchemy.database import get_db_config, db
 from modules.adapter.infrastructure.sqlalchemy.mapper import (
     datalake_base,
     warehouse_base,
-    datamart_base
+    datamart_base,
 )
 
 
@@ -90,9 +90,10 @@ async def async_db(async_config):
     _is_local_db_used(database_url=async_config.get("DATA_WAREHOUSE_URL"))
     _is_local_db_used(database_url=async_config.get("DATA_MART_URL"))
 
-    if is_sqlite_used(async_config.get("DATA_LAKE_URL")) or is_sqlite_used(
-        async_config.get("DATA_WAREHOUSE_URL")) or is_sqlite_used(
-        async_config.get("DATA_MART_URL")
+    if (
+        is_sqlite_used(async_config.get("DATA_LAKE_URL"))
+        or is_sqlite_used(async_config.get("DATA_WAREHOUSE_URL"))
+        or is_sqlite_used(async_config.get("DATA_MART_URL"))
     ):
 
         test_datalake_engine: AsyncEngine = create_async_engine(
@@ -117,7 +118,11 @@ async def async_db(async_config):
             scopefunc=SessionContextManager.get_context,
         )
         _db: AsyncDatabase = AsyncDatabase(
-            engine_list=[test_datalake_engine, test_warehouse_engine, test_datamart_engine],
+            engine_list=[
+                test_datalake_engine,
+                test_warehouse_engine,
+                test_datamart_engine,
+            ],
             session_factory=test_session_factory,
             mapper_list=[datalake_base, warehouse_base],
         )
@@ -136,9 +141,10 @@ async def async_session(async_db, async_config):
     # Start Connection
     connections: list[AsyncConnection] = await async_db.get_connection_list()
 
-    if is_sqlite_used(async_config.get("DATA_LAKE_URL")) or is_sqlite_used(
-        async_config.get("DATA_WAREHOUSE_URL")) or is_sqlite_used(
-        async_config.get("DATA_MART_URL")
+    if (
+        is_sqlite_used(async_config.get("DATA_LAKE_URL"))
+        or is_sqlite_used(async_config.get("DATA_WAREHOUSE_URL"))
+        or is_sqlite_used(async_config.get("DATA_MART_URL"))
     ):
         for connection, engine, mapper in zip(
             connections, async_db.engines, async_db.mappers
@@ -180,9 +186,10 @@ def sync_db(sync_config):
     _is_local_db_used(database_url=sync_config.get("DATA_WAREHOUSE_URL"))
     _is_local_db_used(database_url=sync_config.get("DATA_MART_URL"))
 
-    if is_sqlite_used(sync_config.get("DATA_LAKE_URL")) or is_sqlite_used(
-        sync_config.get("DATA_WAREHOUSE_URL")) or is_sqlite_used(
-        sync_config.get("DATA_MART_URL")
+    if (
+        is_sqlite_used(sync_config.get("DATA_LAKE_URL"))
+        or is_sqlite_used(sync_config.get("DATA_WAREHOUSE_URL"))
+        or is_sqlite_used(sync_config.get("DATA_MART_URL"))
     ):
 
         test_datalake_engine: SyncEngine = create_engine(
@@ -210,7 +217,11 @@ def sync_db(sync_config):
             scopefunc=SessionContextManager.get_context,
         )
         _db: SyncDatabase = SyncDatabase(
-            engine_list=[test_datalake_engine, test_warehouse_engine, test_datamart_engine],
+            engine_list=[
+                test_datalake_engine,
+                test_warehouse_engine,
+                test_datamart_engine,
+            ],
             session_factory=test_session_factory,
             mapper_list=[datalake_base, warehouse_base, datamart_base],
         )

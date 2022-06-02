@@ -9,6 +9,7 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import
     SyncKaptRepository,
 )
 from modules.adapter.presentation.cli.enum import TopicEnum
+from modules.application.use_case.kakao_api.v1.kakao_api_use_case import KakaoApiUseCase
 from modules.application.use_case.kapt.v1.kapt_use_case import KaptOpenApiUseCase
 
 
@@ -17,6 +18,10 @@ def get_task(topic: str):
         return KaptOpenApiUseCase(
             topic=topic,
             kapt_repo=SyncKaptRepository(session_factory=db.session),
+        )
+    if topic == TopicEnum.CRAWL_KAKAO_API.value:
+        return KakaoApiUseCase(
+            topic=topic, kapt_repo=SyncKaptRepository(session_factory=db.session)
         )
 
 
