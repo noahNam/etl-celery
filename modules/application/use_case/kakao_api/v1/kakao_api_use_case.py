@@ -7,14 +7,10 @@ from scrapy.utils.project import get_project_settings
 from modules.adapter.infrastructure.crawler.crawler.spiders.kakao_api_spider import (
     KakaoApiSpider,
 )
-from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
     KakaoApiInputEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
-from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repository import (
-    SyncKakaoApiRepository,
-)
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )
