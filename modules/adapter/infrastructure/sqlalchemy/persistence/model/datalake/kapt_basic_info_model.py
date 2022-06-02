@@ -86,4 +86,6 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
             name=self.name,
             origin_dong_address=self.origin_dong_address,
             origin_road_address=self.origin_road_address,
+            new_dong_address=self.new_dong_address,
+            new_road_address=self.new_road_address,
         )
