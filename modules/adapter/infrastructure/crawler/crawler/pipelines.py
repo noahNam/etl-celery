@@ -36,10 +36,3 @@ class KaptPipeline:
             self._repo.save(new_model)
 
         return item
-
-
-class KakaoApiPipeline:
-    def __init__(self):
-        # self._repo: SyncKakaoApiRepository
-        # self._collected_kakao_infos: list[KakaoPlaceInfoItem] = list()
-        pass

@@ -28,9 +28,3 @@ class KaptRepository(ABC):
     @abstractmethod
     def save(self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None) -> None:
         pass
-
-    @abstractmethod
-    def exists_by_kapt_code(
-        self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None
-    ) -> bool:
-        pass

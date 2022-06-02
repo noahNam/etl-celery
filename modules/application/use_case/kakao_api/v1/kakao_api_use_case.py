@@ -60,7 +60,7 @@ class KakaoApiUseCase(BaseKakaoApiUseCase):
         process.crawl(
             crawler_or_spidercls=self._crawler,
             params=self._spider_input_params,
-            repo=SyncKakaoApiRepository(session_factory=db.session),
+            repo=self._repo,
         )
         process.start()
         self.teardown()

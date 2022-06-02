@@ -23,3 +23,11 @@ class KaptLocationInfoItem(BaseModel):
     kaptd_wtimesub: str | None = Field()
     convenient_facility: str | None = Field()
     education_facility: str | None = Field()
+
+
+class KakaoPlaceInfoItem(BaseModel):
+    x_vl: float
+    y_vl: float
+    road_address: str | None
+    jibun_address: str | None
+    bld_name: str | None
