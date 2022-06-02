@@ -10,6 +10,7 @@ from modules.adapter.infrastructure.crawler.crawler.spiders.kapt_spider import (
 from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
     KaptOpenApiInputEntity,
 )
+from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )
@@ -46,7 +47,9 @@ class KaptOpenApiUseCase(BaseKaptUseCase):
         self.setup()
 
     def setup(self):
-        self._spider_input_params: list[KaptOpenApiInputEntity] = self._repo.find_all()
+        self._spider_input_params: list[KaptOpenApiInputEntity] = self._repo.find_all(
+            find_type=KaptFindTypeEnum.KAPT_OPEN_API_INPUT.value
+        )
 
     def run_crawling(self):
         process = CrawlerProcess(settings=self._scrapy_settings)

@@ -1,7 +1,5 @@
 from uuid import uuid4
 
-from sqlalchemy.future import select
-
 from core.domain.kapt.interface.kapt_repository import KaptRepository
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
 from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (

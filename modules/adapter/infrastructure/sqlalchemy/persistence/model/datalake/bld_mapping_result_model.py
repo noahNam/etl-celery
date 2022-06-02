@@ -10,7 +10,10 @@ class BldMappingResultModel(datalake_base, TimestampMixin):
     __tablename__ = "bld_mapping_results"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
+        BigInteger().with_variant(Integer, "sqlite"),
+        nullable=False,
+        primary_key=True,
+        autoincrement=True,
     )
     place_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True

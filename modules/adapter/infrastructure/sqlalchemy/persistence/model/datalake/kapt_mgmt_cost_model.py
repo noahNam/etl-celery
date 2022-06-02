@@ -10,7 +10,10 @@ class KaptMgmtCostModel(datalake_base, TimestampMixin):
     __tablename__ = "kapt_mgmt_costs"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), primary_key=True, nullable=False, autoincrement=True
+        BigInteger().with_variant(Integer, "sqlite"),
+        primary_key=True,
+        nullable=False,
+        autoincrement=True,
     )
     kapt_code = Column(String(16), index=True, nullable=False)
     name = Column(String(32), nullable=True)

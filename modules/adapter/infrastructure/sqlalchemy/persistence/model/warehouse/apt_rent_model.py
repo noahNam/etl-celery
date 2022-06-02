@@ -10,7 +10,10 @@ class AptRentModel(warehouse_base, TimestampMixin):
     __tablename__ = "apt_rents"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True, autoincrement=True
+        BigInteger().with_variant(Integer, "sqlite"),
+        nullable=False,
+        primary_key=True,
+        autoincrement=True,
     )
     house_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
