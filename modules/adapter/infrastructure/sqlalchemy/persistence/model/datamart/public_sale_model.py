@@ -68,5 +68,6 @@ class PublicSaleModel(datamart_base, TimestampMixin):
     remain_amount = Column(Float, nullable=True)
     sale_limit = Column(String(100), nullable=True)
     compulsory_residence = Column(String(100), nullable=True)
+    hallway_type = Column(String(4), nullable=True)
     is_checked = Column(Boolean, nullable=False, default=False)
     is_available = Column(Boolean, nullable=False, default=False)
