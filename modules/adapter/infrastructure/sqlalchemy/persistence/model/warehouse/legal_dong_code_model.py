@@ -12,7 +12,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 
 
 class LegalDongCodeModel(warehouse_base, TimestampMixin):
-    __tablename__ = "legal_dong_codes"
+    __tablename__ = "legal_codes"
 
     id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, autoincrement=True
