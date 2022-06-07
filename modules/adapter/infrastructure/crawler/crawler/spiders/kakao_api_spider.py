@@ -9,6 +9,9 @@ from modules.adapter.infrastructure.crawler.crawler.items import KakaoPlaceInfoI
 from modules.adapter.infrastructure.pypubsub.enum.call_failure_history_enum import (
     CallFailureTopicEnum,
 )
+from modules.adapter.infrastructure.pypubsub.enum.kakao_api_enum import (
+    KakaoApiTopicEnum,
+)
 from modules.adapter.infrastructure.pypubsub.event_listener import event_listener_dict
 from modules.adapter.infrastructure.pypubsub.event_observer import send_message
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.call_failure_history_model import (
@@ -93,9 +96,9 @@ class KakaoApiSpider(Spider):
                 origin_road_address=response.request.meta["origin_road_address"],
                 bld_name=item.bld_name,
             )
-            pk = self.__save_kakao_infos(kakao_orm=new_model)
-
-            if pk:
+            # 중복 저장 제거
+            if not self.__is_exists_by_origin_address(kakao_orm=new_model):
+                pk = self.__save_kakao_infos(kakao_orm=new_model)
                 self.update_kapt_place_id(
                     house_id=response.request.meta["house_id"], place_id=pk
                 )
@@ -202,9 +205,20 @@ class KakaoApiSpider(Spider):
 
     def __save_kakao_infos(self, kakao_orm: KakaoApiResultModel) -> int | None:
         send_message(
-            topic_name=CallFailureTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value,
+            topic_name=KakaoApiTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value,
             kakao_orm=kakao_orm,
         )
         return event_listener_dict.get(
-            f"{CallFailureTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value}"
+            f"{KakaoApiTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value}"
+        )
+
+    def __is_exists_by_origin_address(
+        self, kakao_orm: KakaoApiResultModel
+    ) -> int | None:
+        send_message(
+            topic_name=KakaoApiTopicEnum.IS_EXISTS_BY_ORIGIN_ADDRESS.value,
+            kakao_orm=kakao_orm,
+        )
+        return event_listener_dict.get(
+            f"{KakaoApiTopicEnum.IS_EXISTS_BY_ORIGIN_ADDRESS.value}"
         )

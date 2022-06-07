@@ -55,3 +55,22 @@ class SyncKakaoApiRepository(BaseSyncRepository, KakaoApiRepository):
             if saved_orm:
                 return saved_orm.id
         return None
+
+    def is_exists_by_origin_address(
+        self, kakao_orm: KakaoApiResultModel | None
+    ) -> bool:
+        with self.session_factory() as session:
+            if kakao_orm:
+                query = (
+                    select(KakaoApiResultModel)
+                    .filter_by(
+                        origin_jibun_address=kakao_orm.origin_jibun_address,
+                        origin_road_address=kakao_orm.origin_road_address,
+                    )
+                    .limit(1)
+                )
+                result = session.execute(query).scalars().first()
+
+        if result:
+            return True
+        return False

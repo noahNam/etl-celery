@@ -12,10 +12,13 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 
 
 class LegalDongCodeModel(warehouse_base, TimestampMixin):
-    __tablename__ = "legal_codes"
+    __tablename__ = "legal_dong_codes"
 
     id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), nullable=False, autoincrement=True
+        BigInteger().with_variant(Integer, "sqlite"),
+        nullable=False,
+        autoincrement=True,
+        primary_key=True,
     )
     region_cd = Column(String(10), nullable=True)
     sido_cd = Column(String(2), nullable=True)
