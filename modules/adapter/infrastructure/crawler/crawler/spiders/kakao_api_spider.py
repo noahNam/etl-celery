@@ -122,9 +122,12 @@ class KakaoApiSpider(Spider):
             current_house_id=failure.request.meta["house_id"],
             current_kapt_code=failure.request.meta["kapt_code"],
             current_bld_name=failure.request.meta["name"],
+            new_dong_address=failure.request.meta["new_dong_address"],
+            new_road_address=failure.request.meta["new_road_address"],
             origin_dong_address=failure.request.meta["origin_dong_address"],
             origin_road_address=failure.request.meta["origin_road_address"],
             current_url=failure.request.meta["url"],
+            response=failure,
         )
 
     def get_kakao_info_item(
@@ -186,7 +189,7 @@ class KakaoApiSpider(Spider):
             f"origin_road_address: {origin_road_address}, "
             f"new_dong_address: {new_dong_address}, "
             f"new_road_address: {new_road_address}",
-            reason=f"response:{response}",
+            reason=f"response:{response.value}",
         )
 
         self.__save_crawling_failure(fail_orm=fail_orm)

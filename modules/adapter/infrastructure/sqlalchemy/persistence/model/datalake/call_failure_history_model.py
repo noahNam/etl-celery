@@ -19,7 +19,7 @@ class CallFailureHistoryModel(datalake_base, TimestampMixin):
         nullable=False,
         autoincrement=True,
     )
-    ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
+    ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
     ref_table = Column(String(20), nullable=True)
     param = Column(String().with_variant(LONGTEXT, "mysql"), nullable=True)
     reason = Column(String().with_variant(LONGTEXT, "mysql"), nullable=True)

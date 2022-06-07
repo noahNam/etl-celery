@@ -22,7 +22,3 @@ def test_xml_response_to_item():
     to_dict = xmltodict.parse(xml_text)
     assert to_dict["response"]["body"]["item"].get("kaptCode") == "A12009203"
     assert to_dict["response"]["body"]["item"].get("subwayStation") == "홍제"
-
-
-def test_json_response_to_item():
-    pass
