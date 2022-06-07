@@ -127,10 +127,11 @@ class KaptSpider(Spider):
         fail_orm = CallFailureHistoryModel(
             ref_id=current_house_id,
             ref_table="kapt_area_infos",
-            reason=f"url: {current_url}, kapt_code: {current_kapt_code}",
+            param=f"url: {current_url}, kapt_code: {current_kapt_code}",
+            reason=f"{failure.value}",
         )
 
-        self.__save_crawling_failure(fail_orm=fail_orm)
+        # self.__save_crawling_failure(fail_orm=fail_orm)
 
     def error_callback_kapt_detail_info(self, failure):
         current_house_id = failure.request.meta["house_id"]
@@ -140,10 +141,11 @@ class KaptSpider(Spider):
         fail_orm = CallFailureHistoryModel(
             ref_id=current_house_id,
             ref_table="kapt_location_infos",
-            reason=f"url: {current_url}, kapt_code: {current_kapt_code}",
+            param=f"url: {current_url}, kapt_code: {current_kapt_code}",
+            reason=f"{failure.value}",
         )
 
-        self.__save_crawling_failure(fail_orm=fail_orm)
+        # self.__save_crawling_failure(fail_orm=fail_orm)
 
     def __save_crawling_failure(self, fail_orm) -> None:
         send_message(

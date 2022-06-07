@@ -89,6 +89,8 @@ class KakaoApiSpider(Spider):
                 y_vl=item.y_vl,
                 jibun_address=item.jibun_address,
                 road_address=item.road_address,
+                origin_jibun_address=response.request.meta["origin_jibun_address"],
+                origin_road_address=response.request.meta["origin_road_address"],
                 bld_name=item.bld_name,
             )
             pk = self.__save_kakao_infos(kakao_orm=new_model)
@@ -104,9 +106,12 @@ class KakaoApiSpider(Spider):
                 current_house_id=response.request.meta["house_id"],
                 current_kapt_code=response.request.meta["kapt_code"],
                 current_bld_name=response.request.meta["name"],
+                new_dong_address=response.request.meta["new_dong_address"],
+                new_road_address=response.request.meta["new_road_address"],
                 origin_dong_address=response.request.meta["origin_dong_address"],
                 origin_road_address=response.request.meta["origin_road_address"],
                 current_url=response.request.meta["url"],
+                response=response,
             )
 
     def error_callback_kakao_info(self, failure):
@@ -161,18 +166,24 @@ class KakaoApiSpider(Spider):
         current_house_id,
         current_kapt_code,
         current_bld_name,
+        new_dong_address,
+        new_road_address,
         origin_dong_address,
         origin_road_address,
         current_url,
+        response,
     ) -> None:
         fail_orm = CallFailureHistoryModel(
             ref_id=current_house_id,
             ref_table="kakao_api_results",
-            reason=f"url: {current_url}, "
+            param=f"url: {current_url}, "
             f"kapt_code: {current_kapt_code}, "
             f"current_bld_name: {current_bld_name}, "
             f"origin_dong_address: {origin_dong_address}, "
-            f"origin_road_address: {origin_road_address}",
+            f"origin_road_address: {origin_road_address}, "
+            f"new_dong_address: {new_dong_address}, "
+            f"new_road_address: {new_road_address}",
+            reason=f"response:{response}",
         )
 
         self.__save_crawling_failure(fail_orm=fail_orm)
