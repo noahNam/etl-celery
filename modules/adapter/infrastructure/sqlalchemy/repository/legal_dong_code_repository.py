@@ -1,4 +1,4 @@
-from sqlalchemy import exc
+from sqlalchemy import exc, select
 
 from core.domain.legal_dong_code.interface.legal_dong_code_repository import (
     LegalDongCodeRepository,
@@ -39,3 +39,25 @@ class SyncLegalDongCodeRepository(LegalDongCodeRepository, BaseSyncRepository):
                 )
                 session.rollback()
                 raise NotUniqueErrorException
+
+    def is_exists_by_legal_codes(
+        self, legal_code_orm: LegalDongCodeModel | None
+    ) -> bool:
+        with self.session_factory() as session:
+            if legal_code_orm:
+                query = (
+                    select(LegalDongCodeModel)
+                    .filter_by(
+                        region_cd=legal_code_orm.region_cd,
+                        sido_cd=legal_code_orm.sido_cd,
+                        sgg_cd=legal_code_orm.sgg_cd,
+                        umd_cd=legal_code_orm.umd_cd,
+                        ri_cd=legal_code_orm.ri_cd,
+                    )
+                    .limit(1)
+                )
+                result = session.execute(query).scalars().first()
+
+        if result:
+            return True
+        return False

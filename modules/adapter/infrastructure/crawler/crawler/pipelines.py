@@ -53,7 +53,7 @@ class LegalCodePipeline:
         """spider parameter: 사용하지 않지만 남겨두어야 제대로 작동합니다."""
         new_model: LegalDongCodeModel | None = LegalDongCodeModel(**item.dict())
 
-        if not self._repo.exists_by_kapt_code(new_model):
+        if not self._repo.is_exists_by_legal_codes(legal_code_orm=new_model):
             self._repo.save(new_model)
 
         return item
