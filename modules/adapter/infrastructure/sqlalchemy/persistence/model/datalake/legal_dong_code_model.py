@@ -17,7 +17,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 class LegalDongCodeModel(datalake_base, TimestampMixin):
     __tablename__ = "legal_dong_codes"
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
+    id = Column(
+        BigInteger().with_variant(Integer, "sqlite"),
+        nullable=False,
+        primary_key=True,
+        autoincrement=True,
+    )
     region_cd = Column(String(10), nullable=True)
     sido_cd = Column(String(2), nullable=True)
     sgg_cd = Column(String(3), nullable=True)
