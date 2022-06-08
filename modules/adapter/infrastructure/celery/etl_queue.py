@@ -52,5 +52,5 @@ def setup_periodic_tasks(sender, **kwargs):
     tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAKAO_API.value})
 
 
-# celery -A modules.adapter.infrastructure.celery.task_queue.celery flower --address=localhost --port=5555
-# celery -A modules.adapter.infrastructure.celery.task_queue.celery worker -B --loglevel=info -P threads -c 3
+# celery -A modules.adapter.infrastructure.celery.etl_queue.celery flower --address=localhost --port=5555
+# celery -A modules.adapter.infrastructure.celery.etl_queue.celery worker -B --loglevel=info -P threads -c 3

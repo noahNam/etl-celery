@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from billiard.context import Process
 
-from modules.adapter.infrastructure.celery.task_queue import celery
+from modules.adapter.infrastructure.celery.crawler_queue import celery
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
 from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
