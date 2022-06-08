@@ -45,7 +45,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # sender.add_periodic_task(
     #     10.0,
     #     tasks.start_crwaler.s(topic=TopicEnum.CRAWL_KAPT.value),
-    #     name='kapt',
+    #     name='warehouse',
     # )
 
     # tasks.start_crwaler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})

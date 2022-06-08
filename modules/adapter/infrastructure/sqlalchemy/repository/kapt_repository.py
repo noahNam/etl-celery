@@ -5,12 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 
-from core.domain.kapt.interface.kapt_repository import KaptRepository
+from core.domain.datalake.kapt.interface.kapt_repository import KaptRepository
 from exceptions.base import NotUniqueErrorException
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
-    KaptOpenApiInputEntity,
-    KakaoApiInputEntity,
-)
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import KaptOpenApiInputEntity, \
+    KakaoApiInputEntity
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_area_info_model import (
     KaptAreaInfoModel,

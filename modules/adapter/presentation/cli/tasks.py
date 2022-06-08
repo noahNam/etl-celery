@@ -9,8 +9,8 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import
     SyncKaptRepository,
 )
 from modules.adapter.presentation.cli.enum import TopicEnum
-from modules.application.use_case.kakao_api.v1.kakao_api_use_case import KakaoApiUseCase
-from modules.application.use_case.kapt.v1.kapt_use_case import KaptOpenApiUseCase
+from modules.application.use_case.crawling.kakao_api import KakaoApiUseCase
+from modules.application.use_case.crawling.kapt.v1.kapt_use_case import KaptOpenApiUseCase
 
 
 def get_task(topic: str):
@@ -19,7 +19,11 @@ def get_task(topic: str):
             topic=topic,
             kapt_repo=SyncKaptRepository(session_factory=db.session),
         )
-    if topic == TopicEnum.CRAWL_KAKAO_API.value:
+    elif topic == TopicEnum.CRAWL_KAKAO_API.value:
+        return KakaoApiUseCase(
+            topic=topic, kapt_repo=SyncKaptRepository(session_factory=db.session)
+        )
+    elif topic == TopicEnum.CRAWL_KAKAO_API.value:
         return KakaoApiUseCase(
             topic=topic, kapt_repo=SyncKaptRepository(session_factory=db.session)
         )
@@ -36,5 +40,16 @@ def start_crwaler(topic):
     process = Process(target=uc.run_crawling)
     process.start()
     process.join()
+
+    SessionContextManager.reset_context(context=context)
+
+
+@celery.task
+def start_worker(topic):
+    session_id = str(uuid4())
+    context = SessionContextManager.set_context_value(session_id)
+
+    uc = get_task(topic=topic)
+    uc.execute()
 
     SessionContextManager.reset_context(context=context)

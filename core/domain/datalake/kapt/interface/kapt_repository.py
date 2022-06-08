@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptOpenApiInputEntity,
     KakaoApiInputEntity,
 )

@@ -1,10 +1,10 @@
 from sqlalchemy import exc, select
 
-from core.domain.kakao_api.interface.kakao_api_result_repository import (
+from core.domain.datalake.kakao_api.interface.kakao_api_result_repository import (
     KakaoApiRepository,
 )
 from exceptions.base import NotUniqueErrorException
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kakao_api_result_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kakao_api_result_entity import (
     KakaoApiResultEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kakao_api_result_model import (
