@@ -1,9 +1,7 @@
 from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Numeric
 
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
-    KaptOpenApiInputEntity,
-    KakaoApiInputEntity,
-)
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import KaptOpenApiInputEntity, \
+    KakaoApiInputEntity
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
