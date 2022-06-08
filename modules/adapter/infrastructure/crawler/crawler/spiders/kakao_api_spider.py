@@ -98,9 +98,9 @@ class KakaoApiSpider(Spider):
             )
             # 중복 저장 제거
             if not self.__is_exists_by_origin_address(kakao_orm=new_model):
-                pk = self.__save_kakao_infos(kakao_orm=new_model)
+                place_id = self.__save_kakao_infos(kakao_orm=new_model)
                 self.update_kapt_place_id(
-                    house_id=response.request.meta["house_id"], place_id=pk
+                    house_id=response.request.meta["house_id"], place_id=place_id
                 )
 
         else:
