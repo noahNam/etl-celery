@@ -26,7 +26,7 @@ def get_task(topic: str):
 
 
 @celery.task
-def start_worker(topic):
+def start_crwaler(topic):
     session_id = str(uuid4())
     context = SessionContextManager.set_context_value(session_id)
 
