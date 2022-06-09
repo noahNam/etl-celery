@@ -3,6 +3,7 @@ from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Numeri
 from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
     KaptOpenApiInputEntity,
     KakaoApiInputEntity,
+    KaptBasicInfoEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -28,7 +29,7 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     new_dong_address = Column(String(100), nullable=True)
     new_road_address = Column(String(100), nullable=True)
     place_id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), index=True, nullable=False
+        BigInteger().with_variant(Integer, "sqlite"), index=True, nullable=True
     )
     right_lot_out_type = Column(String(16), nullable=True)
     use_apr_day = Column(String(8), nullable=True)
@@ -73,6 +74,68 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     manage_office_contact = Column(String(16), nullable=True)
     manage_office_fax = Column(String(16), nullable=True)
     welfare = Column(String(200), nullable=True)
+
+    def to_entity(self) -> KaptBasicInfoEntity:
+        return KaptBasicInfoEntity(
+            house_id=self.house_id,
+            kapt_code=self.kapt_code,
+            sido=self.sido,
+            sigungu=self.sigungu,
+            eubmyun=self.eubmyun,
+            dongri=self.dongri,
+            name=self.name,
+            code_apt_nm=self.code_apt_nm,
+            origin_dong_address=self.origin_dong_address,
+            origin_road_address=self.origin_road_address,
+            new_dong_address=self.new_dong_address,
+            new_road_address=self.new_road_address,
+            place_id=self.place_id,
+            right_lot_out_type=self.right_lot_out_type,
+            use_apr_day=self.use_apr_day,
+            dong_cnt=self.dong_cnt,
+            hhld_cnt=self.hhld_cnt,
+            manage_type=self.manage_type,
+            heat_type=self.heat_type,
+            hallway_type=self.hallway_type,
+            builder=self.builder,
+            agency=self.agency,
+            house_contractor=self.house_contractor,
+            general_manage_type=self.general_manage_type,
+            general_people=self.general_people,
+            security_manage_type=self.security_manage_type,
+            security_people=self.security_people,
+            security_company=self.security_company,
+            cleaning_manage_type=self.cleaning_manage_type,
+            cleaning_people=self.cleaning_people,
+            dispose_food=self.dispose_food,
+            disinfection_manage_type=self.disinfection_manage_type,
+            disinfection_per_year=self.disinfection_per_year,
+            disinfection_method=self.disinfection_method,
+            building_structure=self.building_structure,
+            ele_capacity=self.ele_capacity,
+            ele_contract_method=self.ele_contract_method,
+            ele_manager_yn=self.ele_manager_yn,
+            fire_reception_system=self.fire_reception_system,
+            water_supply_system=self.water_supply_system,
+            elv_manage_type=self.elv_manage_type,
+            elv_passenger=self.elv_passenger,
+            elv_freight=self.elv_freight,
+            elv_merge=self.elv_merge,
+            elv_handicapped=self.elv_handicapped,
+            elv_emergency=self.elv_emergency,
+            elv_etc=self.elv_etc,
+            park_total_cnt=self.park_total_cnt,
+            park_ground_cnt=self.park_ground_cnt,
+            park_underground_cnt=self.park_underground_cnt,
+            cctv_cnt=self.cctv_cnt,
+            home_network=self.home_network,
+            manage_office_address=self.manage_office_address,
+            manage_office_contact=self.manage_office_contact,
+            manage_office_fax=self.manage_office_fax,
+            welfare=self.welfare,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+        )
 
     def to_open_api_input_entity(self) -> KaptOpenApiInputEntity:
         return KaptOpenApiInputEntity(

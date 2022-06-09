@@ -70,8 +70,12 @@ class KaptSpider(Spider):
                 name=xml_to_dict["response"]["body"]["item"].get("kaptName"),
                 kapt_tarea=xml_to_dict["response"]["body"]["item"].get("kaptTarea"),
                 kapt_marea=xml_to_dict["response"]["body"]["item"].get("kaptMarea"),
-                kapt_mparea_60=xml_to_dict["response"]["body"]["item"].get("kaptMparea_60"),
-                kapt_mparea_85=xml_to_dict["response"]["body"]["item"].get("kaptMparea_85"),
+                kapt_mparea_60=xml_to_dict["response"]["body"]["item"].get(
+                    "kaptMparea_60"
+                ),
+                kapt_mparea_85=xml_to_dict["response"]["body"]["item"].get(
+                    "kaptMparea_85"
+                ),
                 kapt_mparea_135=xml_to_dict["response"]["body"]["item"].get(
                     "kaptMparea_135"
                 ),
@@ -100,10 +104,16 @@ class KaptSpider(Spider):
             item: KaptLocationInfoItem = KaptLocationInfoItem(
                 kapt_code=xml_to_dict["response"]["body"]["item"].get("kaptCode"),
                 name=xml_to_dict["response"]["body"]["item"].get("kaptName"),
-                kaptd_wtimebus=xml_to_dict["response"]["body"]["item"].get("kaptdWtimebus"),
+                kaptd_wtimebus=xml_to_dict["response"]["body"]["item"].get(
+                    "kaptdWtimebus"
+                ),
                 subway_line=xml_to_dict["response"]["body"]["item"].get("subwayLine"),
-                subway_station=xml_to_dict["response"]["body"]["item"].get("subwayStation"),
-                kaptd_wtimesub=xml_to_dict["response"]["body"]["item"].get("kaptdWtimesub"),
+                subway_station=xml_to_dict["response"]["body"]["item"].get(
+                    "subwayStation"
+                ),
+                kaptd_wtimesub=xml_to_dict["response"]["body"]["item"].get(
+                    "kaptdWtimesub"
+                ),
                 convenient_facility=xml_to_dict["response"]["body"]["item"].get(
                     "convenientFacility"
                 ),

@@ -16,7 +16,7 @@ class KaptBasicInfoEntity(BaseModel):
     origin_road_address: str | None
     new_dong_address: str | None
     new_road_address: str | None
-    place_id: int
+    place_id: int | None
     right_lot_out_type: str | None
     use_apr_day: str | None
     dong_cnt: int | None
@@ -44,7 +44,7 @@ class KaptBasicInfoEntity(BaseModel):
     ele_manager_yn: str | None
     fire_reception_system: str | None
     water_supply_system: str | None
-    ele_manage_type: str | None
+    elv_manage_type: str | None
     elv_passenger: int | None
     elv_freight: int | None
     elv_merge: int | None
@@ -106,3 +106,12 @@ class KakaoApiInputEntity(BaseModel):
     origin_road_address: str | None
     new_dong_address: str | None
     new_road_address: str | None
+
+
+class GovtBldInputEntity(BaseModel):
+    house_id: int
+    kapt_code: str | None
+    name: str | None
+    origin_dong_address: str | None
+    new_dong_address: str | None
+    bjd_code: str | None
