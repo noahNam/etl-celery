@@ -50,8 +50,11 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
     # tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAKAO_API.value})
+    # tasks.start_worker.apply_async(
+    #     kwargs={"topic": TopicEnum.CRAWL_LEGAL_DONG_CODE.value}
+    # )
     tasks.start_worker.apply_async(
-        kwargs={"topic": TopicEnum.CRAWL_LEGAL_DONG_CODE.value}
+        kwargs={"topic": TopicEnum.CRAWL_BUILDING_MANAGE.value}
     )
 
 

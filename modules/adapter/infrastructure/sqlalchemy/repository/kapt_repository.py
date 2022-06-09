@@ -10,6 +10,9 @@ from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
     KaptOpenApiInputEntity,
     KakaoApiInputEntity,
+    KaptAreaInfoEntity,
+    KaptBasicInfoEntity,
+    GovtBldInputEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_area_info_model import (
@@ -158,3 +161,45 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
             )
             session.commit()
         return None
+
+    def find_all_bld_infos(self) -> list[GovtBldInputEntity] | None:
+        area_entities: list[KaptAreaInfoEntity] = list()
+        basic_entities: list[KaptBasicInfoEntity] = list()
+        bld_input_entities: list[GovtBldInputEntity] = list()
+
+        with self.session_factory() as session:
+            # step_1
+            query = select(KaptAreaInfoModel)
+            queryset: list[KaptAreaInfoModel] = session.execute(query).scalars().all()
+
+            if queryset:
+                [area_entities.append(query.to_entity()) for query in queryset]
+            else:
+                return None
+
+            # step_2
+            for area_info in area_entities:
+                query = (
+                    select(KaptBasicInfoModel)
+                    .filter_by(kapt_code=area_info.kapt_code)
+                    .limit(1)
+                )
+                result: KaptBasicInfoModel | None = (
+                    session.execute(query).scalars().first()
+                )
+                if result:
+                    basic_entities.append(result.to_entity())
+
+        for area, basic in zip(area_entities, basic_entities):
+            bld_input_entities.append(
+                GovtBldInputEntity(
+                    house_id=basic.house_id,
+                    kapt_code=area.kapt_code,
+                    name=area.name,
+                    origin_dong_address=basic.origin_dong_address,
+                    new_dong_address=basic.new_dong_address,
+                    bjd_code=area.bjd_code,
+                )
+            )
+
+        return bld_input_entities

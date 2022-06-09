@@ -12,6 +12,9 @@ from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_reposi
     SyncLegalDongCodeRepository,
 )
 from modules.adapter.presentation.cli.enum import TopicEnum
+from modules.application.use_case.govt_bld_info.v1.govt_bld_use_case import (
+    GovtBldUseCase,
+)
 from modules.application.use_case.kakao_api.v1.kakao_api_use_case import KakaoApiUseCase
 from modules.application.use_case.kapt.v1.kapt_use_case import KaptOpenApiUseCase
 from modules.application.use_case.legal_dong_code.v1.legal_code_use_case import (
@@ -32,6 +35,10 @@ def get_task(topic: str):
     if topic == TopicEnum.CRAWL_LEGAL_DONG_CODE.value:
         return LegalCodeUseCase(
             topic=topic, repo=SyncLegalDongCodeRepository(session_factory=db.session)
+        )
+    if topic == TopicEnum.CRAWL_BUILDING_MANAGE.value:
+        return GovtBldUseCase(
+            topic=topic, repo=SyncKaptRepository(session_factory=db.session)
         )
 
 
