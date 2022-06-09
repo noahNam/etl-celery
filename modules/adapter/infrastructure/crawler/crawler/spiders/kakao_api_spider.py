@@ -92,7 +92,7 @@ class KakaoApiSpider(Spider):
                 y_vl=item.y_vl,
                 jibun_address=item.jibun_address,
                 road_address=item.road_address,
-                origin_jibun_address=response.request.meta["origin_jibun_address"],
+                origin_jibun_address=response.request.meta["origin_dong_address"],
                 origin_road_address=response.request.meta["origin_road_address"],
                 bld_name=item.bld_name,
             )
@@ -189,7 +189,7 @@ class KakaoApiSpider(Spider):
             f"origin_road_address: {origin_road_address}, "
             f"new_dong_address: {new_dong_address}, "
             f"new_road_address: {new_road_address}",
-            reason=f"response:{response.value}",
+            reason=f"response:{response.text}",
         )
 
         self.__save_crawling_failure(fail_orm=fail_orm)

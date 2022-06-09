@@ -30,7 +30,7 @@ class LegalCodeSpider(Spider):
 
         url = LegalCodeEnum.BASE_INFO_END_POINT.value
 
-        for i in range(LegalCodeEnum.TOTAL_PAGE_NUMBER.value):
+        for i in range(1, LegalCodeEnum.TOTAL_PAGE_NUMBER.value + 1):
             yield Request(
                 url=url
                 + f"?type=json&ServiceKey={LegalCodeSpider.open_api_service_key}&numOfRows=1000&flag=Y&pageNo={i}",
