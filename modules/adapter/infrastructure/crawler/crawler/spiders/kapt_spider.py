@@ -63,22 +63,26 @@ class KaptSpider(Spider):
 
     def parse_kapt_base_info(self, response):
         xml_to_dict = parse(response.text)
-        item: KaptAreaInfoItem = KaptAreaInfoItem(
-            kapt_code=xml_to_dict["response"]["body"]["item"].get("kaptCode"),
-            name=xml_to_dict["response"]["body"]["item"].get("kaptName"),
-            kapt_tarea=xml_to_dict["response"]["body"]["item"].get("kaptTarea"),
-            kapt_marea=xml_to_dict["response"]["body"]["item"].get("kaptMarea"),
-            kapt_mparea_60=xml_to_dict["response"]["body"]["item"].get("kaptMparea_60"),
-            kapt_mparea_85=xml_to_dict["response"]["body"]["item"].get("kaptMparea_85"),
-            kapt_mparea_135=xml_to_dict["response"]["body"]["item"].get(
-                "kaptMparea_135"
-            ),
-            kapt_mparea_136=xml_to_dict["response"]["body"]["item"].get(
-                "kaptMparea_136"
-            ),
-            priv_area=xml_to_dict["response"]["body"]["item"].get("privArea"),
-            bjd_code=xml_to_dict["response"]["body"]["item"].get("bjdCode"),
-        )
+        item: KaptAreaInfoItem | None = None
+        try:
+            item: KaptAreaInfoItem = KaptAreaInfoItem(
+                kapt_code=xml_to_dict["response"]["body"]["item"].get("kaptCode"),
+                name=xml_to_dict["response"]["body"]["item"].get("kaptName"),
+                kapt_tarea=xml_to_dict["response"]["body"]["item"].get("kaptTarea"),
+                kapt_marea=xml_to_dict["response"]["body"]["item"].get("kaptMarea"),
+                kapt_mparea_60=xml_to_dict["response"]["body"]["item"].get("kaptMparea_60"),
+                kapt_mparea_85=xml_to_dict["response"]["body"]["item"].get("kaptMparea_85"),
+                kapt_mparea_135=xml_to_dict["response"]["body"]["item"].get(
+                    "kaptMparea_135"
+                ),
+                kapt_mparea_136=xml_to_dict["response"]["body"]["item"].get(
+                    "kaptMparea_136"
+                ),
+                priv_area=xml_to_dict["response"]["body"]["item"].get("privArea"),
+                bjd_code=xml_to_dict["response"]["body"]["item"].get("bjdCode"),
+            )
+        except KeyError:
+            pass
 
         if KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value:
             self.change_service_key()
@@ -86,24 +90,29 @@ class KaptSpider(Spider):
         else:
             KaptSpider.request_count += KaptSpider.request_count
 
-        yield item
+        if item:
+            yield item
 
     def parse_kapt_detail_info(self, response):
         xml_to_dict = parse(response.text)
-        item: KaptLocationInfoItem = KaptLocationInfoItem(
-            kapt_code=xml_to_dict["response"]["body"]["item"].get("kaptCode"),
-            name=xml_to_dict["response"]["body"]["item"].get("kaptName"),
-            kaptd_wtimebus=xml_to_dict["response"]["body"]["item"].get("kaptdWtimebus"),
-            subway_line=xml_to_dict["response"]["body"]["item"].get("subwayLine"),
-            subway_station=xml_to_dict["response"]["body"]["item"].get("subwayStation"),
-            kaptd_wtimesub=xml_to_dict["response"]["body"]["item"].get("kaptdWtimesub"),
-            convenient_facility=xml_to_dict["response"]["body"]["item"].get(
-                "convenientFacility"
-            ),
-            education_facility=xml_to_dict["response"]["body"]["item"].get(
-                "educationFacility"
-            ),
-        )
+        item: KaptLocationInfoItem | None = None
+        try:
+            item: KaptLocationInfoItem = KaptLocationInfoItem(
+                kapt_code=xml_to_dict["response"]["body"]["item"].get("kaptCode"),
+                name=xml_to_dict["response"]["body"]["item"].get("kaptName"),
+                kaptd_wtimebus=xml_to_dict["response"]["body"]["item"].get("kaptdWtimebus"),
+                subway_line=xml_to_dict["response"]["body"]["item"].get("subwayLine"),
+                subway_station=xml_to_dict["response"]["body"]["item"].get("subwayStation"),
+                kaptd_wtimesub=xml_to_dict["response"]["body"]["item"].get("kaptdWtimesub"),
+                convenient_facility=xml_to_dict["response"]["body"]["item"].get(
+                    "convenientFacility"
+                ),
+                education_facility=xml_to_dict["response"]["body"]["item"].get(
+                    "educationFacility"
+                ),
+            )
+        except KeyError:
+            pass
 
         if KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value:
             self.change_service_key()
@@ -111,7 +120,8 @@ class KaptSpider(Spider):
         else:
             KaptSpider.request_count += KaptSpider.request_count
 
-        yield item
+        if item:
+            yield item
 
     def change_service_key(self):
         if KaptSpider.open_api_service_key == KaptEnum.SERVICE_KEY_2.value:
