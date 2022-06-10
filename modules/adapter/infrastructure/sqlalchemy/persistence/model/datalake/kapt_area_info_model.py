@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String
 
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptAreaInfoEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
@@ -23,7 +23,7 @@ class KaptAreaInfoModel(datalake_base, TimestampMixin):
     priv_area = Column(String(22), nullable=True)
     bjd_code = Column(String(10), nullable=True)
 
-    def to_entity(self) -> KaptAreaInfoEntity:
+    def to_kapt_area_info_entity(self) -> KaptAreaInfoEntity:
         return KaptAreaInfoEntity(
             kapt_code=self.kapt_code,
             name=self.name,

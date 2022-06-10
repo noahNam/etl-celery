@@ -1,6 +1,7 @@
 from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Numeric
+from sqlalchemy.orm import relationship
 
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptOpenApiInputEntity,
     KakaoApiInputEntity,
     KaptBasicInfoEntity,
@@ -33,8 +34,8 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     )
     right_lot_out_type = Column(String(16), nullable=True)
     use_apr_day = Column(String(8), nullable=True)
-    dong_cnt = Column(Numeric(5), nullable=True)
-    hhld_cnt = Column(Numeric(5), nullable=True)
+    dong_cnt = Column(SmallInteger, nullable=True)
+    hhld_cnt = Column(SmallInteger, nullable=True)
     manage_type = Column(String(16), nullable=True)
     heat_type = Column(String(8), nullable=True)
     hallway_type = Column(String(4), nullable=True)
@@ -75,7 +76,31 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     manage_office_fax = Column(String(16), nullable=True)
     welfare = Column(String(200), nullable=True)
 
-    def to_entity(self) -> KaptBasicInfoEntity:
+    # relationship
+    kapt_mgmt_costs = relationship(
+        "KaptMgmtCostModel",
+        backref="kapt_basic_infos",
+        uselist=True,
+        primaryjoin="KaptBasicInfoModel.kapt_code == foreign(KaptMgmtCostModel.kapt_code)",
+    )
+
+    def to_open_api_input_entity(self) -> KaptOpenApiInputEntity:
+        return KaptOpenApiInputEntity(
+            house_id=self.house_id, kapt_code=self.kapt_code, name=self.name
+        )
+
+    def to_kakao_api_input_entity(self) -> KakaoApiInputEntity:
+        return KakaoApiInputEntity(
+            house_id=self.house_id,
+            kapt_code=self.kapt_code,
+            name=self.name,
+            origin_dong_address=self.origin_dong_address,
+            origin_road_address=self.origin_road_address,
+            new_dong_address=self.new_dong_address,
+            new_road_address=self.new_road_address,
+        )
+
+    def to_kapt_basic_info_entity(self) -> KaptBasicInfoEntity:
         return KaptBasicInfoEntity(
             house_id=self.house_id,
             kapt_code=self.kapt_code,
@@ -135,20 +160,4 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
             welfare=self.welfare,
             created_at=self.created_at,
             updated_at=self.updated_at,
-        )
-
-    def to_open_api_input_entity(self) -> KaptOpenApiInputEntity:
-        return KaptOpenApiInputEntity(
-            house_id=self.house_id, kapt_code=self.kapt_code, name=self.name
-        )
-
-    def to_kakao_api_input_entity(self) -> KakaoApiInputEntity:
-        return KakaoApiInputEntity(
-            house_id=self.house_id,
-            kapt_code=self.kapt_code,
-            name=self.name,
-            origin_dong_address=self.origin_dong_address,
-            origin_road_address=self.origin_road_address,
-            new_dong_address=self.new_dong_address,
-            new_road_address=self.new_road_address,
         )
