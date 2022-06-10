@@ -47,3 +47,16 @@ class LegalDongCodeItem(BaseModel):
     locathigh_cd: str | None
     locallow_nm: str | None
     adpt_de: str | None
+
+
+class GovtBldInputInfo(BaseModel):
+    house_id: int
+    kapt_code: str | None
+    name: str | None
+    origin_dong_address: str | None
+    new_dong_address: str | None
+    origin_bjd_code: str | None
+    bun: str | None
+    ji: str | None
+    sigungu_code: str | None
+    bjdong_code: str | None

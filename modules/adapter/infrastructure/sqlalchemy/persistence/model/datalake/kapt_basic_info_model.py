@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Numeric
+from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger
 from sqlalchemy.orm import relationship
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (

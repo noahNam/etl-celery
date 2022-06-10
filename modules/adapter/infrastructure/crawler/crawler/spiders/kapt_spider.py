@@ -165,7 +165,8 @@ class KaptSpider(Spider):
             reason=f"{failure.value}",
         )
 
-        self.__save_crawling_failure(fail_orm=fail_orm)
+        if not self.__is_exists_failure(fail_orm=fail_orm):
+            self.__save_crawling_failure(fail_orm=fail_orm)
 
     def __save_crawling_failure(self, fail_orm) -> None:
         send_message(
@@ -175,3 +176,10 @@ class KaptSpider(Spider):
         event_listener_dict.get(
             f"{CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value}", None
         )
+
+    def __is_exists_failure(self, fail_orm: CallFailureHistoryModel | None) -> bool:
+        send_message(
+            topic_name=CallFailureTopicEnum.IS_EXISTS.value,
+            fail_orm=fail_orm,
+        )
+        return event_listener_dict.get(f"{CallFailureTopicEnum.IS_EXISTS.value}")

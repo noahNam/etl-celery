@@ -191,8 +191,8 @@ class KakaoApiSpider(Spider):
             f"new_road_address: {new_road_address}",
             reason=f"response:{response.text}",
         )
-
-        self.__save_crawling_failure(fail_orm=fail_orm)
+        if not self.__is_exists_failure(fail_orm=fail_orm):
+            self.__save_crawling_failure(fail_orm=fail_orm)
 
     def update_kapt_place_id(self, house_id: int, place_id: int):
         self.repo.update_place_id(house_id=house_id, place_id=place_id)
@@ -225,3 +225,10 @@ class KakaoApiSpider(Spider):
         return event_listener_dict.get(
             f"{KakaoApiTopicEnum.IS_EXISTS_BY_ORIGIN_ADDRESS.value}"
         )
+
+    def __is_exists_failure(self, fail_orm: CallFailureHistoryModel | None) -> bool:
+        send_message(
+            topic_name=CallFailureTopicEnum.IS_EXISTS.value,
+            fail_orm=fail_orm,
+        )
+        return event_listener_dict.get(f"{CallFailureTopicEnum.IS_EXISTS.value}")
