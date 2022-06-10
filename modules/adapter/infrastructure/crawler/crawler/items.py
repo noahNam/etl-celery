@@ -60,3 +60,7 @@ class GovtBldInputInfo(BaseModel):
     ji: str | None
     sigungu_code: str | None
     bjdong_code: str | None
+
+
+class GovtBldTopInfoItem(BaseModel):
+    pass

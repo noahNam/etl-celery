@@ -60,7 +60,7 @@ class GovtBldSpider(Spider):
                         "name": param.name,
                         "origin_dong_address": param.origin_dong_address,
                         "new_dong_address": param.new_dong_address,
-                        "bjd_code": param.bjd_code,
+                        "bjd_code": param.origin_bjd_code,
                         "url": urls[0]
                         + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
                     },
@@ -82,7 +82,7 @@ class GovtBldSpider(Spider):
                         "name": param.name,
                         "origin_dong_address": param.origin_dong_address,
                         "new_dong_address": param.new_dong_address,
-                        "bjd_code": param.bjd_code,
+                        "bjd_code": param.origin_bjd_code,
                         "url": urls[0]
                         + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
                     },
@@ -104,7 +104,7 @@ class GovtBldSpider(Spider):
                         "name": param.name,
                         "origin_dong_address": param.origin_dong_address,
                         "new_dong_address": param.new_dong_address,
-                        "bjd_code": param.bjd_code,
+                        "bjd_code": param.origin_bjd_code,
                         "url": urls[0]
                         + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
                     },
@@ -138,6 +138,7 @@ class GovtBldSpider(Spider):
         return input_infos
 
     def _extract_input_params(self, bld_info: GovtBldInputEntity) -> GovtBldInputInfo:
+        """ '0000' : 공공데이터 번지 파라미터 default value format"""
         bunji, bun, ji = None, "0000", "0000"
 
         if bld_info.new_dong_address:
