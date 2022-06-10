@@ -169,8 +169,7 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
             with self.session_factory() as session:
                 query = (
                     select(KaptBasicInfoModel)
-                        .where(KaptBasicInfoModel.kapt_code == "A13980014")
-                        # .where(func.date(KaptBasicInfoModel.updated_at) == target_date or func.date(KaptBasicInfoModel.updated_at) == target_date)
+                        .where(func.date(KaptBasicInfoModel.updated_at) == target_date or func.date(KaptBasicInfoModel.updated_at) == target_date)
                 )
                 results = session.execute(query).scalars().all()
             if results:
