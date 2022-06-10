@@ -26,4 +26,4 @@ class MgmtCostModel(warehouse_base, TimestampMixin):
     individual_fee = Column(Integer, nullable=True)
     public_part_imp_cost = Column(Integer, nullable=True)
     etc_income_amount = Column(Integer, nullable=True)
-    is_available = Column(Boolean, nullable=True)
+    is_available = Column(Boolean, nullable=True, default=True)

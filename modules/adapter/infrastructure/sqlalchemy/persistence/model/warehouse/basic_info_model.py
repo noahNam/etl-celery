@@ -97,4 +97,4 @@ class BasicInfoModel(warehouse_base, TimestampMixin):
     education_facility = Column(String(500), nullable=True)
     public_ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
     rebuild_ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
-    is_available = Column(Boolean, nullable=True)
+    is_available = Column(Boolean, nullable=True, default=True)

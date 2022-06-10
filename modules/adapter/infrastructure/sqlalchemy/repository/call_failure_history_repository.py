@@ -2,7 +2,7 @@ from typing import Type
 
 from pydantic import BaseModel
 
-from core.domain.call_failure_history.interface.call_failure_history_repository import (
+from core.domain.datalake.call_failure_history.interface.call_failure_history_repository import (
     CallFailureHistoryRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.call_failure_history_model import (
