@@ -69,7 +69,7 @@ class KaptSpider(Spider):
             kapt_tarea=xml_to_dict["response"]["body"]["item"].get("kaptTarea"),
             kapt_marea=xml_to_dict["response"]["body"]["item"].get("kaptMarea"),
             kapt_mparea_60=xml_to_dict["response"]["body"]["item"].get("kaptMparea_60"),
-            kapt_mparea_85=xml_to_dict["response"]["body"]["item"].get("kaptMparea_80"),
+            kapt_mparea_85=xml_to_dict["response"]["body"]["item"].get("kaptMparea_85"),
             kapt_mparea_135=xml_to_dict["response"]["body"]["item"].get(
                 "kaptMparea_135"
             ),
@@ -127,7 +127,8 @@ class KaptSpider(Spider):
         fail_orm = CallFailureHistoryModel(
             ref_id=current_house_id,
             ref_table="kapt_area_infos",
-            reason=f"url: {current_url}, kapt_code: {current_kapt_code}",
+            param=f"url: {current_url}, kapt_code: {current_kapt_code}",
+            reason=f"{failure.value}",
         )
 
         self.__save_crawling_failure(fail_orm=fail_orm)
@@ -140,7 +141,8 @@ class KaptSpider(Spider):
         fail_orm = CallFailureHistoryModel(
             ref_id=current_house_id,
             ref_table="kapt_location_infos",
-            reason=f"url: {current_url}, kapt_code: {current_kapt_code}",
+            param=f"url: {current_url}, kapt_code: {current_kapt_code}",
+            reason=f"{failure.value}",
         )
 
         self.__save_crawling_failure(fail_orm=fail_orm)

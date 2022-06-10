@@ -8,20 +8,30 @@ from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
+    SyncLegalDongCodeRepository,
+)
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.crawling.kakao_api.v1.kakao_api_use_case import KakaoApiUseCase
 from modules.application.use_case.crawling.kapt.v1.kapt_use_case import KaptOpenApiUseCase
+from modules.application.use_case.legal_dong_code.v1.legal_code_use_case import (
+    LegalCodeUseCase,
+)
 
 
 def get_task(topic: str):
     if topic == TopicEnum.CRAWL_KAPT.value:
         return KaptOpenApiUseCase(
             topic=topic,
-            kapt_repo=SyncKaptRepository(session_factory=db.session),
+            repo=SyncKaptRepository(session_factory=db.session),
         )
     elif topic == TopicEnum.CRAWL_KAKAO_API.value:
         return KakaoApiUseCase(
-            topic=topic, kapt_repo=SyncKaptRepository(session_factory=db.session)
+            topic=topic, repo=SyncKaptRepository(session_factory=db.session)
+        )
+    elif topic == TopicEnum.CRAWL_LEGAL_DONG_CODE.value:
+        return LegalCodeUseCase(
+            topic=topic, repo=SyncLegalDongCodeRepository(session_factory=db.session)
         )
 
 

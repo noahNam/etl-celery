@@ -22,6 +22,8 @@ class KakaoApiResultModel(datalake_base, TimestampMixin):
     y_vl = Column(Numeric(precision=11, scale=7), default=0)
     jibun_address = Column(String(200), nullable=True)
     road_address = Column(String(200), nullable=True)
+    origin_jibun_address = Column(String(200), nullable=True)
+    origin_road_address = Column(String(200), nullable=True)
     bld_name = Column(String(100), nullable=True)
 
     def to_entity(self) -> KakaoApiResultEntity:
@@ -30,6 +32,8 @@ class KakaoApiResultModel(datalake_base, TimestampMixin):
             y_vl=self.y_vl,
             jibun_address=self.jibun_address,
             road_address=self.road_address,
+            origin_jibun_address=self.origin_jibun_address,
+            origin_road_address=self.origin_road_address,
             bld_name=self.bld_name,
             created_at=self.created_at,
             updated_at=self.updated_at,
