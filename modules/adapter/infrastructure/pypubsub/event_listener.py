@@ -3,6 +3,7 @@ from pubsub import pub
 from modules.adapter.infrastructure.pypubsub.enum.call_failure_history_enum import (
     CallFailureTopicEnum,
 )
+from modules.adapter.infrastructure.pypubsub.enum.etl_enum import ETLEnum
 from modules.adapter.infrastructure.pypubsub.enum.kakao_api_enum import (
     KakaoApiTopicEnum,
 )
@@ -21,6 +22,7 @@ event_listener_dict = {
     f"{CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value}": None,
     f"{KakaoApiTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value}": None,
     f"{KakaoApiTopicEnum.IS_EXISTS_BY_ORIGIN_ADDRESS.value}": False,
+    f"{ETLEnum.GET_ETL_TARGET_SCHEMAS_FROM_KAPT.value}": dict(),
 }
 
 

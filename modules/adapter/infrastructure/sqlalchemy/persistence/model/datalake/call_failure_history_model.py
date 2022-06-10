@@ -1,7 +1,7 @@
 from sqlalchemy import Column, BigInteger, Integer, String, Boolean
 from sqlalchemy.dialects.mysql import LONGTEXT
 
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.call_failure_history_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.call_failure_history_entity import (
     CallFailureHistoryEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
