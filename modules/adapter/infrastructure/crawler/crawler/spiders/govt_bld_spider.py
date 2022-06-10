@@ -120,13 +120,43 @@ class GovtBldSpider(Spider):
         pass
 
     def error_callback_bld_top_info(self, failure):
-        pass
+        self.save_failure_info(
+            ref_table="govt_bld_top_infos",
+            current_house_id=failure.request.meta["house_id"],
+            current_kapt_code=failure.request.meta["kapt_code"],
+            current_bld_name=failure.request.meta["name"],
+            new_dong_address=failure.request.meta["new_dong_address"],
+            origin_dong_address=failure.request.meta["origin_dong_address"],
+            bjd_code=failure.request.meta["bjd_code"],
+            current_url=failure.request.meta["url"],
+            response=failure,
+        )
 
     def error_callback_bld_mid_info(self, failure):
-        pass
+        self.save_failure_info(
+            ref_table="govt_bld_middle_infos",
+            current_house_id=failure.request.meta["house_id"],
+            current_kapt_code=failure.request.meta["kapt_code"],
+            current_bld_name=failure.request.meta["name"],
+            new_dong_address=failure.request.meta["new_dong_address"],
+            origin_dong_address=failure.request.meta["origin_dong_address"],
+            bjd_code=failure.request.meta["bjd_code"],
+            current_url=failure.request.meta["url"],
+            response=failure,
+        )
 
     def error_callback_bld_area_info(self, failure):
-        pass
+        self.save_failure_info(
+            ref_table="govt_bld_area_infos",
+            current_house_id=failure.request.meta["house_id"],
+            current_kapt_code=failure.request.meta["kapt_code"],
+            current_bld_name=failure.request.meta["name"],
+            new_dong_address=failure.request.meta["new_dong_address"],
+            origin_dong_address=failure.request.meta["origin_dong_address"],
+            bjd_code=failure.request.meta["bjd_code"],
+            current_url=failure.request.meta["url"],
+            response=failure,
+        )
 
     def get_input_infos(
         self, bld_info_list: list[GovtBldInputEntity]
@@ -165,6 +195,32 @@ class GovtBldSpider(Spider):
             sigungu_code=bld_info.bjd_code[:5],
             bjdong_code=bld_info.bjd_code[5:],
         )
+
+    def save_failure_info(
+        self,
+        ref_table,
+        current_house_id,
+        current_kapt_code,
+        current_bld_name,
+        new_dong_address,
+        origin_dong_address,
+        bjd_code,
+        current_url,
+        response,
+    ) -> None:
+        fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
+            ref_id=current_house_id,
+            ref_table=ref_table,
+            param=f"url: {current_url}, "
+            f"kapt_code: {current_kapt_code}, "
+            f"current_bld_name: {current_bld_name}, "
+            f"origin_dong_address: {origin_dong_address}, "
+            f"new_dong_address: {new_dong_address}, "
+            f"bjd_code: {bjd_code}",
+            reason=f"response:{response.text}",
+        )
+        if not self.__is_exists_failure(fail_orm=fail_orm):
+            self.__save_crawling_failure(fail_orm=fail_orm)
 
     def __save_crawling_failure(self, fail_orm: CallFailureHistoryModel) -> None:
         send_message(
