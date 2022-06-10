@@ -43,7 +43,7 @@ class GovtBldSpider(Spider):
             )
             yield Request(
                 url=urls[1]
-                    + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
+                + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
                 callback=self.parse_bld_mid_info,
                 errback=self.error_callback_bld_mid_info,
                 meta={
@@ -54,12 +54,12 @@ class GovtBldSpider(Spider):
                     "new_dong_address": param.new_dong_address,
                     "bjd_code": param.bjd_code,
                     "url": urls[0]
-                           + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
+                    + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
                 },
             )
             yield Request(
                 url=urls[2]
-                    + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
+                + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
                 callback=self.parse_bld_area_info,
                 errback=self.error_callback_bld_area_info,
                 meta={
@@ -70,7 +70,7 @@ class GovtBldSpider(Spider):
                     "new_dong_address": param.new_dong_address,
                     "bjd_code": param.bjd_code,
                     "url": urls[0]
-                           + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
+                    + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
                 },
             )
 

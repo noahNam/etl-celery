@@ -115,3 +115,52 @@ class GovtBldInputEntity(BaseModel):
     origin_dong_address: str | None
     new_dong_address: str | None
     bjd_code: str | None
+
+
+class KaptMgmtCostEntity(BaseModel):
+    id: int
+    kapt_code: str
+    house_id: int | None  # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언
+    name: str | None
+    payment_date: str | None
+    common_manage_cost: int | None
+    personnel_cost: int | None
+    office_cost: int | None
+    utility_tax: int | None
+    clothe_cost: int | None
+    edu_cost: int | None
+    car_keep_cost: int | None
+    etc_cost: int | None
+    clean_cost: int | None
+    security_cost: int | None
+    disinfection_cost: int | None
+    elv_keep_cost: int | None
+    home_network_cost: int | None
+    repair_cost: int | None
+    facilities_keep_cost: int | None
+    safety_check_cost: int | None
+    disaster_prevention_cost: int | None
+    consignment_fee: int | None
+    individual_fee: int | None
+    common_heat_cost: int | None
+    dedicate_heat_cost: int | None
+    common_water_supply_cost: int | None
+    dedicate_water_supply_cost: int | None
+    common_gas_cost: int | None
+    dedicate_gas_cost: int | None
+    common_ele_cost: int | None
+    dedicate_ele_cost: int | None
+    common_water_cost: int | None
+    dedicate_water_cost: int | None
+    septic_tank_fee: int | None
+    waste_fee: int | None
+    enlistment_oper_cost: int | None
+    building_insurance_cost: int | None
+    nec_oper_cost: int | None
+    public_part_imp_cost: int | None
+    public_part_usage_cost: int | None
+    public_part_total_amount: int | None
+    public_part_save_rate: int | None
+    etc_income_amount: int | None
+    created_at: datetime
+    updated_at: datetime

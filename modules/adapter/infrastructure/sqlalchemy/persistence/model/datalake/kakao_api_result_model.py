@@ -1,6 +1,6 @@
 from sqlalchemy import Column, BigInteger, Integer, String, Numeric
 
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kakao_api_result_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kakao_api_result_entity import (
     KakaoApiResultEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base

@@ -3,7 +3,7 @@ from scrapy.crawler import Crawler
 from modules.adapter.infrastructure.crawler.crawler.spiders.kakao_api_spider import (
     KakaoApiSpider,
 )
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KakaoApiInputEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
