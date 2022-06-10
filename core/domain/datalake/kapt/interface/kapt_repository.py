@@ -32,9 +32,3 @@ class KaptRepository(ABC):
     @abstractmethod
     def save(self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None) -> None:
         pass
-
-    @abstractmethod
-    def find_by_date(
-            self, target_model: Type[KaptBasicInfoModel | KaptAreaInfoModel | KaptLocationInfoModel | KaptMgmtCostModel], date: str
-    ) -> list[KaptBasicInfoEntity | KaptAreaInfoEntity | KaptLocationInfoEntity | KaptMgmtCostEntity] | None:
-        pass
