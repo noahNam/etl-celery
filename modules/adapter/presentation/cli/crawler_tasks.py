@@ -12,8 +12,12 @@ from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_reposi
     SyncLegalDongCodeRepository,
 )
 from modules.adapter.presentation.cli.enum import TopicEnum
-from modules.application.use_case.crawling.kakao_api.v1.kakao_api_use_case import KakaoApiUseCase
-from modules.application.use_case.crawling.kapt.v1.kapt_use_case import KaptOpenApiUseCase
+from modules.application.use_case.crawling.kakao_api.v1.kakao_api_use_case import (
+    KakaoApiUseCase,
+)
+from modules.application.use_case.crawling.kapt.v1.kapt_use_case import (
+    KaptOpenApiUseCase,
+)
 from modules.application.use_case.legal_dong_code.v1.legal_code_use_case import (
     LegalCodeUseCase,
 )

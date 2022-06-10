@@ -118,7 +118,7 @@ class KaptMgmtCostEntity(BaseModel):
     personnel_cost: int | None
     office_cost: int | None
     utility_tax: int | None
-    clothe_cost : int | None
+    clothe_cost: int | None
     edu_cost: int | None
     car_keep_cost: int | None
     etc_cost: int | None

@@ -3,7 +3,9 @@ from uuid import uuid4
 from modules.adapter.infrastructure.celery.etl_queue import etl_celery
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
 from modules.adapter.infrastructure.sqlalchemy.database import db
-from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import SyncBasicRepository
+from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
+    SyncBasicRepository,
+)
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )

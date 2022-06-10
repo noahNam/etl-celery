@@ -1,6 +1,8 @@
 from sqlalchemy import Column, BigInteger, Integer, String
 
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import KaptMgmtCostEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
+    KaptMgmtCostEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
