@@ -88,11 +88,7 @@ class KaptSpider(Spider):
         except KeyError:
             pass
 
-        if KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value:
-            self.change_service_key()
-            KaptSpider.request_count = 0
-        else:
-            KaptSpider.request_count += KaptSpider.request_count
+        self.count_requests()
 
         if item:
             yield item
@@ -124,11 +120,7 @@ class KaptSpider(Spider):
         except KeyError:
             pass
 
-        if KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value:
-            self.change_service_key()
-            KaptSpider.request_count = 0
-        else:
-            KaptSpider.request_count += KaptSpider.request_count
+        self.count_requests()
 
         if item:
             yield item
@@ -138,6 +130,13 @@ class KaptSpider(Spider):
             KaptSpider.open_api_service_key = KaptEnum.SERVICE_KEY_1.value
         else:
             KaptSpider.open_api_service_key = KaptEnum.SERVICE_KEY_2.value
+
+    def count_requests(self):
+        if KaptSpider.request_count >= KaptEnum.DAILY_REQUEST_COUNT.value:
+            self.change_service_key()
+            KaptSpider.request_count = 0
+        else:
+            KaptSpider.request_count += 1
 
     def error_callback_kapt_base_info(self, failure):
         current_house_id = failure.request.meta["house_id"]
@@ -151,7 +150,8 @@ class KaptSpider(Spider):
             reason=f"{failure.value}",
         )
 
-        self.__save_crawling_failure(fail_orm=fail_orm)
+        if not self.__is_exists_failure(fail_orm=fail_orm):
+            self.__save_crawling_failure(fail_orm=fail_orm)
 
     def error_callback_kapt_detail_info(self, failure):
         current_house_id = failure.request.meta["house_id"]
