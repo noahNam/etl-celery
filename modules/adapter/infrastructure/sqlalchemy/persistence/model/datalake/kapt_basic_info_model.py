@@ -1,8 +1,11 @@
 from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Numeric
 from sqlalchemy.orm import relationship
 
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import KaptOpenApiInputEntity, \
-    KakaoApiInputEntity, KaptBasicInfoEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
+    KaptOpenApiInputEntity,
+    KakaoApiInputEntity,
+    KaptBasicInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
@@ -75,7 +78,10 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
 
     # relationship
     kapt_mgmt_costs = relationship(
-        "KaptMgmtCostModel", backref="kapt_basic_infos", uselist=True, primaryjoin="KaptBasicInfoModel.kapt_code == foreign(KaptMgmtCostModel.kapt_code)"
+        "KaptMgmtCostModel",
+        backref="kapt_basic_infos",
+        uselist=True,
+        primaryjoin="KaptBasicInfoModel.kapt_code == foreign(KaptMgmtCostModel.kapt_code)",
     )
 
     def to_open_api_input_entity(self) -> KaptOpenApiInputEntity:

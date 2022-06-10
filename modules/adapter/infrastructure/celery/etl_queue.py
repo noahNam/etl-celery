@@ -55,5 +55,6 @@ def setup_periodic_tasks(sender, **kwargs):
     #     kwargs={"topic": TopicEnum.CRAWL_LEGAL_DONG_CODE.value}
     # )
 
+
 # celery -A modules.adapter.infrastructure.celery.etl_queue.celery flower --address=localhost --port=5555
 # celery -A modules.adapter.infrastructure.celery.etl_queue.celery worker -B --loglevel=info -P threads -c 1

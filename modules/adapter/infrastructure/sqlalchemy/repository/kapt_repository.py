@@ -8,8 +8,14 @@ from sqlalchemy.orm import Session, joinedload
 
 from core.domain.datalake.kapt.interface.kapt_repository import KaptRepository
 from exceptions.base import NotUniqueErrorException
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import KaptOpenApiInputEntity, \
-    KakaoApiInputEntity, KaptBasicInfoEntity, KaptAreaInfoEntity, KaptLocationInfoEntity, KaptMgmtCostEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
+    KaptOpenApiInputEntity,
+    KakaoApiInputEntity,
+    KaptBasicInfoEntity,
+    KaptAreaInfoEntity,
+    KaptLocationInfoEntity,
+    KaptMgmtCostEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_area_info_model import (
     KaptAreaInfoModel,
@@ -20,7 +26,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_b
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_location_info_model import (
     KaptLocationInfoModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_mgmt_cost_model import KaptMgmtCostModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_mgmt_cost_model import (
+    KaptMgmtCostModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.repository import (
     BaseAsyncRepository,
     BaseSyncRepository,
@@ -160,16 +168,28 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
         return None
 
     def find_by_date(
-            self, target_model: Type[KaptBasicInfoModel | KaptAreaInfoModel | KaptLocationInfoModel | KaptMgmtCostModel], target_date: date
-    ) -> list[KaptBasicInfoEntity | KaptAreaInfoEntity | KaptLocationInfoEntity | KaptMgmtCostEntity] | None:
+        self,
+        target_model: Type[
+            KaptBasicInfoModel
+            | KaptAreaInfoModel
+            | KaptLocationInfoModel
+            | KaptMgmtCostModel
+        ],
+        target_date: date,
+    ) -> list[
+        KaptBasicInfoEntity
+        | KaptAreaInfoEntity
+        | KaptLocationInfoEntity
+        | KaptMgmtCostEntity
+    ] | None:
         result_list = None
 
         if target_model == KaptBasicInfoModel:
             # 단지 기본정보
             with self.session_factory() as session:
-                query = (
-                    select(KaptBasicInfoModel)
-                        .where(func.date(KaptBasicInfoModel.updated_at) == target_date or func.date(KaptBasicInfoModel.updated_at) == target_date)
+                query = select(KaptBasicInfoModel).where(
+                    func.date(KaptBasicInfoModel.updated_at) == target_date
+                    or func.date(KaptBasicInfoModel.updated_at) == target_date
                 )
                 results = session.execute(query).scalars().all()
             if results:
@@ -178,9 +198,9 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
         elif target_model == KaptAreaInfoModel:
             # 단지 면적정보
             with self.session_factory() as session:
-                query = (
-                    select(KaptAreaInfoModel)
-                        .where(func.date(KaptAreaInfoModel.created_at) == target_date or func.date(KaptAreaInfoModel.updated_at) == target_date)
+                query = select(KaptAreaInfoModel).where(
+                    func.date(KaptAreaInfoModel.created_at) == target_date
+                    or func.date(KaptAreaInfoModel.updated_at) == target_date
                 )
                 results = session.execute(query).scalars().all()
             if results:
@@ -189,21 +209,26 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
         elif target_model == KaptLocationInfoModel:
             # 단지 주변정보
             with self.session_factory() as session:
-                query = (
-                    select(KaptLocationInfoModel)
-                        .where(func.date(KaptLocationInfoModel.created_at) == target_date or func.date(KaptLocationInfoModel.updated_at) == target_date)
+                query = select(KaptLocationInfoModel).where(
+                    func.date(KaptLocationInfoModel.created_at) == target_date
+                    or func.date(KaptLocationInfoModel.updated_at) == target_date
                 )
                 results = session.execute(query).scalars().all()
             if results:
-                result_list = [result.to_kapt_location_info_entity() for result in results]
+                result_list = [
+                    result.to_kapt_location_info_entity() for result in results
+                ]
 
         elif target_model == KaptMgmtCostModel:
             # 단지 관리비정보
             with self.session_factory() as session:
                 query = (
                     select(KaptMgmtCostModel)
-                        # .join(KaptBasicInfoModel.kapt_mgmt_costs)
-                        .where(func.date(KaptMgmtCostModel.created_at) == target_date or func.date(KaptMgmtCostModel.updated_at) == target_date)
+                    # .join(KaptBasicInfoModel.kapt_mgmt_costs)
+                    .where(
+                        func.date(KaptMgmtCostModel.created_at) == target_date
+                        or func.date(KaptMgmtCostModel.updated_at) == target_date
+                    )
                 )
                 results = session.execute(query).scalars().all()
             if results:

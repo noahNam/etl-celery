@@ -2,7 +2,9 @@ from uuid import uuid4
 
 from core.domain.datalake.kapt.interface.kapt_repository import KaptRepository
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import KaptOpenApiInputEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
+    KaptOpenApiInputEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_area_info_model import (
     KaptAreaInfoModel,
 )

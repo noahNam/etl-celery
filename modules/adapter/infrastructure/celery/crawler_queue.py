@@ -41,6 +41,7 @@ crawler_celery: Celery = make_celery(fastapi_config)
 @crawler_celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     from modules.adapter.presentation.cli import crawler_tasks
+
     # sender.add_periodic_task(
     #     10.0,
     #     tasks.start_crwaler.s(topic=TopicEnum.CRAWL_KAPT.value),
@@ -48,7 +49,9 @@ def setup_periodic_tasks(sender, **kwargs):
     # )
 
     # crawler_tasks.start_crwaler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
-    crawler_tasks.start_crwaler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAKAO_API.value})
+    crawler_tasks.start_crwaler.apply_async(
+        kwargs={"topic": TopicEnum.CRAWL_KAKAO_API.value}
+    )
 
 
 # celery -A modules.adapter.infrastructure.celery.crawler_queue.celery flower --address=localhost --port=5555
