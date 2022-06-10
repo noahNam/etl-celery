@@ -179,7 +179,7 @@ class KakaoApiSpider(Spider):
         current_url,
         response,
     ) -> None:
-        fail_orm = CallFailureHistoryModel(
+        fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
             ref_id=current_house_id,
             ref_table="kakao_api_results",
             param=f"url: {current_url}, "
