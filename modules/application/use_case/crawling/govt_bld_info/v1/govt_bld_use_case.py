@@ -3,9 +3,10 @@ from scrapy.crawler import Crawler
 from modules.adapter.infrastructure.crawler.crawler.spiders.govt_bld_spider import (
     GovtBldSpider,
 )
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.kapt_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     GovtBldInputEntity,
 )
+
 from modules.application.use_case import BaseSyncUseCase
 
 
