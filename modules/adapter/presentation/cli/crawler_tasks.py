@@ -47,7 +47,7 @@ def get_task(topic: str):
 
 
 @crawler_celery.task
-def start_crwaler(topic):
+def start_crawler(topic):
     session_id = str(uuid4())
     context = SessionContextManager.set_context_value(session_id)
 

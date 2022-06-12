@@ -179,18 +179,32 @@ class KakaoApiSpider(Spider):
         current_url,
         response,
     ) -> None:
-        fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
-            ref_id=current_house_id,
-            ref_table="kakao_api_results",
-            param=f"url: {current_url}, "
-            f"kapt_code: {current_kapt_code}, "
-            f"current_bld_name: {current_bld_name}, "
-            f"origin_dong_address: {origin_dong_address}, "
-            f"origin_road_address: {origin_road_address}, "
-            f"new_dong_address: {new_dong_address}, "
-            f"new_road_address: {new_road_address}",
-            reason=f"response:{response.text}",
-        )
+        try:
+            fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
+                ref_id=current_house_id,
+                ref_table="kakao_api_results",
+                param=f"url: {current_url}, "
+                f"kapt_code: {current_kapt_code}, "
+                f"current_bld_name: {current_bld_name}, "
+                f"origin_dong_address: {origin_dong_address}, "
+                f"origin_road_address: {origin_road_address}, "
+                f"new_dong_address: {new_dong_address}, "
+                f"new_road_address: {new_road_address}",
+                reason=f"response:{response.text}",
+            )
+        except AttributeError:
+            fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
+                ref_id=current_house_id,
+                ref_table="kakao_api_results",
+                param=f"url: {current_url}, "
+                f"kapt_code: {current_kapt_code}, "
+                f"current_bld_name: {current_bld_name}, "
+                f"origin_dong_address: {origin_dong_address}, "
+                f"origin_road_address: {origin_road_address}, "
+                f"new_dong_address: {new_dong_address}, "
+                f"new_road_address: {new_road_address}",
+                reason=f"response:{response}",
+            )
         if not self.__is_exists_failure(fail_orm=fail_orm):
             self.__save_crawling_failure(fail_orm=fail_orm)
 

@@ -132,7 +132,7 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
 
         return None
 
-    def exists_by_kapt_code(
+    def is_exists_by_kapt_code(
         self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None
     ) -> bool:
         with self.session_factory() as session:
