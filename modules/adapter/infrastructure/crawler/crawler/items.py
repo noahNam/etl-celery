@@ -47,3 +47,212 @@ class LegalDongCodeItem(BaseModel):
     locathigh_cd: str | None
     locallow_nm: str | None
     adpt_de: str | None
+
+
+class GovtBldInputInfo(BaseModel):
+    house_id: int
+    kapt_code: str | None
+    name: str | None
+    origin_dong_address: str | None
+    new_dong_address: str | None
+    origin_bjd_code: str | None
+    bun: str | None
+    ji: str | None
+    sigungu_code: str | None
+    bjdong_code: str | None
+
+
+class GovtBldTopInfoItem(BaseModel):
+    house_id: int
+    mgm_bldrgst_pk: str
+    itg_bld_grade: str | None
+    itg_bld_cert: str | None
+    crtn_day: str | None
+    na_bjdong_cd: str | None
+    na_ugrnd_cd: str | None
+    na_main_bun: float | None
+    na_sub_bun: float | None
+    plat_area: float | None
+    arch_area: float | None
+    bc_rat: float | None
+    tot_area: float | None
+    vl_rat_estm_tot_area: float | None
+    vl_rat: float | None
+    main_purps_cd: str | None
+    main_purps_cd_nm: str | None
+    etc_purps: str | None
+    hhld_cnt: float | None
+    fmly_cnt: float | None
+    main_bld_cnt: float | None
+    atch_bld_cnt: float | None
+    atch_bld_area: float | None
+    tot_pkng_cnt: float | None
+    indr_mech_utcnt: float | None
+    indr_mech_area: float | None
+    oudr_mech_utcnt: float | None
+    oudr_mech_area: float | None
+    indr_auto_utcnt: float | None
+    indr_auto_area: float | None
+    oudr_auto_utcnt: float | None
+    oudr_auto_area: float | None
+    pms_day: str | None
+    stcns_day: str | None
+    use_apr_day: str | None
+    pmsno_year: str | None
+    pmsno_kik_cd: str | None
+    pmsno_kik_cd_nm: str | None
+    pmsno_gb_cd: str | None
+    pmsno_gb_cd_nm: str | None
+    ho_cnt: float | None
+    engr_grade: str | None
+    engr_rat: float | None
+    engr_epi: float | None
+    gn_bld_grade: str | None
+    gn_bld_cert: float | None
+    rnum: float | None
+    plat_plc: str | None
+    sigungu_cd: str | None
+    bjdong_cd: str | None
+    plat_gb_cd: str | None
+    bun: str | None
+    ji: str | None
+    regstr_gb_cd: str | None
+    regstr_gb_cd_nm: str | None
+    regstr_kind_cd: str | None
+    regstr_kind_cd_nm: str | None
+    new_old_regstr_gb_cd: str | None
+    new_old_regstr_gb_cd_nm: str | None
+    new_plat_plc: str | None
+    bld_nm: str | None
+    splot_nm: str | None
+    block: str | None
+    lot: str | None
+    bylot_cnt: float | None
+    na_road_cd: str | None
+    dong_nm: str | None
+
+
+class GovtBldMidInfoItem(BaseModel):
+    house_id: int
+    mgm_bldrgst_pk: str
+    main_purps_cd_nm: str | None
+    etc_purps: str | None
+    roof_cd: str | None
+    roof_cd_nm: str | None
+    etc_roof: str | None
+    hhld_cnt: float | None
+    fmly_cnt: float | None
+    heit: float | None
+    grnd_flr_cnt: float | None
+    ugrnd_flr_cnt: float | None
+    ride_use_elvt_cnt: float | None
+    emgen_use_elvt_cnt: float | None
+    atch_bld_cnt: float | None
+    atch_bld_area: float | None
+    tot_dong_tot_area: float | None
+    indr_mech_utcnt: float | None
+    indr_mech_area: float | None
+    oudr_mech_utcnt: float | None
+    oudr_mech_area: float | None
+    indr_auto_utcnt: float | None
+    indr_auto_area: float | None
+    oudr_auto_utcnt: float | None
+    oudr_auto_area: float | None
+    pms_day: str | None
+    stcns_day: str | None
+    use_apr_day: str | None
+    pmsno_year: str | None
+    pmsno_kik_cd: str | None
+    pmsno_kik_cd_nm: str | None
+    pmsno_gb_cd: str | None
+    pmsno_gb_cd_nm: str | None
+    ho_cnt: float | None
+    engr_grade: str | None
+    engr_rat: float | None
+    engr_epi: float | None
+    gn_bld_grade: str | None
+    gn_bld_cert: float | None
+    itg_bld_grade: str | None
+    itg_bld_cert: float | None
+    crtn_day: str | None
+    rnum: float | None
+    plat_plc: str | None
+    sigungu_cd: str | None
+    bjdong_cd: str | None
+    plat_gb_cd: str | None
+    bun: str | None
+    ji: str | None
+    regstr_gb_cd: str | None
+    regstr_gb_cd_nm: str | None
+    regstr_kind_cd: str | None
+    regstr_kind_cd_nm: str | None
+    new_plat_plc: str | None
+    bld_nm: str | None
+    splot_nm: str | None
+    block: str | None
+    lot: str | None
+    bylot_cnt: float | None
+    na_road_cd: str | None
+    na_bjdong_cd: str | None
+    na_ugrnd_cd: str | None
+    na_main_bun: float | None
+    na_sub_bun: float | None
+    dong_nm: str | None
+    main_atch_gb_cd: str | None
+    main_atch_gb_cd_nm: str | None
+    plat_area: float | None
+    arch_area: float | None
+    bc_rat: float | None
+    tot_area: float | None
+    vl_rat_estm_tot_area: float | None
+    vl_rat: float | None
+    strct_cd: str | None
+    strct_cd_nm: str | None
+    etc_strct: str | None
+    main_purps_cd: str | None
+    rserthqk_dsgn_apply_yn: str | None
+    rserthqk_ablty: str | None
+
+
+class GovtBldAreaInfoItem(BaseModel):
+    house_id: int
+    mgm_bldrgst_pk: str
+    regstr_gb_cd: str | None
+    regstr_gb_cd_nm: str | None
+    regstr_kind_cd: str | None
+    regstr_kind_cd_nm: str | None
+    new_plat_plc: str | None
+    bld_nm: str | None
+    splot_nm: str | None
+    block: str | None
+    lot: str | None
+    na_road_cd: str | None
+    na_bjdong_cd: str | None
+    na_ugrnd_cd: str | None
+    na_main_bun: float | None
+    na_sub_bun: float | None
+    dong_nm: str | None
+    ho_nm: str | None
+    flr_gb_cd: str | None
+    flr_gb_cd_nm: str | None
+    flr_no: float | None
+    flr_no_nm: str | None
+    expos_pubuse_gb_cd: str | None
+    expos_pubuse_gb_cd_nm: str | None
+    main_atch_gb_cd: str | None
+    main_atch_gb_cd_nm: str | None
+    strct_cd: str | None
+    strct_cd_nm: str | None
+    etc_strct: str | None
+    main_purps_cd: str | None
+    main_purps_cd_nm: str | None
+    etc_purps: str | None
+    area: float | None
+    crtn_day: str | None
+    rnum: float | None
+    plat_plc: str | None
+    sigungu_cd: str | None
+    bjdong_cd: str | None
+    plat_gb_cd: str | None
+    bun: str | None
+    ji: str | None

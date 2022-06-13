@@ -83,4 +83,3 @@ class GovtBldTopInfoModel(datalake_base, TimestampMixin):
     lot = Column(String(20), nullable=True)
     bylot_cnt = Column(Numeric(5), nullable=True)
     na_road_cd = Column(String(12), nullable=True)
-    dong_nm = Column(String(100), nullable=True)
