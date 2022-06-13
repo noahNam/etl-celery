@@ -11,9 +11,17 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_b
 )
 
 
-class GovtHouseDealRepository(ABC):
+class GovtBldRepository(ABC):
     @abstractmethod
     def save(
-        self, model: GovtBldTopInfoModel | GovtBldMiddleInfoModel | GovtBldAreaInfoModel
+        self,
+        bld_orm: GovtBldTopInfoModel | GovtBldMiddleInfoModel | GovtBldAreaInfoModel,
     ) -> None:
+        pass
+
+    @abstractmethod
+    def is_exists(
+        self,
+        bld_orm: GovtBldTopInfoModel | GovtBldMiddleInfoModel | GovtBldAreaInfoModel,
+    ) -> bool:
         pass

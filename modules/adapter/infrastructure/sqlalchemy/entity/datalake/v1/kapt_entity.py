@@ -110,6 +110,15 @@ class KakaoApiInputEntity(BaseModel):
     new_road_address: str | None
 
 
+class GovtBldInputEntity(BaseModel):
+    house_id: int
+    kapt_code: str | None
+    name: str | None
+    origin_dong_address: str | None
+    new_dong_address: str | None
+    bjd_code: str | None
+
+
 class KaptMgmtCostEntity(BaseModel):
     id: int
     kapt_code: str

@@ -1,10 +1,10 @@
 from sqlalchemy import exc, select
 
-from core.domain.legal_dong_code.interface.legal_dong_code_repository import (
+from core.domain.datalake.legal_dong_code.interface.legal_dong_code_repository import (
     LegalDongCodeRepository,
 )
 from exceptions.base import NotUniqueErrorException
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.legal_dong_code_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.legal_dong_code_model import (

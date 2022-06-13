@@ -12,13 +12,16 @@ from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_reposi
     SyncLegalDongCodeRepository,
 )
 from modules.adapter.presentation.cli.enum import TopicEnum
+from modules.application.use_case.crawling.govt_bld_info.v1.govt_bld_use_case import (
+    GovtBldUseCase,
+)
 from modules.application.use_case.crawling.kakao_api.v1.kakao_api_use_case import (
     KakaoApiUseCase,
 )
 from modules.application.use_case.crawling.kapt.v1.kapt_use_case import (
     KaptOpenApiUseCase,
 )
-from modules.application.use_case.legal_dong_code.v1.legal_code_use_case import (
+from modules.application.use_case.crawling.legal_dong_code.v1.legal_code_use_case import (
     LegalCodeUseCase,
 )
 
@@ -37,10 +40,14 @@ def get_task(topic: str):
         return LegalCodeUseCase(
             topic=topic, repo=SyncLegalDongCodeRepository(session_factory=db.session)
         )
+    if topic == TopicEnum.CRAWL_BUILDING_MANAGE.value:
+        return GovtBldUseCase(
+            topic=topic, repo=SyncKaptRepository(session_factory=db.session)
+        )
 
 
 @crawler_celery.task
-def start_crwaler(topic):
+def start_crawler(topic):
     session_id = str(uuid4())
     context = SessionContextManager.set_context_value(session_id)
 
