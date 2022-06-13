@@ -6,6 +6,9 @@ from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repository import (
+    SyncKakaoApiRepository,
+)
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )
@@ -19,6 +22,7 @@ def get_task(topic: str):
             topic=topic,
             basic_repo=SyncBasicRepository(session_factory=db.session),
             kapt_repo=SyncKaptRepository(session_factory=db.session),
+            kakao_repo=SyncKakaoApiRepository(session_factory=db.session),
         )
 
 

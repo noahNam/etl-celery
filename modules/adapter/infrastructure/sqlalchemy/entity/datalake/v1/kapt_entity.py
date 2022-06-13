@@ -72,6 +72,7 @@ class KaptOpenApiInputEntity(BaseModel):
 
 class KaptAreaInfoEntity(BaseModel):
     kapt_code: str
+    house_id: int | None  # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언(kapt_code는 추후 다른 크롤링 방법으로 메타데이터를 끌어올때 없을 수 있음)(kapt_code는 추후 다른 크롤링 방법으로 메타데이터를 끌어올때 없을 수 있음)
     name: str | None
     kapt_tarea: str | None
     kapt_marea: str | None
@@ -87,6 +88,7 @@ class KaptAreaInfoEntity(BaseModel):
 
 class KaptLocationInfoEntity(BaseModel):
     kapt_code: str
+    house_id: int | None  # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언(kapt_code는 추후 다른 크롤링 방법으로 메타데이터를 끌어올때 없을 수 있음)(kapt_code는 추후 다른 크롤링 방법으로 메타데이터를 끌어올때 없을 수 있음)
     name: str | None
     kaptd_wtimebus: str | None
     subway_line: str | None
@@ -111,7 +113,7 @@ class KakaoApiInputEntity(BaseModel):
 class KaptMgmtCostEntity(BaseModel):
     id: int
     kapt_code: str
-    house_id: int | None  # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언
+    house_id: int | None  # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언(kapt_code는 추후 다른 크롤링 방법으로 메타데이터를 끌어올때 없을 수 있음)
     name: str | None
     payment_date: str | None
     common_manage_cost: int | None

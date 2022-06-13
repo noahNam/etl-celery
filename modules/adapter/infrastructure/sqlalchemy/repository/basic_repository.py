@@ -117,9 +117,10 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                         road_number=value.road_number,
                         road_name=value.road_name,
                         land_number=value.land_number,
+                        x_vl=value.x_vl,
+                        y_vl=value.y_vl,
                     )
                 )
-                session.commit()
 
             elif target_model == MgmtCostModel:
                 session.execute(
@@ -135,9 +136,20 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                         etc_income_amount=value.etc_income_amount,
                     )
                 )
-                session.commit()
 
-        return None
+            session.commit()
+
+    def dynamic_update(self, target_model: Type[BasicInfoModel], value: dict) -> None:
+        with self.session_factory() as session:
+            key = value.get("key")
+            items = value.get("items")
+            query = select(BasicInfoModel).where(target_model.house_id == key)
+            col_info = session.execute(query).scalars().first()
+
+            for (key, value) in items.items():
+                if hasattr(target_model, key):
+                    setattr(col_info, key, value)
+                    session.commit()
 
     def exists_by_key(
         self, value: BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel
