@@ -6,6 +6,9 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
     KaptLocationInfoEntity,
     KaptMgmtCostEntity,
 )
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_area_info_model import (
+    KaptAreaInfoModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
 )
@@ -32,6 +35,10 @@ class TransformBasic:
             return self._etl_kapt_basic_infos(target_list)
         elif from_model == "kapt_mgmt_costs":
             return self._etl_kapt_mgmt_costs(target_list)
+        elif from_model == "kapt_location_infos":
+            return self._etl_kapt_location_infos(target_list)
+        elif from_model == "kapt_area_infos":
+            return self._etl_kapt_area_infos(target_list)
         # DongInfoModel <- govt_bld_middle_infos
         # TypeInfoModel <- govt_bld_area_infos
 
@@ -48,6 +55,40 @@ class TransformBasic:
                     individual_fee=target_entity.individual_fee,
                     public_part_imp_cost=target_entity.public_part_imp_cost,
                     etc_income_amount=target_entity.etc_income_amount,
+                )
+            )
+        return result
+
+    def _etl_kapt_location_infos(
+        self, target_list: list[KaptLocationInfoEntity]
+    ) -> list[dict]:
+        result = list()
+        for target_entity in target_list:
+            result.append(
+                dict(
+                    key=target_entity.house_id,
+                    items=dict(
+                        kaptd_wtimebus=target_entity.kaptd_wtimebus,
+                        subway_line=target_entity.subway_line,
+                        subway_station=target_entity.subway_station,
+                        kaptd_wtimesub=target_entity.kaptd_wtimesub,
+                        convenient_facility=target_entity.convenient_facility,
+                        education_facility=target_entity.education_facility,
+                    ),
+                )
+            )
+        return result
+
+    def _etl_kapt_area_infos(self, target_list: list[KaptAreaInfoEntity]) -> list[dict]:
+        result = list()
+        for target_entity in target_list:
+            result.append(
+                dict(
+                    key=target_entity.house_id,
+                    items=dict(
+                        priv_area=target_entity.priv_area,
+                        bjdong_cd=target_entity.bjd_code,
+                    ),
                 )
             )
         return result

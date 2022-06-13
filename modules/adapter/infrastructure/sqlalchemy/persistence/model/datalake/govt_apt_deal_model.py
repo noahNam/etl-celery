@@ -43,3 +43,14 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
     cancel_deal_day = Column(String(8), nullable=True)
     req_gbn = Column(String(10), nullable=True)
     rdealer_lawdnm = Column(String(150), nullable=True)
+
+    def to_govt_apt_deal_entity(self) -> KakaoApiInputEntity:
+        return KakaoApiInputEntity(
+            house_id=self.house_id,
+            kapt_code=self.kapt_code,
+            name=self.name,
+            origin_dong_address=self.origin_dong_address,
+            origin_road_address=self.origin_road_address,
+            new_dong_address=self.new_dong_address,
+            new_road_address=self.new_road_address,
+        )
