@@ -17,6 +17,15 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncLegalDongCodeRepository(LegalDongCodeRepository, BaseSyncRepository):
+    def find_all(self) -> list[LegalDongCodeEntity] | None:
+        with self.session_factory() as session:
+            queryset = session.execute(select(LegalDongCodeModel)).scalars().all()
+
+        if not queryset:
+            return list()
+        else:
+            return [query.to_entity() for query in queryset]
+
     def find_by_id(self, legal_dong_code_id: int) -> LegalDongCodeEntity | None:
         with self.session_factory() as session:
             legal_code_info = session.get(LegalDongCodeModel, legal_dong_code_id)

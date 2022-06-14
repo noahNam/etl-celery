@@ -5,6 +5,10 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
     TimestampMixin,
 )
 
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
+    GovtAptDealsEntity,
+)
+
 
 class GovtAptDealModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_apt_deals"
@@ -43,3 +47,14 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
     cancel_deal_day = Column(String(8), nullable=True)
     req_gbn = Column(String(10), nullable=True)
     rdealer_lawdnm = Column(String(150), nullable=True)
+
+    def to_entity_for_bld_mapping_reuslts(self) -> GovtAptDealsEntity:
+        return GovtAptDealsEntity(
+            id=self.id,
+            sigungu_cd=self.sigungu_cd,
+            eubmyundong_cd=self.eubmyundong_cd,
+            build_year=self.build_year,
+            jibun=self.jibun,
+            apt_name=self.apt_name,
+            dong=self.dong
+        )
