@@ -41,6 +41,7 @@ def get_task(topic: str):
             bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session)
         )
 
+
 @etl_celery.task
 def start_worker(topic):
     session_id = str(uuid4())
