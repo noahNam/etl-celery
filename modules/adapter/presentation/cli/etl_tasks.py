@@ -22,7 +22,7 @@ from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_re
 
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
-from modules.application.use_case.etl.datalake.v1.mapping_use_case import BldMappingResultsUseCase
+from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import BldMappingResultsUseCase
 
 
 def get_task(topic: str):
