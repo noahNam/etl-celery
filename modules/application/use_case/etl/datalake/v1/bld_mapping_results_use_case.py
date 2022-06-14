@@ -43,7 +43,7 @@ class BldMappingResultsUseCase(BaseEtlUseCase):
         self._govt_repo: SyncGovtAptDealsRepository = govt_repo
         self._transfer: TransferBldMappingResults = TransferBldMappingResults()
         self._dong_code: SyncLegalDongCodeRepository = dong_code_repo
-        self._bld_mappint_repo: SyncBldMappingResultsRepository = bld_mappint_repo
+        self._bld_mappint_repo: SyncBldMappingResultsRepository = bld_mapping_repo
 
     def execute(self):
         # extract
