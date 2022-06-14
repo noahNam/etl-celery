@@ -37,7 +37,7 @@ logger = logger_.getLogger(__name__)
 
 
 class BldMappingResultsUseCase(BaseEtlUseCase):
-    def __init__(self, kapt_repo, govt_repo, dong_code_repo, bld_mappint_repo, *args, **kwargs):
+    def __init__(self, kapt_repo, govt_repo, dong_code_repo, bld_mapping_repo, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._kapt_repo: SyncKaptRepository = kapt_repo
         self._govt_repo: SyncGovtAptDealsRepository = govt_repo
