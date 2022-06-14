@@ -155,3 +155,17 @@ class KaptMgmtCostEntity(BaseModel):
     etc_income_amount: int | None
     created_at: datetime
     updated_at: datetime
+
+
+class KaptMappingEntity(BaseModel):
+    house_id: int
+    sido: str | None
+    sigungu: str | None
+    eubmyun: str | None  # 읍면동
+    dongri: str | None  # 동리
+    use_apr_day: str | None  # 사용승인일
+    origin_dong_address: str | None  # 지번주소
+    name: str | None
+
+
+
