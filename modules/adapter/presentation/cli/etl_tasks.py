@@ -6,7 +6,9 @@ from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
 )
-from modules.adapter.infrastructure.sqlalchemy.repository.govt_bld_repository import SyncGovtBldRepository
+from modules.adapter.infrastructure.sqlalchemy.repository.govt_bld_repository import (
+    SyncGovtBldRepository,
+)
 from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repository import (
     SyncKakaoApiRepository,
 )

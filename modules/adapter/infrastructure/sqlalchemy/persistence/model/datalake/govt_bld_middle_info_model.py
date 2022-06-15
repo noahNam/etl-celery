@@ -1,6 +1,8 @@
 from sqlalchemy import Column, String, BigInteger, Integer, Numeric, SmallInteger
 
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import GovtBldMiddleInfoEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
+    GovtBldMiddleInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,

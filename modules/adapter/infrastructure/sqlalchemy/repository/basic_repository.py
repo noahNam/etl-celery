@@ -140,9 +140,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
             elif target_model == DongInfoModel:
                 session.execute(
                     update(DongInfoModel)
-                    .where(
-                        DongInfoModel.id == value.id
-                    )
+                    .where(DongInfoModel.id == value.id)
                     .values(
                         name=value.name,
                         hhld_cnt=value.hhld_cnt,
@@ -153,9 +151,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
             elif target_model == TypeInfoModel:
                 session.execute(
                     update(TypeInfoModel)
-                    .where(
-                        TypeInfoModel.id == value.id
-                    )
+                    .where(TypeInfoModel.id == value.id)
                     .values(
                         private_area=value.private_area,
                         supply_area=value.supply_area,
