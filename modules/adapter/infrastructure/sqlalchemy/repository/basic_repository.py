@@ -123,9 +123,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
             elif isinstance(value, MgmtCostModel):
                 session.execute(
                     update(MgmtCostModel)
-                    .where(
-                        MgmtCostModel.id == value.id
-                    )
+                    .where(MgmtCostModel.id == value.id)
                     .values(
                         common_manage_cost=value.common_manage_cost,
                         individual_fee=value.individual_fee,
