@@ -5,6 +5,11 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
     TimestampMixin,
 )
 
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
+    GovtAptRentsEntity
+)
+
+
 
 class GovtAptRentModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_apt_rents"
@@ -27,3 +32,14 @@ class GovtAptRentModel(datalake_base, TimestampMixin):
     jibun = Column(String(10), nullable=True)
     regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
+
+    def to_entity_for_bld_mapping_reuslts(self) -> GovtAptRentsEntity:
+        return GovtAptRentsEntity(
+            id=self.id,
+            regional_cd=self.regional_cd,
+            dong=self.dong,
+            build_year=self.build_year,
+            jibun=self.jibun,
+            apt_name=self.apt_name
+        )
+

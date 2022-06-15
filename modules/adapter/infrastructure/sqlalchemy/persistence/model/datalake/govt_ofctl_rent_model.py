@@ -5,6 +5,10 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
     TimestampMixin,
 )
 
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
+    GovtOfctlRentsEntity
+)
+
 
 class GovtOfctlRentModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_ofctl_rents"
@@ -27,3 +31,12 @@ class GovtOfctlRentModel(datalake_base, TimestampMixin):
     jibun = Column(String(10), nullable=True)
     regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
+
+    def to_entity_for_bld_mapping_results(self) -> GovtOfctlRentsEntity:
+        return GovtOfctlRentsEntity(
+            id=self.id,
+            regional_cd=self.regional_cd,
+            dong=self.dong,
+            jibun=self.jibun,
+            ofctl_name=self.ofctl_name
+        )

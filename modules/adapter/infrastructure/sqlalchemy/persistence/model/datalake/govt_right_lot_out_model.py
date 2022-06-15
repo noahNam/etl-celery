@@ -5,6 +5,10 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
     TimestampMixin,
 )
 
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
+    GovtRightLotOutsEntity
+)
+
 
 class GovtRightLotOutModel(datalake_base, TimestampMixin):
     __tablename__ = "govt_right_lot_outs"
@@ -27,3 +31,13 @@ class GovtRightLotOutModel(datalake_base, TimestampMixin):
     jibun = Column(String(10), nullable=True)
     regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
+
+    # GovtRightLotOutsEntity
+    def to_entity_for_bld_mapping_results(self) -> GovtRightLotOutsEntity:
+        return GovtRightLotOutsEntity(
+            id=self.id,
+            regional_cd=self.regional_cd,
+            dong=self.dong,
+            jibun=self.jibun,
+            name=self.name
+        )
