@@ -7,7 +7,9 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.mysql import DOUBLE
 
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import ApplyHomeEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
+    ApplyHomeEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 
 
@@ -29,7 +31,7 @@ class ApplyHomeModel(datalake_base):
     second_subs_amount = Column("청약금_2순위", Text, nullable=True)
     origin_address = Column("주소", Text, nullable=True)
     new_address = Column("주소_수정본", String(250), nullable=True)
-    supply_household  = Column("공급규모", Text, nullable=True)
+    supply_household = Column("공급규모", Text, nullable=True)
     offer_notice_url = Column("모집공고주소", Text, nullable=True)
     move_in_date = Column("입주예정월", Text, nullable=True)
     contract_date = Column("계약일", Text, nullable=True)
@@ -56,7 +58,7 @@ class ApplyHomeModel(datalake_base):
     multi_children_vol_etc_gyeonggi = Column("다자녀_가구_기타경기", BigInteger, nullable=True)
     multi_children_vol_etc = Column("다자녀_가구_기타지역", BigInteger, nullable=True)
     multi_children_household = Column("다자녀_가구_배정세대수", BigInteger, nullable=True)
-    multi_children_vol  = Column("다자녀_가구_해당지역", BigInteger, nullable=True)
+    multi_children_vol = Column("다자녀_가구_해당지역", BigInteger, nullable=True)
     newlywed_vol_etc_gyeonggi = Column("신혼_부부_기타경기", DOUBLE, nullable=True)
     newlywed_vol_etc = Column("신혼_부부_기타지역", DOUBLE, nullable=True)
     newlywed_household = Column("신혼_부부_배정세대수", DOUBLE, nullable=True)

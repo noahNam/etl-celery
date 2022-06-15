@@ -1,6 +1,8 @@
 from sqlalchemy import Column, String, BigInteger, Integer, Text, Float
 
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import SubscriptionInfoEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
+    SubscriptionInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,

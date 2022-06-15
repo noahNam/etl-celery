@@ -28,6 +28,14 @@ def get_task(topic: str):
             kakao_repo=SyncKakaoApiRepository(session_factory=db.session),
             govt_bld_repo=SyncGovtBldRepository(session_factory=db.session),
         )
+    elif topic == TopicEnum.ETL_DL_SUBS_INFOS.value:
+        return BasicUseCase(
+            topic=topic,
+            basic_repo=SyncBasicRepository(session_factory=db.session),
+            kapt_repo=SyncKaptRepository(session_factory=db.session),
+            kakao_repo=SyncKakaoApiRepository(session_factory=db.session),
+            govt_bld_repo=SyncGovtBldRepository(session_factory=db.session),
+        )
 
 
 @etl_celery.task

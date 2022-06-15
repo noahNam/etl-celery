@@ -9,9 +9,13 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.mysql import DOUBLE
 
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import GoogleSheetApplyHomeEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
+    GoogleSheetApplyHomeEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import TimestampMixin
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
+    TimestampMixin,
+)
 
 
 class GoogleSheetApplyHomeModel(datalake_base, TimestampMixin):
@@ -26,7 +30,9 @@ class GoogleSheetApplyHomeModel(datalake_base, TimestampMixin):
     )
     # subs_id == public_sale_id
     subs_id = Column(
-        "house_id", BigInteger().with_variant(Integer, "sqlite"), nullable=True,
+        "house_id",
+        BigInteger().with_variant(Integer, "sqlite"),
+        nullable=True,
     )
     heating_type = Column("난방", String(100), nullable=True)
     floor_area_ratio = Column("용적률", String(10), nullable=True)
