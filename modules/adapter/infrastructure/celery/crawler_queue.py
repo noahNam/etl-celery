@@ -44,15 +44,15 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # sender.add_periodic_task(
     #     10.0,
-    #     tasks.start_crwaler.s(topic=TopicEnum.CRAWL_KAPT.value),
+    #     tasks.start_crawler.s(topic=TopicEnum.CRAWL_KAPT.value),
     #     name='warehouse',
     # )
 
-    # crawler_tasks.start_crwaler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
-    crawler_tasks.start_crwaler.apply_async(
-        kwargs={"topic": TopicEnum.CRAWL_KAKAO_API.value}
+    # crawler_tasks.start_crawler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
+    crawler_tasks.start_crawler.apply_async(
+        kwargs={"topic": TopicEnum.CRAWL_BUILDING_MANAGE.value}
     )
 
 
-# celery -A modules.adapter.infrastructure.celery.crawler_queue.celery flower --address=localhost --port=5555
-# celery -A modules.adapter.infrastructure.celery.crawler_queue.celery worker -B --loglevel=info -P threads -c 3
+# celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery flower --address=localhost --port=5555
+# celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery worker -B --loglevel=info -P threads -c 3

@@ -1,5 +1,8 @@
 from sqlalchemy import Column, String, BigInteger, Integer, Numeric
 
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
+    GovtBldAreaInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
@@ -51,10 +54,25 @@ class GovtBldAreaInfoModel(datalake_base, TimestampMixin):
     etc_purps = Column(String(500), nullable=True)
     area = Column(Numeric(19, 9), nullable=True)
     crtn_day = Column(String(8), nullable=True)
-    rnum = Column(Numeric(8), nullable=True)
+    rnum = Column(Integer, nullable=True)
     plat_plc = Column(String(200), nullable=True)
     sigungu_cd = Column(String(5), nullable=True, index=True)
     bjdong_cd = Column(String(5), nullable=True, index=True)
     plat_gb_cd = Column(String(1), nullable=True)
     bun = Column(String(4), nullable=True)
     ji = Column(String(4), nullable=True)
+
+    def to_govt_bld_area_info_entity(self) -> GovtBldAreaInfoEntity:
+        return GovtBldAreaInfoEntity(
+            house_id=self.house_id,
+            area=self.area,
+            bld_nm=self.bld_nm,
+            dong_nm=self.dong_nm,
+            ho_nm=self.ho_nm,
+            flr_no_nm=self.flr_no_nm,
+            main_atch_gb_cd=self.main_atch_gb_cd,
+            main_atch_gb_cd_nm=self.main_atch_gb_cd_nm,
+            etc_purps=self.etc_purps,
+            expos_pubuse_gb_cd_nm=self.expos_pubuse_gb_cd_nm,
+            rnum=self.rnum,
+        )

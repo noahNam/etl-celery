@@ -92,7 +92,7 @@ class KakaoApiSpider(Spider):
                 y_vl=item.y_vl,
                 jibun_address=item.jibun_address,
                 road_address=item.road_address,
-                origin_jibun_address=response.request.meta["origin_jibun_address"],
+                origin_jibun_address=response.request.meta["origin_dong_address"],
                 origin_road_address=response.request.meta["origin_road_address"],
                 bld_name=item.bld_name,
             )
@@ -179,20 +179,34 @@ class KakaoApiSpider(Spider):
         current_url,
         response,
     ) -> None:
-        fail_orm = CallFailureHistoryModel(
-            ref_id=current_house_id,
-            ref_table="kakao_api_results",
-            param=f"url: {current_url}, "
-            f"kapt_code: {current_kapt_code}, "
-            f"current_bld_name: {current_bld_name}, "
-            f"origin_dong_address: {origin_dong_address}, "
-            f"origin_road_address: {origin_road_address}, "
-            f"new_dong_address: {new_dong_address}, "
-            f"new_road_address: {new_road_address}",
-            reason=f"response:{response.value}",
-        )
-
-        self.__save_crawling_failure(fail_orm=fail_orm)
+        try:
+            fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
+                ref_id=current_house_id,
+                ref_table="kakao_api_results",
+                param=f"url: {current_url}, "
+                f"kapt_code: {current_kapt_code}, "
+                f"current_bld_name: {current_bld_name}, "
+                f"origin_dong_address: {origin_dong_address}, "
+                f"origin_road_address: {origin_road_address}, "
+                f"new_dong_address: {new_dong_address}, "
+                f"new_road_address: {new_road_address}",
+                reason=f"response:{response.text}",
+            )
+        except AttributeError:
+            fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
+                ref_id=current_house_id,
+                ref_table="kakao_api_results",
+                param=f"url: {current_url}, "
+                f"kapt_code: {current_kapt_code}, "
+                f"current_bld_name: {current_bld_name}, "
+                f"origin_dong_address: {origin_dong_address}, "
+                f"origin_road_address: {origin_road_address}, "
+                f"new_dong_address: {new_dong_address}, "
+                f"new_road_address: {new_road_address}",
+                reason=f"response:{response}",
+            )
+        if not self.__is_exists_failure(fail_orm=fail_orm):
+            self.__save_crawling_failure(fail_orm=fail_orm)
 
     def update_kapt_place_id(self, house_id: int, place_id: int):
         self.repo.update_place_id(house_id=house_id, place_id=place_id)
@@ -225,3 +239,10 @@ class KakaoApiSpider(Spider):
         return event_listener_dict.get(
             f"{KakaoApiTopicEnum.IS_EXISTS_BY_ORIGIN_ADDRESS.value}"
         )
+
+    def __is_exists_failure(self, fail_orm: CallFailureHistoryModel | None) -> bool:
+        send_message(
+            topic_name=CallFailureTopicEnum.IS_EXISTS.value,
+            fail_orm=fail_orm,
+        )
+        return event_listener_dict.get(f"{CallFailureTopicEnum.IS_EXISTS.value}")

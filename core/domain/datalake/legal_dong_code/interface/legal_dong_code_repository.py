@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.legal_dong_code_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.legal_dong_code_model import (

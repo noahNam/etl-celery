@@ -1,19 +1,27 @@
-from typing import Type, Any
+from typing import Any
 
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
+    GovtBldTopInfoEntity,
+    GovtBldMiddleInfoEntity,
+    GovtBldAreaInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptBasicInfoEntity,
     KaptAreaInfoEntity,
     KaptLocationInfoEntity,
     KaptMgmtCostEntity,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_area_info_model import (
-    KaptAreaInfoModel,
-)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
 )
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import (
+    DongInfoModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.mgmt_cost_model import (
     MgmtCostModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import (
+    TypeInfoModel,
 )
 
 
@@ -26,6 +34,9 @@ class TransformBasic:
             | KaptAreaInfoEntity
             | KaptLocationInfoEntity
             | KaptMgmtCostEntity
+            | GovtBldTopInfoEntity
+            | GovtBldMiddleInfoEntity
+            | GovtBldAreaInfoEntity
         ],
     ) -> list[Any] | None:
         if not target_list:
@@ -39,8 +50,104 @@ class TransformBasic:
             return self._etl_kapt_location_infos(target_list)
         elif from_model == "kapt_area_infos":
             return self._etl_kapt_area_infos(target_list)
-        # DongInfoModel <- govt_bld_middle_infos
-        # TypeInfoModel <- govt_bld_area_infos
+        elif from_model == "govt_bld_top_infos":
+            return self._etl_govt_bld_top_infos(target_list)
+        elif from_model == "govt_bld_middle_infos":
+            return self._etl_govt_bld_middle_infos(target_list)
+        elif from_model == "govt_bld_area_infos":
+            return self._etl_govt_bld_area_infos(target_list)
+
+    def _etl_govt_bld_area_infos(
+        self, target_list: list[GovtBldAreaInfoEntity]
+    ) -> list[TypeInfoModel]:
+        result = list()
+        private_area = 0
+        supply_area = 0
+        bld_nm = None
+        dong_nm = None
+        ho_nm = None
+        not_contain_words = ["주차장", "관리", "기계", "전기", "제어", "경비"]
+
+        for target_entity in target_list:
+            rnum = target_entity.rnum  # 1부터 시작
+            if rnum == 1:
+                # 변수 초기화
+                bld_nm = target_entity.bld_nm
+                dong_nm = target_entity.dong_nm
+                ho_nm = target_entity.ho_nm
+                private_area = 0
+                supply_area = 0
+
+            # 같은 건물, 동, 호인지 체크
+            if (
+                bld_nm != target_entity.bld_nm
+                or dong_nm != target_entity.dong_nm
+                or ho_nm != target_entity.ho_nm
+            ):
+                continue
+
+            # 아파트인 경우는 주건축물만 취급
+            if target_entity.main_atch_gb_cd != "0":  # 0(주건축물), 1(부건축물)
+                continue
+
+            # 해당 단어를 포함하고 있으면 면적에 포함하지 않음
+            if target_entity.etc_purps in not_contain_words:
+                continue
+
+            if target_entity.expos_pubuse_gb_cd_nm == "전유":
+                # 전유부의 경우
+                private_area = (
+                    target_entity.area
+                    if private_area < target_entity.area
+                    else private_area
+                )
+            else:
+                # 공용부의 경우
+                supply_area += target_entity.area
+
+            result.append(
+                TypeInfoModel(
+                    dong_id=target_entity.dong_id,
+                    private_area=private_area,
+                    supply_area=supply_area,
+                )
+            )
+        return result
+
+    def _etl_govt_bld_middle_infos(
+        self, target_list: list[GovtBldMiddleInfoEntity]
+    ) -> list[DongInfoModel]:
+        result = list()
+        for target_entity in target_list:
+            result.append(
+                DongInfoModel(
+                    house_id=target_entity.house_id,
+                    name=target_entity.dong_nm,
+                    hhld_cnt=target_entity.hhld_cnt,
+                    grnd_flr_cnt=target_entity.grnd_flr_cnt,
+                )
+            )
+        return result
+
+    def _etl_govt_bld_top_infos(
+        self, target_list: list[GovtBldTopInfoEntity]
+    ) -> list[dict]:
+        result = list()
+        for target_entity in target_list:
+            result.append(
+                dict(
+                    key=target_entity.house_id,
+                    items=dict(
+                        bjdong_cd=target_entity.bjdong_cd,
+                        sigungu_cd=target_entity.sigungu_cd,
+                        bun=target_entity.bun,
+                        ji=target_entity.ji,
+                        bc_rat=target_entity.bc_rat,
+                        vl_rat=target_entity.vl_rat,
+                    ),
+                )
+            )
+        return result
 
     def _etl_kapt_mgmt_costs(
         self, target_list: list[KaptMgmtCostEntity]
@@ -97,7 +204,45 @@ class TransformBasic:
         self, target_list: list[KaptBasicInfoEntity]
     ) -> list[BasicInfoModel]:
         result = list()
+
         for target_entity in target_list:
+            dong_address = (
+                target_entity.origin_dong_address
+                if not target_entity.new_dong_address
+                else target_entity.new_dong_address
+            )
+            road_address = (
+                target_entity.origin_road_address
+                if not target_entity.new_road_address
+                else target_entity.new_road_address
+            )
+
+            land_number = dong_address.replace(target_entity.name, "")
+            land_number = land_number.replace(target_entity.sido, "")
+            land_number = land_number.replace(target_entity.sigungu, "")
+            land_number = land_number.replace(target_entity.eubmyun, "")
+            land_number = land_number.replace(target_entity.dongri, "")
+            land_number = land_number.replace(" ", "")
+            if land_number == "" or land_number == "0":
+                land_number = None
+
+            road_name = None
+            road_number = None
+            road_address = road_address.replace(target_entity.sido, "")
+            road_address = road_address.replace(target_entity.sigungu, "")
+            road_address_arr = road_address.split(" ")
+
+            for road_addr in road_address_arr:
+                if road_addr == "":
+                    continue
+
+                if "로" in road_addr:
+                    road_name = road_addr
+                elif "길" in road_addr:
+                    road_name = road_addr
+                else:
+                    road_number = road_addr
+
             result.append(
                 BasicInfoModel(
                     house_id=target_entity.house_id,
@@ -156,104 +301,9 @@ class TransformBasic:
                     manage_office_contact=target_entity.manage_office_contact,
                     manage_office_fax=target_entity.manage_office_fax,
                     welfare=target_entity.welfare,
-                    # road_number=target_entity.road_number,
-                    # road_name=target_entity.road_name,
-                    # land_number=target_entity.land_number,
+                    road_number=road_number,
+                    road_name=road_name,
+                    land_number=land_number,
                 )
             )
         return result
-
-    # def __get_etl_target_schemas(self, date: str) -> dict[
-    #     Type[KaptBasicInfoModel | KaptAreaInfoModel | KaptLocationInfoModel | KaptMgmtCostModel], list[
-    #         KaptBasicInfoEntity | KaptAreaInfoEntity | KaptLocationInfoEntity | KaptMgmtCostEntity] | None]:
-    #
-    #     send_message(
-    #         topic_name=ETLEnum.GET_ETL_TARGET_SCHEMAS_FROM_KAPT.value,
-    #         date=date,
-    #     )
-    #     return event_listener_dict.get(
-    #         f"{ETLEnum.GET_ETL_TARGET_SCHEMAS_FROM_KAPT.value}"
-    #     )
-
-    # BasicInfoModel(
-    #     house_id=kapt_basic_info.house_id,
-    #     kapt_code=kapt_basic_info.kapt_code,
-    #     sido=kapt_basic_info.sido,
-    #     sigungu=kapt_basic_info.sigungu,
-    #     eubmyun=kapt_basic_info.eubmyun,
-    #     dongri=kapt_basic_info.dongri,
-    #     name=kapt_basic_info.name,
-    #     code_apt_nm=kapt_basic_info.code_apt_nm,
-    #     origin_dong_address=kapt_basic_info.origin_dong_address,
-    #     origin_road_address=kapt_basic_info.origin_road_address,
-    #     new_dong_address=kapt_basic_info.new_dong_address,
-    #     new_road_address=kapt_basic_info.new_road_address,
-    #     place_id=kapt_basic_info.place_id,
-    #     right_lot_out_type=kapt_basic_info.right_lot_out_type,
-    #     use_apr_day=kapt_basic_info.use_apr_day,
-    #     dong_cnt=kapt_basic_info.dong_cnt,
-    #     hhld_cnt=kapt_basic_info.hhld_cnt,
-    #     manage_type=kapt_basic_info.manage_type,
-    #     heat_type=kapt_basic_info.heat_type,
-    #     hallway_type=kapt_basic_info.hallway_type,
-    #     builder=kapt_basic_info.builder,
-    #     agency=kapt_basic_info.agency,
-    #     house_contractor=kapt_basic_info.house_contractor,
-    #     general_manage_type=kapt_basic_info.general_manage_type,
-    #     general_people=kapt_basic_info.general_people,
-    #     security_manage_type=kapt_basic_info.security_manage_type,
-    #     security_people=kapt_basic_info.security_people,
-    #     security_company=kapt_basic_info.security_company,
-    #     cleaning_manage_type=kapt_basic_info.cleaning_manage_type,
-    #     cleaning_people=kapt_basic_info.cleaning_people,
-    #     dispose_food=kapt_basic_info.dispose_food,
-    #     disinfection_manage_type=kapt_basic_info.disinfection_manage_type,
-    #     disinfection_per_year=kapt_basic_info.disinfection_per_year,
-    #     disinfection_method=kapt_basic_info.disinfection_method,
-    #     building_structure=kapt_basic_info.building_structure,
-    #     ele_capacity=kapt_basic_info.ele_capacity,
-    #     ele_contract_method=kapt_basic_info.ele_contract_method,
-    #     ele_manager_yn=kapt_basic_info.ele_manager_yn,
-    #     fire_reception_system=kapt_basic_info.fire_reception_system,
-    #     water_supply_system=kapt_basic_info.water_supply_system,
-    #     elv_manage_type=kapt_basic_info.elv_manage_type,
-    #     elv_passenger=kapt_basic_info.elv_passenger,
-    #     elv_freight=kapt_basic_info.elv_freight,
-    #     elv_merge=kapt_basic_info.elv_merge,
-    #     elv_handicapped=kapt_basic_info.elv_handicapped,
-    #     elv_emergency=kapt_basic_info.elv_emergency,
-    #     elv_etc=kapt_basic_info.elv_etc,
-    #     park_total_cnt=kapt_basic_info.park_total_cnt,
-    #     park_ground_cnt=kapt_basic_info.park_ground_cnt,
-    #     park_underground_cnt=kapt_basic_info.park_underground_cnt,
-    #     cctv_cnt=kapt_basic_info.cctv_cnt,
-    #     home_network=kapt_basic_info.home_network,
-    #     manage_office_address=kapt_basic_info.manage_office_address,
-    #     manage_office_contact=kapt_basic_info.manage_office_contact,
-    #     manage_office_fax=kapt_basic_info.manage_office_fax,
-    #     welfare=kapt_basic_info.welfare,
-    #
-    #     road_number=kapt_basic_info.road_number,
-    #     road_name=kapt_basic_info.road_name,
-    #     land_number=kapt_basic_info.land_number,
-    #     # kapt_basic_infos ############################################################
-    #     x_vl=kapt_basic_info.x_vl,
-    #     y_vl=kapt_basic_info.y_vl,
-    #     # kakao_api_results ###########################################################
-    #     sigungu_cd=kapt_basic_info.sigungu_cd,
-    #     bun=kapt_basic_info.bun,
-    #     ji=kapt_basic_info.ji,
-    #     vl_rat=kapt_basic_info.vl_rat,
-    #     bc_rat=kapt_basic_info.bc_rat,
-    #     bjdong_cd=kapt_basic_info.bjdong_cd,
-    #     # govt_bld_top_infos ##########################################################
-    #     priv_area=kapt_basic_info.priv_area,
-    #     # kapt_area_infos #############################################################
-    #     kaptd_wtimebus=kapt_basic_info.kaptd_wtimebus,
-    #     subway_line=kapt_basic_info.subway_line,
-    #     subway_station=kapt_basic_info.subway_station,
-    #     kaptd_wtimesub=kapt_basic_info.kaptd_wtimesub,
-    #     convenient_facility=kapt_basic_info.convenient_facility,
-    #     education_facility=kapt_basic_info.education_facility,
-    #     # kapt_location_infos #########################################################
-    # )
