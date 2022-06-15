@@ -39,6 +39,14 @@ def get_task(topic: str):
             topic=topic,
             subs_info_repo=SyncSubscriptionInfoRepository(session_factory=db.session),
         )
+    elif topic == TopicEnum.ETL_WH_SUBS_INFOS.value:
+        return SubscriptionInfoUseCase(
+            topic=topic,
+            subscription_repo=SyncSubscriptionInfoRepository(
+                session_factory=db.session
+            ),
+            subs_info_repo=SyncSubscriptionInfoRepository(session_factory=db.session),
+        )
 
 
 @etl_celery.task
