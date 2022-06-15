@@ -13,7 +13,7 @@ class GovtBldTopInfoEntity(BaseModel):
 
 class GovtBldMiddleInfoEntity(BaseModel):
     house_id: int
-    dong_id: int | None # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언
+    dong_id: int | None  # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언
     dong_nm: str | None
     hhld_cnt: int | None
     grnd_flr_cnt: int | None

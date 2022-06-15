@@ -1,7 +1,10 @@
 from typing import Any
 
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import GovtBldTopInfoEntity, \
-    GovtBldMiddleInfoEntity, GovtBldAreaInfoEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
+    GovtBldTopInfoEntity,
+    GovtBldMiddleInfoEntity,
+    GovtBldAreaInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptBasicInfoEntity,
     KaptAreaInfoEntity,
@@ -11,11 +14,15 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import DongInfoModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import (
+    DongInfoModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.mgmt_cost_model import (
     MgmtCostModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import TypeInfoModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import (
+    TypeInfoModel,
+)
 
 
 class TransformBasic:
@@ -62,7 +69,7 @@ class TransformBasic:
         not_contain_words = ["주차장", "관리", "기계", "전기", "제어", "경비"]
 
         for target_entity in target_list:
-            rnum = target_entity.rnum # 1부터 시작
+            rnum = target_entity.rnum  # 1부터 시작
             if rnum == 1:
                 # 변수 초기화
                 bld_nm = target_entity.bld_nm
@@ -73,9 +80,9 @@ class TransformBasic:
 
             # 같은 건물, 동, 호인지 체크
             if (
-                    bld_nm != target_entity.bld_nm
-                    or dong_nm != target_entity.dong_nm
-                    or ho_nm != target_entity.ho_nm
+                bld_nm != target_entity.bld_nm
+                or dong_nm != target_entity.dong_nm
+                or ho_nm != target_entity.ho_nm
             ):
                 continue
 
@@ -89,7 +96,11 @@ class TransformBasic:
 
             if target_entity.expos_pubuse_gb_cd_nm == "전유":
                 # 전유부의 경우
-                private_area = target_entity.area if private_area < target_entity.area else private_area
+                private_area = (
+                    target_entity.area
+                    if private_area < target_entity.area
+                    else private_area
+                )
             else:
                 # 공용부의 경우
                 supply_area += target_entity.area
@@ -118,7 +129,9 @@ class TransformBasic:
             )
         return result
 
-    def _etl_govt_bld_top_infos(self, target_list: list[GovtBldTopInfoEntity]) -> list[dict]:
+    def _etl_govt_bld_top_infos(
+        self, target_list: list[GovtBldTopInfoEntity]
+    ) -> list[dict]:
         result = list()
         for target_entity in target_list:
             result.append(
@@ -193,22 +206,30 @@ class TransformBasic:
         result = list()
 
         for target_entity in target_list:
-            dong_address = target_entity.origin_dong_address if not target_entity.new_dong_address else target_entity.new_dong_address
-            road_address = target_entity.origin_road_address if not target_entity.new_road_address else target_entity.new_road_address
+            dong_address = (
+                target_entity.origin_dong_address
+                if not target_entity.new_dong_address
+                else target_entity.new_dong_address
+            )
+            road_address = (
+                target_entity.origin_road_address
+                if not target_entity.new_road_address
+                else target_entity.new_road_address
+            )
 
-            land_number = dong_address.replace(target_entity.name, '')
-            land_number = land_number.replace(target_entity.sido, '')
-            land_number = land_number.replace(target_entity.sigungu, '')
-            land_number = land_number.replace(target_entity.eubmyun, '')
-            land_number = land_number.replace(target_entity.dongri, '')
-            land_number = land_number.replace(' ', '')
-            if land_number == '' or land_number == '0':
+            land_number = dong_address.replace(target_entity.name, "")
+            land_number = land_number.replace(target_entity.sido, "")
+            land_number = land_number.replace(target_entity.sigungu, "")
+            land_number = land_number.replace(target_entity.eubmyun, "")
+            land_number = land_number.replace(target_entity.dongri, "")
+            land_number = land_number.replace(" ", "")
+            if land_number == "" or land_number == "0":
                 land_number = None
 
             road_name = None
             road_number = None
-            road_address = road_address.replace(target_entity.sido, '')
-            road_address = road_address.replace(target_entity.sigungu, '')
+            road_address = road_address.replace(target_entity.sido, "")
+            road_address = road_address.replace(target_entity.sigungu, "")
             road_address_arr = road_address.split(" ")
 
             for road_addr in road_address_arr:
