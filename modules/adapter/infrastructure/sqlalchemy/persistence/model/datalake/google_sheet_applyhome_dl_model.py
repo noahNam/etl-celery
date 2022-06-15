@@ -4,8 +4,6 @@ from sqlalchemy import (
     Integer,
     String,
     SmallInteger,
-    DateTime,
-    func,
 )
 from sqlalchemy.dialects.mysql import DOUBLE
 
@@ -53,13 +51,10 @@ class GoogleSheetApplyHomeModel(datalake_base, TimestampMixin):
     cross_ventilation = Column("맞통풍", String(1), nullable=True)
     alpha_room = Column("알파룸", String(1), nullable=True)
     cyber_house_link = Column("사이버모델하우스_링크", String(200), nullable=True)
+    supply_rate = Column("당해지역공급비율", SmallInteger, nullable=True)
+    supply_rate_etc = Column("기타지역공급비율", SmallInteger, nullable=True)
 
-    created_at = Column(DateTime(), server_default=func.now(), nullable=False)
-    updated_at = Column(
-        DateTime(), server_default=func.now(), onupdate=func.now(), nullable=False
-    )
-
-    def to_entity(self) -> GoogleSheetApplyHomeEntity:
+    def to_google_sheet_apply_home_entity(self) -> GoogleSheetApplyHomeEntity:
         return GoogleSheetApplyHomeEntity(
             id=self.id,
             subs_id=self.subs_id,
@@ -82,4 +77,6 @@ class GoogleSheetApplyHomeModel(datalake_base, TimestampMixin):
             cross_ventilation=self.cross_ventilation,
             alpha_room=self.alpha_room,
             cyber_house_link=self.cyber_house_link,
+            supply_rate=self.supply_rate,
+            supply_rate_etc=self.supply_rate_etc,
         )

@@ -23,6 +23,8 @@ class GoogleSheetApplyHomeEntity(BaseModel):
     cross_ventilation: str | None
     alpha_room: str | None
     cyber_house_link: str | None
+    supply_rate: int | None
+    supply_rate_etc: int | None
 
 
 class ApplyHomeEntity(BaseModel):
