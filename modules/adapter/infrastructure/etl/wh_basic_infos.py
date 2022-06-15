@@ -156,6 +156,7 @@ class TransformBasic:
         for target_entity in target_list:
             result.append(
                 MgmtCostModel(
+                    id=target_entity.id,
                     house_id=target_entity.house_id,
                     payment_date=target_entity.payment_date,
                     common_manage_cost=target_entity.common_manage_cost,

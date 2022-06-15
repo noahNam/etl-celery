@@ -118,7 +118,7 @@ class BasicUseCase(BaseBasicUseCase):
                 result.x_vl = kakao_api_result.x_vl
                 result.y_vl = kakao_api_result.y_vl
 
-            self.__upsert_to_warehouse(target_model=BasicInfoModel, results=results)
+            self.__upsert_to_warehouse(results=results)
 
         # 단지 관리비 정보
         kapt_mgmt_costs: list[KaptMgmtCostEntity] | None = self._kapt_repo.find_by_date(
@@ -131,7 +131,7 @@ class BasicUseCase(BaseBasicUseCase):
         )
 
         if results:
-            self.__upsert_to_warehouse(target_model=MgmtCostModel, results=results)
+            self.__upsert_to_warehouse(results=results)
 
         # 단지 주변 정보
         kapt_location_infos: list[
@@ -199,7 +199,7 @@ class BasicUseCase(BaseBasicUseCase):
         )
 
         if results:
-            self.__upsert_to_warehouse(target_model=DongInfoModel, results=results)
+            self.__upsert_to_warehouse(results=results)
 
         # 총괄부 표제 타입 정보
         govt_bld_area_infos: list[
@@ -213,7 +213,7 @@ class BasicUseCase(BaseBasicUseCase):
         )
 
         if results:
-            self.__upsert_to_warehouse(target_model=TypeInfoModel, results=results)
+            self.__upsert_to_warehouse(results=results)
 
     """
     key mapping
@@ -232,20 +232,17 @@ class BasicUseCase(BaseBasicUseCase):
 
     def __upsert_to_warehouse(
         self,
-        target_model: Type[
-            BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel
-        ],
         results: list[BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel],
-    ):
+    ) -> None:
         for result in results:
             exists_result: bool = self._basic_repo.exists_by_key(value=result)
 
             if not exists_result:
                 # insert
-                self._basic_repo.save(target_model=target_model, value=result)
+                self._basic_repo.save(value=result)
             else:
                 # update
-                self._basic_repo.update(target_model=target_model, value=result)
+                self._basic_repo.update(value=result)
 
     """
     only update
@@ -255,7 +252,7 @@ class BasicUseCase(BaseBasicUseCase):
         self,
         target_model: Type[BasicInfoModel],
         results: list[dict],
-    ):
+    ) -> None:
         for result in results:
             # update
             self._basic_repo.dynamic_update(target_model=target_model, value=result)
