@@ -137,6 +137,31 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     )
                 )
 
+            elif target_model == DongInfoModel:
+                session.execute(
+                    update(DongInfoModel)
+                    .where(
+                        DongInfoModel.id == value.id
+                    )
+                    .values(
+                        name=value.name,
+                        hhld_cnt=value.hhld_cnt,
+                        grnd_flr_cnt=value.grnd_flr_cnt,
+                    )
+                )
+
+            elif target_model == TypeInfoModel:
+                session.execute(
+                    update(TypeInfoModel)
+                    .where(
+                        TypeInfoModel.id == value.id
+                    )
+                    .values(
+                        private_area=value.private_area,
+                        supply_area=value.supply_area,
+                    )
+                )
+
             session.commit()
 
     def dynamic_update(self, target_model: Type[BasicInfoModel], value: dict) -> None:
@@ -161,6 +186,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     .where(BasicInfoModel.kapt_code == value.kapt_code)
                     .limit(1)
                 )
+                result = session.execute(query).scalars().first()
 
             elif isinstance(value, DongInfoModel):
                 query = (
@@ -171,6 +197,8 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     )
                     .limit(1)
                 )
+                result = session.execute(query).scalars().first()
+                value.id = result
 
             elif isinstance(value, TypeInfoModel):
                 query = (
@@ -182,6 +210,8 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     )
                     .limit(1)
                 )
+                result = session.execute(query).scalars().first()
+                value.id = result
 
             elif isinstance(value, MgmtCostModel):
                 query = (
@@ -192,7 +222,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     )
                     .limit(1)
                 )
-            result = session.execute(query).scalars().first()
+                result = session.execute(query).scalars().first()
 
         if result:
             return True
