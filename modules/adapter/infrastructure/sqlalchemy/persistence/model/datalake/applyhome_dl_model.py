@@ -99,7 +99,7 @@ class ApplyHomeModel(datalake_base):
     avg_win_point_gyeonggi = Column("기타경기_당첨가점평균", DOUBLE, nullable=True)
     avg_win_point_etc = Column("기타지역_당첨가점평균", Text, nullable=True)
 
-    def to_entity(self) -> ApplyHomeEntity:
+    def to_apply_home_entity(self) -> ApplyHomeEntity:
         return ApplyHomeEntity(
             id=self.id,
             offer_date=self.offer_date,

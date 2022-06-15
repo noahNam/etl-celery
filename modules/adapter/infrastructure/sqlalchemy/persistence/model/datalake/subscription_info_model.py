@@ -97,7 +97,7 @@ class SubscriptionInfoModel(datalake_base, TimestampMixin):
     avg_win_point_gyeonggi = Column(String(10), nullable=True)
     avg_win_point_etc = Column(String(10), nullable=True)
 
-    def to_entity(self) -> SubscriptionInfoEntity:
+    def to_subs_info_entity(self) -> SubscriptionInfoEntity:
         return SubscriptionInfoEntity(
             id=self.id,
             offer_date=self.offer_date,
