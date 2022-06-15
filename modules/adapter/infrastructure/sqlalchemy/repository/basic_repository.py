@@ -49,13 +49,11 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
 
     def update(
         self,
-        target_model: Type[
-            BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel
-        ],
-        value: [BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel],
+        value: BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel,
     ) -> None:
         with self.session_factory() as session:
-            if target_model == BasicInfoModel:
+            # if target_model == BasicInfoModel:
+            if isinstance(value, BasicInfoModel):
                 session.execute(
                     update(BasicInfoModel)
                     .where(BasicInfoModel.kapt_code == value.kapt_code)
@@ -122,12 +120,11 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     )
                 )
 
-            elif target_model == MgmtCostModel:
+            elif isinstance(value, MgmtCostModel):
                 session.execute(
                     update(MgmtCostModel)
                     .where(
-                        MgmtCostModel.house_id == value.house_id
-                        and MgmtCostModel.payment_date == value.payment_date
+                        MgmtCostModel.id == value.id
                     )
                     .values(
                         common_manage_cost=value.common_manage_cost,
@@ -137,7 +134,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     )
                 )
 
-            elif target_model == DongInfoModel:
+            elif isinstance(value, DongInfoModel):
                 session.execute(
                     update(DongInfoModel)
                     .where(DongInfoModel.id == value.id)
@@ -148,7 +145,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     )
                 )
 
-            elif target_model == TypeInfoModel:
+            elif isinstance(value, TypeInfoModel):
                 session.execute(
                     update(TypeInfoModel)
                     .where(TypeInfoModel.id == value.id)
