@@ -8,6 +8,9 @@ from modules.adapter.infrastructure.pypubsub.enum.kakao_api_enum import (
     KakaoApiTopicEnum,
 )
 from modules.adapter.infrastructure.sqlalchemy.database import db
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.call_failure_history_model import (
+    CallFailureHistoryModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kakao_api_result_model import (
     KakaoApiResultModel,
 )
@@ -23,6 +26,7 @@ event_listener_dict = {
     f"{KakaoApiTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value}": None,
     f"{KakaoApiTopicEnum.IS_EXISTS_BY_ORIGIN_ADDRESS.value}": False,
     f"{ETLEnum.GET_ETL_TARGET_SCHEMAS_FROM_KAPT.value}": dict(),
+    f"{CallFailureTopicEnum.IS_EXISTS.value}": False,
 }
 
 
@@ -49,6 +53,11 @@ def is_exists_by_origin_address(kakao_orm: KakaoApiResultModel) -> None:
     )
 
 
+def is_exists_failure(fail_orm: CallFailureHistoryModel) -> None:
+    result = SyncFailureRepository(db.session).is_exists(fail_orm=fail_orm)
+    event_listener_dict.update({f"{CallFailureTopicEnum.IS_EXISTS.value}": result})
+
+
 pub.subscribe(save_crawling_failure, CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value)
 pub.subscribe(
     save_kakao_crawling_result, KakaoApiTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value
@@ -56,3 +65,4 @@ pub.subscribe(
 pub.subscribe(
     is_exists_by_origin_address, KakaoApiTopicEnum.IS_EXISTS_BY_ORIGIN_ADDRESS.value
 )
+pub.subscribe(is_exists_failure, CallFailureTopicEnum.IS_EXISTS.value)
