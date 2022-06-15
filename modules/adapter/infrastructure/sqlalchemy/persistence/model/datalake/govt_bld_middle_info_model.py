@@ -1,5 +1,6 @@
-from sqlalchemy import Column, String, BigInteger, Integer, Numeric
+from sqlalchemy import Column, String, BigInteger, Integer, Numeric, SmallInteger
 
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import GovtBldMiddleInfoEntity
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
@@ -24,10 +25,10 @@ class GovtBldMiddleInfoModel(datalake_base, TimestampMixin):
     roof_cd = Column(String(2), nullable=True)
     roof_cd_nm = Column(String(100), nullable=True)
     etc_roof = Column(String(500), nullable=True)
-    hhld_cnt = Column(Numeric(5), nullable=True)
-    fmly_cnt = Column(Numeric(5), nullable=True)
+    hhld_cnt = Column(SmallInteger, nullable=True)
+    fmly_cnt = Column(SmallInteger, nullable=True)
     heit = Column(Numeric(19, 9), nullable=True)
-    grnd_flr_cnt = Column(Numeric(5), nullable=True)
+    grnd_flr_cnt = Column(SmallInteger, nullable=True)
     ugrnd_flr_cnt = Column(Numeric(5), nullable=True)
     ride_use_elvt_cnt = Column(Numeric(5), nullable=True)
     emgen_use_elvt_cnt = Column(Numeric(5), nullable=True)
@@ -96,3 +97,11 @@ class GovtBldMiddleInfoModel(datalake_base, TimestampMixin):
     main_purps_cd = Column(String(5), nullable=True)
     rserthqk_dsgn_apply_yn = Column(String(1), nullable=True)
     rserthqk_ablty = Column(String(200), nullable=True)
+
+    def to_govt_bld_top_info_entity(self) -> GovtBldMiddleInfoEntity:
+        return GovtBldMiddleInfoEntity(
+            house_id=self.house_id,
+            dong_nm=self.dong_nm,
+            hhld_cnt=self.hhld_cnt,
+            grnd_flr_cnt=self.grnd_flr_cnt,
+        )

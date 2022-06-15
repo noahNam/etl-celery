@@ -54,9 +54,9 @@ def setup_periodic_tasks(sender, **kwargs):
     # etl_tasks.start_worker.apply_async(
     #     kwargs={"topic": TopicEnum.CRAWL_LEGAL_DONG_CODE.value}
     # )
-    etl_tasks.start_worker.apply_async(
-        kwargs={"topic": TopicEnum.CRAWL_BUILDING_MANAGE.value}
-    )
+    # etl_tasks.start_worker.apply_async(
+    #     kwargs={"topic": TopicEnum.CRAWL_BUILDING_MANAGE.value}
+    # )
 
 
 # celery -A modules.adapter.infrastructure.celery.etl_queue.celery flower --address=localhost --port=5555
