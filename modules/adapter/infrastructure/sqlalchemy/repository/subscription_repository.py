@@ -1,29 +1,16 @@
-from datetime import date
 from typing import Callable, ContextManager, Type
-from sqlalchemy import exc, select, desc, update, func
+from sqlalchemy import exc, select, desc, update
 from sqlalchemy.orm import Session
 
-from core.domain.datalake.subscription_info.interface.subscription_info_repository import (
-    SubscriptionInfoRepository,
+from core.domain.warehouse.subscription.interface.subscription_info_repository import (
+    SubscriptionRepository,
 )
 from exceptions.base import NotUniqueErrorException
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
-    ApplyHomeEntity,
-    GoogleSheetApplyHomeEntity,
-    SubscriptionInfoEntity,
-    SubscriptionManualInfoEntity,
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_detail_model import (
+    SubscriptionDetailModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.applyhome_dl_model import (
-    ApplyHomeModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.google_sheet_applyhome_dl_model import (
-    GoogleSheetApplyHomeModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_info_model import (
-    SubscriptionInfoModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_manual_info_model import (
-    SubscriptionManualInfoModel,
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_model import (
+    SubscriptionModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository import (
     BaseSyncRepository,
@@ -33,39 +20,32 @@ from modules.adapter.infrastructure.utils.log_helper import logger_
 logger = logger_.getLogger(__name__)
 
 
-class SyncSubscriptionInfoRepository(SubscriptionInfoRepository, BaseSyncRepository):
+class SyncSubscriptionRepository(SubscriptionRepository, BaseSyncRepository):
     def __init__(self, session_factory: Callable[..., ContextManager[Session]]):
         super().__init__(session_factory=session_factory)
 
-    def save_to_new_schema(
-        self, value: SubscriptionInfoModel | SubscriptionManualInfoModel
-    ) -> None:
+    def save(self, value: SubscriptionModel | SubscriptionDetailModel) -> None:
         with self.session_factory() as session:
             try:
                 session.add(value)
                 session.commit()
             except exc.IntegrityError as e:
                 logger.error(
-                    f"[SyncSubscriptionInfoRepository][save_to_new_schema] target_model : {value} error : {e}"
+                    f"[SyncSubscriptionRepository][save] target_model : {value} error : {e}"
                 )
                 session.rollback()
                 raise NotUniqueErrorException
 
-    def update_to_new_schema(
-        self, value: SubscriptionInfoModel | SubscriptionManualInfoModel
-    ) -> None:
+    def update(self, value: SubscriptionModel | SubscriptionDetailModel) -> None:
         with self.session_factory() as session:
-            if isinstance(value, SubscriptionInfoModel):
+            if isinstance(value, SubscriptionModel):
                 session.execute(
-                    update(SubscriptionInfoModel)
-                    .where(SubscriptionInfoModel.id == value.id)
+                    update(SubscriptionModel)
+                    .where(SubscriptionModel.subs_id == value.subs_id)
                     .values(
-                        subs_id=value.subs_id,
                         offer_date=value.offer_date,
                         notice_winner_date=value.notice_winner_date,
                         name=value.name,
-                        area_type=value.area_type,
-                        supply_price=value.supply_price,
                         second_subs_amount=value.second_subs_amount,
                         origin_address=value.origin_address,
                         new_address=value.new_address,
@@ -83,7 +63,6 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository, BaseSyncReposit
                         second_supply_date=value.second_supply_date,
                         second_supply_etc_date=value.second_supply_etc_date,
                         second_etc_gyeonggi_date=value.second_etc_gyeonggi_date,
-                        supply_area=value.supply_area,
                         region=value.region,
                         housing_category=value.housing_category,
                         rent_type=value.rent_type,
@@ -92,6 +71,18 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository, BaseSyncReposit
                         subscription_date=value.subscription_date,
                         special_supply_status=value.special_supply_status,
                         cmptt_rank=value.cmptt_rank,
+                    )
+                )
+
+            elif isinstance(value, SubscriptionDetailModel):
+                session.execute(
+                    update(SubscriptionDetailModel)
+                    .where(SubscriptionDetailModel.id == value.id)
+                    .values(
+                        subs_id=value.subs_id,
+                        area_type=value.area_type,
+                        supply_price=value.supply_price,
+                        supply_area=value.supply_area,
                         special_household=value.special_household,
                         multi_children_vol_etc_gyeonggi=value.multi_children_vol_etc_gyeonggi,
                         multi_children_vol_etc=value.multi_children_vol_etc,
@@ -139,68 +130,18 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository, BaseSyncReposit
                     )
                 )
 
-            elif isinstance(value, SubscriptionManualInfoModel):
-                session.execute(
-                    update(SubscriptionManualInfoModel)
-                    .where(SubscriptionManualInfoModel.id == value.id)
-                    .values(
-                        subs_id=value.subs_id,
-                        heat_type=value.heat_type,
-                        vl_rat=value.vl_rat,
-                        bc_rat=value.bc_rat,
-                        hallway_type=value.hallway_type,
-                        hhld_total_cnt=value.hhld_total_cnt,
-                        park_total_cnt=value.park_total_cnt,
-                        highest_floor=value.highest_floor,
-                        dong_cnt=value.dong_cnt,
-                        deposit=value.deposit,
-                        middle_payment=value.middle_payment,
-                        balance=value.balance,
-                        restriction_sale=value.restriction_sale,
-                        compulsory_residence=value.compulsory_residence,
-                        bay=value.bay,
-                        pansang_tower=value.pansang_tower,
-                        kitchen_window=value.kitchen_window,
-                        direct_window=value.direct_window,
-                        alpha_room=value.alpha_room,
-                        cyber_model_house_link=value.cyber_model_house_link,
-                        supply_rate=value.supply_rate,
-                        supply_rate_etc=value.supply_rate_etc,
-                    )
-                )
-
             session.commit()
 
-    def find_all(
-        self, target_model: Type[ApplyHomeModel | GoogleSheetApplyHomeModel]
-    ) -> list[ApplyHomeEntity | GoogleSheetApplyHomeEntity] | None:
+    def exists_by_key(self, value: SubscriptionModel | SubscriptionDetailModel) -> bool:
         with self.session_factory() as session:
-            queryset = (
-                session.execute(select(target_model).order_by(desc(target_model.id)))
-                .scalars()
-                .all()
-            )
-
-        if not queryset:
-            return None
-
-        if target_model == GoogleSheetApplyHomeModel:
-            return [query.to_google_sheet_apply_home_entity() for query in queryset]
-
-        return [query.to_apply_home_entity() for query in queryset]
-
-    def exists_by_key(
-        self, value: SubscriptionInfoModel | SubscriptionManualInfoModel
-    ) -> bool:
-        with self.session_factory() as session:
-            if isinstance(value, SubscriptionInfoModel):
-                query = select(SubscriptionInfoModel).where(
-                    SubscriptionInfoModel.id == value.id
+            if isinstance(value, SubscriptionModel):
+                query = select(SubscriptionModel).where(
+                    SubscriptionModel.subs_id == value.subs_id
                 )
 
-            elif isinstance(value, SubscriptionManualInfoModel):
-                query = select(SubscriptionManualInfoModel).where(
-                    SubscriptionManualInfoModel.id == value.id
+            elif isinstance(value, SubscriptionDetailModel):
+                query = select(SubscriptionDetailModel).where(
+                    SubscriptionDetailModel.id == value.id
                 )
 
             result = session.execute(query).scalars().first()
@@ -210,35 +151,34 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository, BaseSyncReposit
 
         return False
 
-    def find_by_date(
+    def dynamic_update(
         self,
-        target_model: Type[SubscriptionInfoModel | SubscriptionManualInfoModel],
-        target_date: date,
-    ) -> list[SubscriptionInfoEntity | SubscriptionManualInfoEntity] | None:
-        result_list = None
-
-        if target_model == SubscriptionInfoModel:
-            with self.session_factory() as session:
-                query = select(SubscriptionInfoModel).where(
-                    SubscriptionInfoModel.subs_id.in_([232, 506, 10229])
-                    # func.date(SubscriptionInfoModel.updated_at) == target_date
-                    # or func.date(SubscriptionInfoModel.updated_at) == target_date
+        target_model: Type[SubscriptionModel | SubscriptionDetailModel],
+        value: dict,
+    ) -> None:
+        with self.session_factory() as session:
+            if target_model == SubscriptionModel:
+                key = value.get("key")
+                items = value.get("items")
+                query = select(SubscriptionModel).where(
+                    SubscriptionModel.subs_id == key
                 )
-                results = session.execute(query).scalars().all()
-            if results:
-                result_list = [result.to_subs_info_entity() for result in results]
+                col_info = session.execute(query).scalars().first()
 
-        elif target_model == SubscriptionManualInfoModel:
-            with self.session_factory() as session:
-                query = select(SubscriptionManualInfoModel).where(
-                    SubscriptionManualInfoModel.subs_id.in_([232, 506, 10229])
-                    # func.date(SubscriptionManualInfoModel.created_at) == target_date
-                    # or func.date(SubscriptionManualInfoModel.updated_at) == target_date
-                )
-                results = session.execute(query).scalars().all()
-            if results:
-                result_list = [
-                    result.to_subs_manual_info_entity() for result in results
-                ]
+                if col_info:
+                    for (key, value) in items.items():
+                        if hasattr(target_model, key):
+                            setattr(col_info, key, value)
+                            session.commit()
 
-        return result_list
+            elif target_model == SubscriptionDetailModel:
+                key = value.get("key")
+                items = value.get("items")
+                query = select(target_model).where(SubscriptionDetailModel.id == key)
+                col_info = session.execute(query).scalars().first()
+
+                if col_info:
+                    for (key, value) in items.items():
+                        if hasattr(target_model, key):
+                            setattr(col_info, key, value)
+                            session.commit()

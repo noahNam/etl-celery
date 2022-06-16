@@ -18,11 +18,17 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import
 from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository import (
     SyncSubscriptionInfoRepository,
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repository import (
+    SyncSubscriptionRepository,
+)
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
 )
 from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
+from modules.application.use_case.etl.warehouse.v1.subscription_use_case import (
+    SubscriptionUseCase,
+)
 
 
 def get_task(topic: str):
@@ -37,6 +43,12 @@ def get_task(topic: str):
     elif topic == TopicEnum.ETL_DL_SUBS_INFOS.value:
         return SubscriptionInfoUseCase(
             topic=topic,
+            subs_info_repo=SyncSubscriptionInfoRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_WH_SUBS_INFOS.value:
+        return SubscriptionUseCase(
+            topic=topic,
+            subscription_repo=SyncSubscriptionRepository(session_factory=db.session),
             subs_info_repo=SyncSubscriptionInfoRepository(session_factory=db.session),
         )
 

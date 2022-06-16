@@ -100,6 +100,7 @@ class SubscriptionInfoModel(datalake_base, TimestampMixin):
     def to_subs_info_entity(self) -> SubscriptionInfoEntity:
         return SubscriptionInfoEntity(
             id=self.id,
+            subs_id=self.subs_id,
             offer_date=self.offer_date,
             notice_winner_date=self.notice_winner_date,
             name=self.name,

@@ -182,5 +182,31 @@ class SubscriptionInfoEntity(BaseModel):
     top_win_point_gyeonggi: str | None
     top_win_point_etc: str | None
     avg_win_point: str | None
-    avg_win_point_gyeonggi: float | None
+    avg_win_point_gyeonggi: str | None
     avg_win_point_etc: str | None
+
+
+class SubscriptionManualInfoEntity(BaseModel):
+    id: int
+    subs_id: int | None
+    heat_type: str | None
+    vl_rat: float | None
+    bc_rat: float | None
+    hallway_type: str | None
+    hhld_total_cnt: int | None
+    park_total_cnt: int | None
+    highest_floor: int | None
+    dong_cnt: int | None
+    deposit: float | None
+    middle_payment: float | None
+    balance: float | None
+    restriction_sale: str | None
+    compulsory_residence: str | None
+    bay: str | None
+    pansang_tower: str | None
+    kitchen_window: str | None
+    direct_window: str | None
+    alpha_room: str | None
+    cyber_model_house_link: str | None
+    supply_rate: int | None
+    supply_rate_etc: int | None
