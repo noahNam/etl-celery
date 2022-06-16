@@ -63,6 +63,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                         eubmyun=value.eubmyun,
                         dongri=value.dongri,
                         name=value.name,
+                        bld_name=value.bld_name,
                         code_apt_nm=value.code_apt_nm,
                         origin_dong_address=value.origin_dong_address,
                         origin_road_address=value.origin_road_address,

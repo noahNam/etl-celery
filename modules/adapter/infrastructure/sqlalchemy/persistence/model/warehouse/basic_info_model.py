@@ -26,6 +26,7 @@ class BasicInfoModel(warehouse_base, TimestampMixin):
     eubmyun = Column(String(4), nullable=True)
     dongri = Column(String(8), nullable=True)
     name = Column(String(32), nullable=True)
+    bld_name = Column(String(100), nullable=True)
     code_apt_nm = Column(String(16), nullable=True, index=True)
     origin_dong_address = Column(String(100), nullable=True)
     origin_road_address = Column(String(100), nullable=True)
