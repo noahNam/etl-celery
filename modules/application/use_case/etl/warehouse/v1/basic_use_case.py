@@ -115,6 +115,7 @@ class BasicUseCase(BaseBasicUseCase):
                 kakao_api_result: KakaoApiResultEntity | None = (
                     self._kakao_repo.find_by_id(id=result.place_id)
                 )
+                result.bld_name = kakao_api_result.bld_name
                 result.x_vl = kakao_api_result.x_vl
                 result.y_vl = kakao_api_result.y_vl
 
