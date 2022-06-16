@@ -150,3 +150,35 @@ class SyncSubscriptionRepository(SubscriptionRepository, BaseSyncRepository):
             return True
 
         return False
+
+    def dynamic_update(
+        self,
+        target_model: Type[SubscriptionModel | SubscriptionDetailModel],
+        value: dict,
+    ) -> None:
+        with self.session_factory() as session:
+            if target_model == SubscriptionModel:
+                key = value.get("key")
+                items = value.get("items")
+                query = select(SubscriptionModel).where(
+                    SubscriptionModel.subs_id == key
+                )
+                col_info = session.execute(query).scalars().first()
+
+                if col_info:
+                    for (key, value) in items.items():
+                        if hasattr(target_model, key):
+                            setattr(col_info, key, value)
+                            session.commit()
+
+            elif target_model == SubscriptionDetailModel:
+                key = value.get("key")
+                items = value.get("items")
+                query = select(target_model).where(SubscriptionDetailModel.id == key)
+                col_info = session.execute(query).scalars().first()
+
+                if col_info:
+                    for (key, value) in items.items():
+                        if hasattr(target_model, key):
+                            setattr(col_info, key, value)
+                            session.commit()

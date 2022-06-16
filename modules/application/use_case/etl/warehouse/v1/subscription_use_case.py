@@ -1,18 +1,11 @@
 import os
 from datetime import date
+from typing import Type
 
-from modules.adapter.infrastructure.etl.dl_subs_infos import TransformSubsInfo
 from modules.adapter.infrastructure.etl.wh_subscriptions import TransformSubscription
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
-    ApplyHomeEntity,
-    GoogleSheetApplyHomeEntity,
     SubscriptionInfoEntity,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.applyhome_dl_model import (
-    ApplyHomeModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.google_sheet_applyhome_dl_model import (
-    GoogleSheetApplyHomeModel,
+    SubscriptionManualInfoEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_info_model import (
     SubscriptionInfoModel,
@@ -60,6 +53,7 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
     def execute(self):
         today = date.today()
 
+        # DL:subscription_infos -> WH: subscriptions, subscription_details
         subscription_infos: list[
             SubscriptionInfoEntity
         ] | None = self._subs_info_repo.find_by_date(
@@ -71,10 +65,30 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
         ] | None = TransformSubscription().start_etl(
             from_model="subscription_infos", target_list=subscription_infos
         )
-
         if results:
-            self.__upsert_to_warehouse(results=dict.get("subscriptions"))
-            self.__upsert_to_warehouse(results=dict.get("subscription_details"))
+            self.__upsert_to_warehouse(results=results.get("subscriptions"))
+            self.__upsert_to_warehouse(results=results.get("subscription_details"))
+
+        # DL:subscription_manual_infos -> WH: subscriptions, subscription_details
+        # Only update
+        subscription_manual_infos: list[
+            SubscriptionManualInfoEntity
+        ] | None = self._subs_info_repo.find_by_date(
+            target_model=SubscriptionManualInfoModel, target_date=today
+        )
+
+        results: dict[str, [dict]] | None = TransformSubscription().start_etl(
+            from_model="subscription_manual_infos",
+            target_list=subscription_manual_infos,
+        )
+        if results:
+            self.__update_to_warehouse(
+                target_model=SubscriptionModel, results=results.get("subscriptions")
+            )
+            self.__update_to_warehouse(
+                target_model=SubscriptionDetailModel,
+                results=results.get("subscription_details"),
+            )
 
     """
     insert, update
@@ -93,3 +107,18 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
             else:
                 # update
                 self._subscription_repo.update(value=result)
+
+    """
+    only update
+    """
+
+    def __update_to_warehouse(
+        self,
+        target_model: Type[SubscriptionModel | SubscriptionDetailModel],
+        results: list[dict],
+    ) -> None:
+        for result in results:
+            # update
+            self._subscription_repo.dynamic_update(
+                target_model=target_model, value=result
+            )

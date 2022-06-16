@@ -162,10 +162,11 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
             query = select(BasicInfoModel).where(target_model.house_id == key)
             col_info = session.execute(query).scalars().first()
 
-            for (key, value) in items.items():
-                if hasattr(target_model, key):
-                    setattr(col_info, key, value)
-                    session.commit()
+            if col_info:
+                for (key, value) in items.items():
+                    if hasattr(target_model, key):
+                        setattr(col_info, key, value)
+                        session.commit()
 
     def exists_by_key(
         self, value: BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel
