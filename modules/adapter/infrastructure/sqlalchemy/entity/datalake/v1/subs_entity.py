@@ -182,7 +182,7 @@ class SubscriptionInfoEntity(BaseModel):
     top_win_point_gyeonggi: str | None
     top_win_point_etc: str | None
     avg_win_point: str | None
-    avg_win_point_gyeonggi: float | None
+    avg_win_point_gyeonggi: str | None
     avg_win_point_etc: str | None
 
 

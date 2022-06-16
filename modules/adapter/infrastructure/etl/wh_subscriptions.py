@@ -1,3 +1,5 @@
+from typing import Any
+
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
     SubscriptionInfoEntity,
     SubscriptionManualInfoEntity,
@@ -15,55 +17,25 @@ class TransformSubscription:
         self,
         from_model: str,
         target_list: list[SubscriptionInfoEntity | SubscriptionManualInfoEntity],
-    ) -> dict[str, list[SubscriptionModel] | list[SubscriptionDetailModel]] | None:
+    ) -> dict[
+        str, list[SubscriptionModel] | list[SubscriptionDetailModel] | Any
+    ] | None:
         if not target_list:
             return None
 
         if from_model == "subscription_infos":
             return self._subscription_infos(target_list)
         elif from_model == "subscription_manual_infos":
-            return self._subscription_infos(target_list)
+            return self._subscription_manual_infos(target_list)
 
     def _subscription_infos(
         self, target_list: list[SubscriptionInfoEntity]
     ) -> dict[str, list[SubscriptionModel] | list[SubscriptionDetailModel]]:
         subscriptions = list()
         subscription_details = list()
+        subs_id = None
 
         for target_entity in target_list:
-            subscriptions.append(
-                SubscriptionModel(
-                    subs_id=target_entity.subs_id,
-                    offer_date=target_entity.offer_date,
-                    notice_winner_date=target_entity.notice_winner_date,
-                    name=target_entity.name,
-                    second_subs_amount=target_entity.second_subs_amount,
-                    origin_address=target_entity.origin_address,
-                    new_address=target_entity.new_address,
-                    supply_household=target_entity.supply_household,
-                    offer_notice_url=target_entity.offer_notice_url,
-                    move_in_date=target_entity.move_in_date,
-                    contract_date=target_entity.contract_date,
-                    hompage_url=target_entity.hompage_url,
-                    special_supply_date=target_entity.special_supply_date,
-                    special_supply_etc_date=target_entity.special_supply_etc_date,
-                    special_etc_gyeonggi_date=target_entity.special_etc_gyeonggi_date,
-                    first_supply_date=target_entity.first_supply_date,
-                    first_supply_etc_date=target_entity.first_supply_etc_date,
-                    first_etc_gyeonggi_date=target_entity.first_etc_gyeonggi_date,
-                    second_supply_date=target_entity.second_supply_date,
-                    second_supply_etc_date=target_entity.second_supply_etc_date,
-                    second_etc_gyeonggi_date=target_entity.second_etc_gyeonggi_date,
-                    region=target_entity.region,
-                    housing_category=target_entity.housing_category,
-                    rent_type=target_entity.rent_type,
-                    construct_company=target_entity.construct_company,
-                    contact=target_entity.contact,
-                    subscription_date=target_entity.subscription_date,
-                    special_supply_status=target_entity.special_supply_status,
-                    cmptt_rank=target_entity.cmptt_rank,
-                )
-            )
 
             subscription_details.append(
                 SubscriptionDetailModel(
@@ -118,6 +90,101 @@ class TransformSubscription:
                     avg_win_point_etc=target_entity.avg_win_point_etc,
                 )
             )
+
+            # subscriptions은 subs_id로 묶음. 그렇지 않으면 subscription_details 만큼 obj가 생성
+            if subs_id == target_entity.subs_id:
+                continue
+
+            subscriptions.append(
+                SubscriptionModel(
+                    subs_id=target_entity.subs_id,
+                    offer_date=target_entity.offer_date,
+                    notice_winner_date=target_entity.notice_winner_date,
+                    name=target_entity.name,
+                    second_subs_amount=target_entity.second_subs_amount,
+                    origin_address=target_entity.origin_address,
+                    new_address=target_entity.new_address,
+                    supply_household=target_entity.supply_household,
+                    offer_notice_url=target_entity.offer_notice_url,
+                    move_in_date=target_entity.move_in_date,
+                    contract_date=target_entity.contract_date,
+                    hompage_url=target_entity.hompage_url,
+                    special_supply_date=target_entity.special_supply_date,
+                    special_supply_etc_date=target_entity.special_supply_etc_date,
+                    special_etc_gyeonggi_date=target_entity.special_etc_gyeonggi_date,
+                    first_supply_date=target_entity.first_supply_date,
+                    first_supply_etc_date=target_entity.first_supply_etc_date,
+                    first_etc_gyeonggi_date=target_entity.first_etc_gyeonggi_date,
+                    second_supply_date=target_entity.second_supply_date,
+                    second_supply_etc_date=target_entity.second_supply_etc_date,
+                    second_etc_gyeonggi_date=target_entity.second_etc_gyeonggi_date,
+                    region=target_entity.region,
+                    housing_category=target_entity.housing_category,
+                    rent_type=target_entity.rent_type,
+                    construct_company=target_entity.construct_company,
+                    contact=target_entity.contact,
+                    subscription_date=target_entity.subscription_date,
+                    special_supply_status=target_entity.special_supply_status,
+                    cmptt_rank=target_entity.cmptt_rank,
+                )
+            )
+            subs_id = target_entity.subs_id
+
+        return dict(
+            subscriptions=subscriptions, subscription_details=subscription_details
+        )
+
+    def _subscription_manual_infos(
+        self, target_list: list[SubscriptionManualInfoEntity]
+    ) -> dict[Any]:
+        subscriptions = list()
+        subscription_details = list()
+        subs_id = None
+
+        for target_entity in target_list:
+            subscription_details.append(
+                dict(
+                    key=target_entity.id,
+                    items=dict(
+                        subs_id=target_entity.subs_id,
+                        bay=target_entity.bay,
+                        pansang_tower=target_entity.pansang_tower,
+                        kitchen_window=target_entity.kitchen_window,
+                        direct_window=target_entity.direct_window,
+                        alpha_room=target_entity.alpha_room,
+                    ),
+                )
+            )
+
+            # subscriptions은 subs_id로 묶음. 그렇지 않으면 subscription_details 만큼 obj가 생성
+            if subs_id == target_entity.subs_id:
+                continue
+
+            subscriptions.append(
+                dict(
+                    key=target_entity.subs_id,
+                    items=dict(
+                        heat_type=target_entity.heat_type,
+                        vl_rat=target_entity.vl_rat,
+                        bc_rat=target_entity.bc_rat,
+                        hallway_type=target_entity.hallway_type,
+                        hhld_total_cnt=target_entity.hhld_total_cnt,
+                        park_total_cnt=target_entity.park_total_cnt,
+                        highest_floor=target_entity.highest_floor,
+                        dong_cnt=target_entity.dong_cnt,
+                        deposit=target_entity.deposit,
+                        middle_payment=target_entity.middle_payment,
+                        balance=target_entity.balance,
+                        restriction_sale=target_entity.restriction_sale,
+                        compulsory_residence=target_entity.compulsory_residence,
+                        cyber_model_house_link=target_entity.cyber_model_house_link,
+                        supply_rate=target_entity.supply_rate,
+                        supply_rate_etc=target_entity.supply_rate_etc,
+                    ),
+                )
+            )
+            subs_id = target_entity.subs_id
+
         return dict(
             subscriptions=subscriptions, subscription_details=subscription_details
         )
