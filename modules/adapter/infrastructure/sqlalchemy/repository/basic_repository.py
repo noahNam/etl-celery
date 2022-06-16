@@ -123,9 +123,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
             elif isinstance(value, MgmtCostModel):
                 session.execute(
                     update(MgmtCostModel)
-                    .where(
-                        MgmtCostModel.id == value.id
-                    )
+                    .where(MgmtCostModel.id == value.id)
                     .values(
                         common_manage_cost=value.common_manage_cost,
                         individual_fee=value.individual_fee,
@@ -164,10 +162,11 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
             query = select(BasicInfoModel).where(target_model.house_id == key)
             col_info = session.execute(query).scalars().first()
 
-            for (key, value) in items.items():
-                if hasattr(target_model, key):
-                    setattr(col_info, key, value)
-                    session.commit()
+            if col_info:
+                for (key, value) in items.items():
+                    if hasattr(target_model, key):
+                        setattr(col_info, key, value)
+                        session.commit()
 
     def exists_by_key(
         self, value: BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel

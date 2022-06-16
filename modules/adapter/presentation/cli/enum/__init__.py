@@ -10,3 +10,4 @@ class TopicEnum(Enum):
     CRAWL_BUILDING_MANAGE = "antgirl.crawl_building_manage.v1"
     ETL_WH_BASIC_INFOS = "antgirl.etl_wh_basic_infos.v1"
     ETL_DL_SUBS_INFOS = "antgirl.etl_dl_subs_infos.v1"  # 기존 청약홈 데이터 새로운 테이블로 이관
+    ETL_WH_SUBS_INFOS = "antgirl.etl_wh_subs_infos.v1"
