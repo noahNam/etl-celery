@@ -15,6 +15,12 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repos
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.private_sale_repository import (
+    SyncPrivateSaleRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.real_estate_repository import (
+    SyncRealEstateRepository,
+)
 from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository import (
     SyncSubscriptionInfoRepository,
 )
@@ -24,6 +30,12 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repositor
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
+)
+from modules.application.use_case.etl.datamart.v1.private_sale_use_case import (
+    PrivateSaleUseCase,
+)
+from modules.application.use_case.etl.datamart.v1.real_estate_use_case import (
+    RealEstateUseCase,
 )
 from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
 from modules.application.use_case.etl.warehouse.v1.subscription_use_case import (
@@ -50,6 +62,18 @@ def get_task(topic: str):
             topic=topic,
             subscription_repo=SyncSubscriptionRepository(session_factory=db.session),
             subs_info_repo=SyncSubscriptionInfoRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_MART_REAL_ESTATES.value:
+        return RealEstateUseCase(
+            topic=topic,
+            basic_repo=SyncBasicRepository(session_factory=db.session),
+            real_estate_repo=SyncRealEstateRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_MART_PRIVATE_SALES.value:
+        return PrivateSaleUseCase(
+            topic=topic,
+            basic_repo=SyncBasicRepository(session_factory=db.session),
+            private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
         )
 
 
