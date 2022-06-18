@@ -116,6 +116,8 @@ class BasicUseCase(BaseBasicUseCase):
                     self._kakao_repo.find_by_id(id=result.place_id)
                 )
                 result.bld_name = kakao_api_result.bld_name
+                result.place_dong_address = kakao_api_result.jibun_address
+                result.place_road_address = kakao_api_result.road_address
                 result.x_vl = kakao_api_result.x_vl
                 result.y_vl = kakao_api_result.y_vl
 

@@ -8,6 +8,9 @@ from sqlalchemy import (
     Boolean,
 )
 
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
+    BasicInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
@@ -32,13 +35,15 @@ class BasicInfoModel(warehouse_base, TimestampMixin):
     origin_road_address = Column(String(100), nullable=True)
     new_dong_address = Column(String(100), nullable=True)
     new_road_address = Column(String(100), nullable=True)
+    place_dong_address = Column(String(100), nullable=True)
+    place_road_address = Column(String(100), nullable=True)
     place_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), index=True, nullable=False
     )
     right_lot_out_type = Column(String(16), nullable=True)
     use_apr_day = Column(String(8), nullable=True)
-    dong_cnt = Column(Numeric(5), nullable=True)
-    hhld_cnt = Column(Numeric(5), nullable=True)
+    dong_cnt = Column(SmallInteger, nullable=True)
+    hhld_cnt = Column(SmallInteger, nullable=True)
     manage_type = Column(String(16), nullable=True)
     heat_type = Column(String(8), nullable=True)
     hallway_type = Column(String(4), nullable=True)
@@ -99,3 +104,87 @@ class BasicInfoModel(warehouse_base, TimestampMixin):
     public_ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
     rebuild_ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
     is_available = Column(Boolean, nullable=True, default=True)
+
+    def to_basic_info_entity(self) -> BasicInfoEntity:
+        return BasicInfoEntity(
+            house_id=self.house_id,
+            kapt_code=self.kapt_code,
+            sido=self.sido,
+            sigungu=self.sigungu,
+            eubmyun=self.eubmyun,
+            dongri=self.dongri,
+            name=self.name,
+            bld_name=self.bld_name,
+            code_apt_nm=self.code_apt_nm,
+            origin_dong_address=self.origin_dong_address,
+            origin_road_address=self.origin_road_address,
+            new_dong_address=self.new_dong_address,
+            new_road_address=self.new_road_address,
+            place_dong_address=self.place_dong_address,
+            place_road_address=self.place_road_address,
+            place_id=self.place_id,
+            right_lot_out_type=self.right_lot_out_type,
+            use_apr_day=self.use_apr_day,
+            dong_cnt=self.dong_cnt,
+            hhld_cnt=self.hhld_cnt,
+            manage_type=self.manage_type,
+            heat_type=self.heat_type,
+            hallway_type=self.hallway_type,
+            builder=self.builder,
+            agency=self.agency,
+            house_contractor=self.house_contractor,
+            general_manage_type=self.general_manage_type,
+            general_people=self.general_people,
+            security_manage_type=self.security_manage_type,
+            security_people=self.security_people,
+            security_company=self.security_company,
+            cleaning_manage_type=self.cleaning_manage_type,
+            cleaning_people=self.cleaning_people,
+            dispose_food=self.dispose_food,
+            disinfection_manage_type=self.disinfection_manage_type,
+            disinfection_per_year=self.disinfection_per_year,
+            disinfection_method=self.disinfection_method,
+            building_structure=self.building_structure,
+            ele_capacity=self.ele_capacity,
+            ele_contract_method=self.ele_contract_method,
+            ele_manager_yn=self.ele_manager_yn,
+            fire_reception_system=self.fire_reception_system,
+            water_supply_system=self.water_supply_system,
+            elv_manage_type=self.elv_manage_type,
+            elv_passenger=self.elv_passenger,
+            elv_freight=self.elv_freight,
+            elv_merge=self.elv_merge,
+            elv_handicapped=self.elv_handicapped,
+            elv_emergency=self.elv_emergency,
+            elv_etc=self.elv_etc,
+            park_total_cnt=self.park_total_cnt,
+            park_ground_cnt=self.park_ground_cnt,
+            park_underground_cnt=self.park_underground_cnt,
+            cctv_cnt=self.cctv_cnt,
+            home_network=self.home_network,
+            manage_office_address=self.manage_office_address,
+            manage_office_contact=self.manage_office_contact,
+            manage_office_fax=self.manage_office_fax,
+            welfare=self.welfare,
+            x_vl=self.x_vl,
+            y_vl=self.y_vl,
+            road_number=self.road_number,
+            road_name=self.road_name,
+            land_number=self.land_number,
+            sigungu_cd=self.sigungu_cd,
+            bjdong_cd=self.bjdong_cd,
+            bun=self.bun,
+            ji=self.ji,
+            vl_rat=self.vl_rat,
+            bc_rat=self.bc_rat,
+            priv_area=self.priv_area,
+            kaptd_wtimebus=self.kaptd_wtimebus,
+            subway_line=self.subway_line,
+            subway_station=self.subway_station,
+            kaptd_wtimesub=self.kaptd_wtimesub,
+            convenient_facility=self.convenient_facility,
+            education_facility=self.education_facility,
+            public_ref_id=self.public_ref_id,
+            rebuild_ref_id=self.rebuild_ref_id,
+            is_available=self.is_available,
+        )
