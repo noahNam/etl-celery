@@ -97,9 +97,9 @@ class TransformPrivateSale:
                 manage_cost_results.update(  # PrivateSaleModel에서 사용할 value 담는 dict
                     {
                         house_id: [
-                            summer_manage_cost / abs(summer_usage_cnt),
-                            winter_manage_cost / abs(winter_usage_cnt),
-                            avg_manage_cost / avg_usage_cnt,
+                            summer_manage_cost / abs(summer_usage_cnt) if summer_usage_cnt else None,
+                            winter_manage_cost / abs(winter_usage_cnt) if winter_usage_cnt else None,
+                            avg_manage_cost / avg_usage_cnt  if avg_usage_cnt else None,
                         ]
                     }
                 )

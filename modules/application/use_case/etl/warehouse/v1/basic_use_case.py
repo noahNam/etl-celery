@@ -83,6 +83,7 @@ class BaseBasicUseCase:
         self._kapt_repo: SyncKaptRepository = kapt_repo
         self._kakao_repo: SyncKakaoApiRepository = kakao_repo
         self._govt_bld_repo: SyncGovtBldRepository = govt_bld_repo
+        self._transfer: TransformBasic  = TransformBasic()
 
     @property
     def client_id(self) -> str:
@@ -102,7 +103,7 @@ class BasicUseCase(BaseBasicUseCase):
         ] | None = self._kapt_repo.find_by_date(
             target_model=KaptBasicInfoModel, target_date=today
         )
-        results: list[BasicInfoModel] | None = TransformBasic().start_etl(
+        results: list[BasicInfoModel] | None = self._transfer.start_etl(
             from_model="kapt_basic_infos", target_list=kapt_basic_infos
         )
 
@@ -129,7 +130,7 @@ class BasicUseCase(BaseBasicUseCase):
         )
         self.__bind_house_id(target_list=kapt_mgmt_costs)
 
-        results: list[MgmtCostModel] | None = TransformBasic().start_etl(
+        results: list[MgmtCostModel] | None = self._transfer.start_etl(
             from_model="kapt_mgmt_costs", target_list=kapt_mgmt_costs
         )
 
@@ -144,7 +145,7 @@ class BasicUseCase(BaseBasicUseCase):
         )
         self.__bind_house_id(target_list=kapt_location_infos)
 
-        results: list[dict] | None = TransformBasic().start_etl(
+        results: list[dict] | None = self._transfer.start_etl(
             from_model="kapt_location_infos", target_list=kapt_location_infos
         )
 
@@ -157,7 +158,7 @@ class BasicUseCase(BaseBasicUseCase):
         )
         self.__bind_house_id(target_list=kapt_area_infos)
 
-        results: list[dict] | None = TransformBasic().start_etl(
+        results: list[dict] | None = self._transfer.start_etl(
             from_model="kapt_area_infos", target_list=kapt_area_infos
         )
 
@@ -170,7 +171,7 @@ class BasicUseCase(BaseBasicUseCase):
         )
         self.__bind_house_id(target_list=kapt_area_infos)
 
-        results: list[dict] | None = TransformBasic().start_etl(
+        results: list[dict] | None = self._transfer.start_etl(
             from_model="kapt_area_infos", target_list=kapt_area_infos
         )
 
@@ -184,7 +185,7 @@ class BasicUseCase(BaseBasicUseCase):
         ] | None = self._govt_bld_repo.find_by_date(
             target_model=GovtBldTopInfoModel, target_date=today
         )
-        results: list[dict] | None = TransformBasic().start_etl(
+        results: list[dict] | None = self._transfer.start_etl(
             from_model="govt_bld_top_infos", target_list=govt_bld_top_infos
         )
         if results:
@@ -197,7 +198,7 @@ class BasicUseCase(BaseBasicUseCase):
             target_model=GovtBldMiddleInfoModel, target_date=today
         )
 
-        results: list[DongInfoModel] | None = TransformBasic().start_etl(
+        results: list[DongInfoModel] | None = self._transfer.start_etl(
             from_model="govt_bld_middle_infos", target_list=govt_bld_middle_infos
         )
 
@@ -211,7 +212,7 @@ class BasicUseCase(BaseBasicUseCase):
             target_model=GovtBldAreaInfoModel, target_date=today
         )
 
-        results: list[TypeInfoModel] | None = TransformBasic().start_etl(
+        results: list[TypeInfoModel] | None = self._transfer.start_etl(
             from_model="govt_bld_area_infos", target_list=govt_bld_area_infos
         )
 
