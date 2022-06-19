@@ -33,6 +33,7 @@ class BaseSubscriptionInfoUseCase:
     ):
         self._topic: str = topic
         self._subs_info_repo: SyncSubscriptionInfoRepository = subs_info_repo
+        self._transfer: TransformSubsInfo = TransformSubsInfo()
 
     @property
     def client_id(self) -> str:
@@ -49,7 +50,7 @@ class SubscriptionInfoUseCase(BaseSubscriptionInfoUseCase):
             target_model=ApplyHomeModel
         )
 
-        results: list[SubscriptionInfoModel] | None = TransformSubsInfo().start_etl(
+        results: list[SubscriptionInfoModel] | None = self._transfer.start_etl(
             from_model="apply_homes", target_list=apply_homes
         )
         if results:
@@ -60,9 +61,7 @@ class SubscriptionInfoUseCase(BaseSubscriptionInfoUseCase):
             GoogleSheetApplyHomeEntity
         ] | None = self._subs_info_repo.find_all(target_model=GoogleSheetApplyHomeModel)
 
-        results: list[
-            SubscriptionManualInfoModel
-        ] | None = TransformSubsInfo().start_etl(
+        results: list[SubscriptionManualInfoModel] | None = self._transfer.start_etl(
             from_model="google_sheet_applys", target_list=google_sheet_applys
         )
         if results:

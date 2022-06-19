@@ -1,10 +1,15 @@
-from typing import Callable, ContextManager, Type
-from sqlalchemy import update, exc
+from datetime import date
+from typing import Callable, ContextManager, Type, Any
+from sqlalchemy import update, exc, func, desc, or_
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 
 from core.domain.warehouse.basic.interface.basic_repository import BasicRepository
 from exceptions.base import NotUniqueErrorException
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
+    BasicInfoEntity,
+    CalcMgmtCostEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
 )
@@ -52,7 +57,6 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
         value: BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel,
     ) -> None:
         with self.session_factory() as session:
-            # if target_model == BasicInfoModel:
             if isinstance(value, BasicInfoModel):
                 session.execute(
                     update(BasicInfoModel)
@@ -63,11 +67,14 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                         eubmyun=value.eubmyun,
                         dongri=value.dongri,
                         name=value.name,
+                        bld_name=value.bld_name,
                         code_apt_nm=value.code_apt_nm,
                         origin_dong_address=value.origin_dong_address,
                         origin_road_address=value.origin_road_address,
                         new_dong_address=value.new_dong_address,
                         new_road_address=value.new_road_address,
+                        place_dong_address=value.place_dong_address,
+                        place_road_address=value.place_road_address,
                         place_id=value.place_id,
                         right_lot_out_type=value.right_lot_out_type,
                         use_apr_day=value.use_apr_day,
@@ -234,3 +241,47 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
             return None
 
         return house_id
+
+    def find_by_date(
+        self,
+        target_model: Type[BasicInfoModel],
+        target_date: date,
+    ) -> list[BasicInfoEntity] | None:
+        result_list = None
+
+        if target_model == BasicInfoModel:
+            with self.session_factory() as session:
+                query = select(BasicInfoModel).where(
+                    or_(
+                        func.date(BasicInfoModel.created_at) == target_date,
+                        func.date(BasicInfoModel.updated_at) == target_date,
+                    ),
+                    BasicInfoModel.place_id != None,
+                )
+                results = session.execute(query).scalars().all()
+            if results:
+                result_list = [result.to_basic_info_entity() for result in results]
+
+        return result_list
+
+    def find_all(
+        self, target_model: Type[MgmtCostModel], id: int | None, options: Any
+    ) -> list[CalcMgmtCostEntity] | None:
+        if target_model == MgmtCostModel:
+            with self.session_factory() as session:
+                queryset = (
+                    session.execute(
+                        select(MgmtCostModel)
+                        .where(target_model.house_id == id)
+                        .order_by(desc(MgmtCostModel.payment_date))
+                    )
+                    .scalars()
+                    .all()
+                )
+
+            if not queryset:
+                return None
+
+            return [
+                query.to_calc_mgmt_cost_entity(priv_area=options) for query in queryset
+            ]
