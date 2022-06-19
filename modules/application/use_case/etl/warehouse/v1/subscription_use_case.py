@@ -40,6 +40,7 @@ class BaseSubscriptionUseCase:
         self._topic: str = topic
         self._subscription_repo: SyncSubscriptionRepository = subscription_repo
         self._subs_info_repo: SyncSubscriptionInfoRepository = subs_info_repo
+        self._transfer: TransformSubscription = TransformSubscription()
 
     @property
     def client_id(self) -> str:
@@ -62,7 +63,7 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
 
         results: dict[
             str, list[SubscriptionModel] | list[SubscriptionDetailModel]
-        ] | None = TransformSubscription().start_etl(
+        ] | None = self._transfer.start_etl(
             from_model="subscription_infos", target_list=subscription_infos
         )
         if results:
@@ -77,7 +78,7 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
             target_model=SubscriptionManualInfoModel, target_date=today
         )
 
-        results: dict[str, [dict]] | None = TransformSubscription().start_etl(
+        results: dict[str, [dict]] | None = self._transfer.start_etl(
             from_model="subscription_manual_infos",
             target_list=subscription_manual_infos,
         )
