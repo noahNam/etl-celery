@@ -83,7 +83,7 @@ class BaseBasicUseCase:
         self._kapt_repo: SyncKaptRepository = kapt_repo
         self._kakao_repo: SyncKakaoApiRepository = kakao_repo
         self._govt_bld_repo: SyncGovtBldRepository = govt_bld_repo
-        self._transfer: TransformBasic  = TransformBasic()
+        self._transfer: TransformBasic = TransformBasic()
 
     @property
     def client_id(self) -> str:

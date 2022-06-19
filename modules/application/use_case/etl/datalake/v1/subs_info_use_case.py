@@ -61,9 +61,7 @@ class SubscriptionInfoUseCase(BaseSubscriptionInfoUseCase):
             GoogleSheetApplyHomeEntity
         ] | None = self._subs_info_repo.find_all(target_model=GoogleSheetApplyHomeModel)
 
-        results: list[
-            SubscriptionManualInfoModel
-        ] | None = self._transfer.start_etl(
+        results: list[SubscriptionManualInfoModel] | None = self._transfer.start_etl(
             from_model="google_sheet_applys", target_list=google_sheet_applys
         )
         if results:
