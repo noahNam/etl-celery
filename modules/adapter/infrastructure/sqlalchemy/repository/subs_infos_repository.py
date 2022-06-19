@@ -220,9 +220,8 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository, BaseSyncReposit
         if target_model == SubscriptionInfoModel:
             with self.session_factory() as session:
                 query = select(SubscriptionInfoModel).where(
-                    SubscriptionInfoModel.subs_id.in_([232, 506, 10229])
-                    # func.date(SubscriptionInfoModel.updated_at) == target_date
-                    # or func.date(SubscriptionInfoModel.updated_at) == target_date
+                    func.date(SubscriptionInfoModel.updated_at) == target_date
+                    or func.date(SubscriptionInfoModel.updated_at) == target_date
                 )
                 results = session.execute(query).scalars().all()
             if results:
@@ -231,9 +230,8 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository, BaseSyncReposit
         elif target_model == SubscriptionManualInfoModel:
             with self.session_factory() as session:
                 query = select(SubscriptionManualInfoModel).where(
-                    SubscriptionManualInfoModel.subs_id.in_([232, 506, 10229])
-                    # func.date(SubscriptionManualInfoModel.created_at) == target_date
-                    # or func.date(SubscriptionManualInfoModel.updated_at) == target_date
+                    func.date(SubscriptionManualInfoModel.created_at) == target_date
+                    or func.date(SubscriptionManualInfoModel.updated_at) == target_date
                 )
                 results = session.execute(query).scalars().all()
             if results:
