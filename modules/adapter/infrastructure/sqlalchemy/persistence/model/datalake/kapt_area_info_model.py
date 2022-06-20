@@ -22,7 +22,7 @@ class KaptAreaInfoModel(datalake_base, TimestampMixin):
     kapt_mparea_136 = Column(String(22), nullable=True)
     priv_area = Column(String(22), nullable=True)
     bjd_code = Column(String(10), nullable=True)
-    update_needed = Column(Boolean, nullable=False, default=False)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     def to_kapt_area_info_entity(self) -> KaptAreaInfoEntity:
         return KaptAreaInfoEntity(
