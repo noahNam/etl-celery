@@ -16,7 +16,7 @@ class GovtBldEnum(Enum):
     GOVT_BLD_AREA_URL = (
         "http://apis.data.go.kr/1613000/BldRgstService_v2/getBrExposPubuseAreaInfo"
     )
-    SERVICE_KEY_1 = "toLAcbnBlhSZDGMeOK8gyApaeLsaa0qrLC3urCU0k%2BtyV9%2BNA9%2FwfIYqsfF9Hi2FBcxMuJBobhGNlCAyRam%2FjQ%3D%3D"
-    SERVICE_KEY_2 = "DupoKfKzoSLgBFwamlL4goP7CWP4F8e9I0OL%2Fk4lxr%2FYZrAysoaK6vlFKGVmVvqDzQrnWiFrOvlPt7FWWGHFxg%3D%3D"
+    SERVICE_KEY_1 = "DupoKfKzoSLgBFwamlL4goP7CWP4F8e9I0OL%2Fk4lxr%2FYZrAysoaK6vlFKGVmVvqDzQrnWiFrOvlPt7FWWGHFxg%3D%3D"
+    SERVICE_KEY_2 = "toLAcbnBlhSZDGMeOK8gyApaeLsaa0qrLC3urCU0k%2BtyV9%2BNA9%2FwfIYqsfF9Hi2FBcxMuJBobhGNlCAyRam%2FjQ%3D%3D"
     NUMBER_OF_ROWS = 1000
     DAILY_REQUEST_COUNT = 10000
