@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer
+from sqlalchemy import Column, String, BigInteger, Integer, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -27,3 +27,4 @@ class GovtRightLotOutModel(datalake_base, TimestampMixin):
     jibun = Column(String(10), nullable=True)
     regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
