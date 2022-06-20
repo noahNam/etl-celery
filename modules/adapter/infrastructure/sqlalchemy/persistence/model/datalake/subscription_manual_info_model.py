@@ -79,4 +79,5 @@ class SubscriptionManualInfoModel(datalake_base, TimestampMixin):
             cyber_model_house_link=self.cyber_model_house_link,
             supply_rate=self.supply_rate,
             supply_rate_etc=self.supply_rate_etc,
+            update_needed=self.update_needed,
         )

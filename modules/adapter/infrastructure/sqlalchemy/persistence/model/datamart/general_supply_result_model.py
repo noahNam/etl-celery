@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer, Numeric, ForeignKey
+from sqlalchemy import Column, String, BigInteger, Integer, Numeric, ForeignKey, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datamart_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_detail_model import (
@@ -26,3 +26,4 @@ class GeneralSupplyResultModel(datamart_base, TimestampMixin):
     applicant_num = Column(Numeric(5), nullable=True)
     competition_rate = Column(Numeric(3), nullable=True)
     win_point = Column(Numeric(3), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)

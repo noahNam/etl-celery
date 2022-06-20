@@ -1,6 +1,6 @@
 import os
 
-from modules.adapter.infrastructure.etl.mart_private_sales import TransformPrivateSale
+from modules.adapter.infrastructure.etl.mart_dong_type_infos import TransformDongTypeInfos
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     BasicInfoEntity,
     CalcMgmtCostEntity,
@@ -17,8 +17,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.mgmt_
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
 )
-from datetime import date
-
 from modules.adapter.infrastructure.sqlalchemy.repository.private_sale_repository import (
     SyncPrivateSaleRepository,
 )
@@ -37,7 +35,7 @@ class BaseDongTypeUseCase:
         self._topic: str = topic
         self._basic_repo: SyncBasicRepository = basic_repo
         self._private_sale_repo: SyncPrivateSaleRepository = private_sale_repo
-        self._transfer: TransformPrivateSale = TransformPrivateSale()
+        self._transfer: TransformDongTypeInfos = TransformDongTypeInfos()
 
     @property
     def client_id(self) -> str:
@@ -49,11 +47,9 @@ class DongTypeUseCase(BaseDongTypeUseCase):
         super().__init__(*args, **kwargs)
 
     def execute(self):
-        today = date.today()
-
         # 단지 기본 정보
-        basic_infos: list[BasicInfoEntity] | None = self._basic_repo.find_by_date(
-            target_model=BasicInfoModel, target_date=today
+        basic_infos: list[BasicInfoEntity] | None = self._basic_repo.find_to_update(
+            target_model=BasicInfoModel
         )
         # 관리비 정보
         mgmt_costs = list()

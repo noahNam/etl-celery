@@ -159,6 +159,7 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
             manage_office_contact=self.manage_office_contact,
             manage_office_fax=self.manage_office_fax,
             welfare=self.welfare,
+            update_needed=self.update_needed,
             created_at=self.created_at,
             updated_at=self.updated_at,
         )

@@ -6,7 +6,7 @@ from sqlalchemy import (
     Text,
     Float,
     Numeric,
-    SmallInteger,
+    SmallInteger, Boolean,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
@@ -65,3 +65,4 @@ class SubscriptionModel(warehouse_base, TimestampMixin):
     subscription_date = Column(String(23), nullable=True)
     special_supply_status = Column(String(6), nullable=True)
     cmptt_rank = Column(String(6), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)

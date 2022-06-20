@@ -76,4 +76,5 @@ class GovtBldAreaInfoModel(datalake_base, TimestampMixin):
             etc_purps=self.etc_purps,
             expos_pubuse_gb_cd_nm=self.expos_pubuse_gb_cd_nm,
             rnum=self.rnum,
+            update_needed=self.update_needed
         )

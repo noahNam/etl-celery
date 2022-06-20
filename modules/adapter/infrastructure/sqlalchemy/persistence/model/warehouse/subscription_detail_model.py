@@ -4,7 +4,7 @@ from sqlalchemy import (
     BigInteger,
     Integer,
     Float,
-    ForeignKey,
+    ForeignKey, Boolean,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
@@ -80,3 +80,4 @@ class SubscriptionDetailModel(warehouse_base, TimestampMixin):
     avg_win_point = Column(String(10), nullable=True)
     avg_win_point_gyeonggi = Column(String(10), nullable=True)
     avg_win_point_etc = Column(String(10), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)

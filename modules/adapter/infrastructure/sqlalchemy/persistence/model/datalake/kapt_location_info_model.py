@@ -32,6 +32,7 @@ class KaptLocationInfoModel(datalake_base, TimestampMixin):
             kaptd_wtimesub=self.kaptd_wtimesub,
             convenient_facility=self.convenient_facility,
             education_facility=self.education_facility,
+            update_needed=self.update_needed,
             created_at=self.created_at,
             updated_at=self.updated_at,
         )

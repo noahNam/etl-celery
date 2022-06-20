@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Integer, String, Numeric, ForeignKey
+from sqlalchemy import Column, BigInteger, Integer, String, Numeric, ForeignKey, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -24,3 +24,4 @@ class DongInfoModel(warehouse_base, TimestampMixin):
     name = Column(String(30), nullable=True)
     hhld_cnt = Column(Numeric(5), nullable=True)
     grnd_flr_cnt = Column(Numeric(5), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
