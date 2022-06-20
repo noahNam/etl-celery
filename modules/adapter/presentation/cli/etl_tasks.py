@@ -31,6 +31,7 @@ from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
 )
+from modules.application.use_case.etl.datamart.v1.dong_type_use_case import DongTypeUseCase
 from modules.application.use_case.etl.datamart.v1.private_sale_use_case import (
     PrivateSaleUseCase,
 )
@@ -71,6 +72,12 @@ def get_task(topic: str):
         )
     elif topic == TopicEnum.ETL_MART_PRIVATE_SALES.value:
         return PrivateSaleUseCase(
+            topic=topic,
+            basic_repo=SyncBasicRepository(session_factory=db.session),
+            private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_MART_DONG_TYPE_INFOS.value:
+        return DongTypeUseCase(
             topic=topic,
             basic_repo=SyncBasicRepository(session_factory=db.session),
             private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
