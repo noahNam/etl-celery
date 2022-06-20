@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer, Text, Float
+from sqlalchemy import Column, String, BigInteger, Integer, Text, Float, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
     SubscriptionInfoEntity,
@@ -96,6 +96,7 @@ class SubscriptionInfoModel(datalake_base, TimestampMixin):
     avg_win_point = Column(String(10), nullable=True)
     avg_win_point_gyeonggi = Column(String(10), nullable=True)
     avg_win_point_etc = Column(String(10), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=False)
 
     def to_subs_info_entity(self) -> SubscriptionInfoEntity:
         return SubscriptionInfoEntity(

@@ -48,7 +48,6 @@ class GovtBldSpider(Spider):
         input_params: list[GovtBldInputInfo] | None = self.get_input_infos(
             bld_info_list=self.params
         )
-
         if input_params:
             for param in input_params:
                 yield Request(
@@ -56,7 +55,7 @@ class GovtBldSpider(Spider):
                     f"&sigunguCd={param.sigungu_code}"
                     f"&bjdongCd={param.bjdong_code}"
                     f"&platGbCd=0"
-                    f"&bun={param.bun if param.bun else '0000'} "
+                    f"&bun={param.bun if param.bun else '0000'}"
                     f"&ji={param.ji if param.ji else '0000'}"
                     f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
                     f"&pageNo=1",
@@ -80,7 +79,7 @@ class GovtBldSpider(Spider):
                     f"&sigunguCd={param.sigungu_code}"
                     f"&bjdongCd={param.bjdong_code}"
                     f"&platGbCd=0"
-                    f"&bun={param.bun if param.bun else '0000'} "
+                    f"&bun={param.bun if param.bun else '0000'}"
                     f"&ji={param.ji if param.ji else '0000'}"
                     f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
                     f"&pageNo=1",
@@ -104,7 +103,7 @@ class GovtBldSpider(Spider):
                     f"&sigunguCd={param.sigungu_code}"
                     f"&bjdongCd={param.bjdong_code}"
                     f"&platGbCd=0"
-                    f"&bun={param.bun if param.bun else '0000'} "
+                    f"&bun={param.bun if param.bun else '0000'}"
                     f"&ji={param.ji if param.ji else '0000'}"
                     f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
                     f"&pageNo=1",
@@ -127,116 +126,82 @@ class GovtBldSpider(Spider):
     def parse_bld_top_info(self, response):
         xml_to_dict = parse(response.text)
         item: GovtBldTopInfoItem | None = None
+
+        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
+        elif not xml_to_dict["response"]["body"]["items"]:
+            item = None
+        else:
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+
         try:
             item: GovtBldTopInfoItem = GovtBldTopInfoItem(
                 house_id=response.request.meta["house_id"],
-                mgm_bldrgst_pk=xml_to_dict["response"]["body"]["item"].get(
-                    "mgmBldrgstPk"
-                ),
-                itg_bld_grade=xml_to_dict["response"]["body"]["item"].get(
-                    "itgBldGrade"
-                ),
-                itg_bld_cert=xml_to_dict["response"]["body"]["item"].get("itgBldCert"),
-                crtn_day=xml_to_dict["response"]["body"]["item"].get("crtnDay"),
-                na_bjdong_cd=xml_to_dict["response"]["body"]["item"].get("naBjdongCd"),
-                na_ugrnd_cd=xml_to_dict["response"]["body"]["item"].get("naUgrndCd"),
-                na_main_bun=xml_to_dict["response"]["body"]["item"].get("naMainBun"),
-                na_sub_bun=xml_to_dict["response"]["body"]["item"].get("naSubBun"),
-                plat_area=xml_to_dict["response"]["body"]["item"].get("platArea"),
-                arch_area=xml_to_dict["response"]["body"]["item"].get("archArea"),
-                bc_rat=xml_to_dict["response"]["body"]["item"].get("bcRat"),
-                tot_area=xml_to_dict["response"]["body"]["item"].get("totArea"),
-                vl_rat_estm_tot_area=xml_to_dict["response"]["body"]["item"].get(
-                    "vlRatEstmTotArea"
-                ),
-                vl_rat=xml_to_dict["response"]["body"]["item"].get("vlRat"),
-                main_purps_cd=xml_to_dict["response"]["body"]["item"].get(
-                    "mainPurpsCd"
-                ),
-                main_purps_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "mainPurpsCdNm"
-                ),
-                etc_purps=xml_to_dict["response"]["body"]["item"].get("etcPurps"),
-                hhld_cnt=xml_to_dict["response"]["body"]["item"].get("hhldCnt"),
-                fmly_cnt=xml_to_dict["response"]["body"]["item"].get("fmlyCnt"),
-                main_bld_cnt=xml_to_dict["response"]["body"]["item"].get("mainBldCnt"),
-                atch_bld_cnt=xml_to_dict["response"]["body"]["item"].get("atchBldCnt"),
-                atch_bld_area=xml_to_dict["response"]["body"]["item"].get(
-                    "atchBldArea"
-                ),
-                tot_pkng_cnt=xml_to_dict["response"]["body"]["item"].get("totPkngCnt"),
-                indr_mech_utcnt=xml_to_dict["response"]["body"]["item"].get(
-                    "indrMechUtcnt"
-                ),
-                indr_mech_area=xml_to_dict["response"]["body"]["item"].get(
-                    "indrMechArea"
-                ),
-                oudr_mech_utcnt=xml_to_dict["response"]["body"]["item"].get(
-                    "oudrMechUtcnt"
-                ),
-                oudr_mech_area=xml_to_dict["response"]["body"]["item"].get(
-                    "oudrMechArea"
-                ),
-                indr_auto_utcnt=xml_to_dict["response"]["body"]["item"].get(
-                    "indrAutoUtcnt"
-                ),
-                indr_auto_area=xml_to_dict["response"]["body"]["item"].get(
-                    "indrAutoArea"
-                ),
-                oudr_auto_utcnt=xml_to_dict["response"]["body"]["item"].get(
-                    "oudrAutoUtcnt"
-                ),
-                oudr_auto_area=xml_to_dict["response"]["body"]["item"].get(
-                    "oudrAutoArea"
-                ),
-                pms_day=xml_to_dict["response"]["body"]["item"].get("pmsDay"),
-                stcns_day=xml_to_dict["response"]["body"]["item"].get("stcnsDay"),
-                use_apr_day=xml_to_dict["response"]["body"]["item"].get("useAprDay"),
-                pmsno_year=xml_to_dict["response"]["body"]["item"].get("pmsnoYear"),
-                pmsno_kik_cd=xml_to_dict["response"]["body"]["item"].get("pmsnoKikCd"),
-                pmsno_kik_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "pmsnoKikCdNm"
-                ),
-                pmsno_gb_cd=xml_to_dict["response"]["body"]["item"].get("pmsnoGbCd"),
-                pmsno_gb_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "pmsnoGbCdNm"
-                ),
-                ho_cnt=xml_to_dict["response"]["body"]["item"].get("hoCnt"),
-                engr_grade=xml_to_dict["response"]["body"]["item"].get("engrGrade"),
-                engr_rat=xml_to_dict["response"]["body"]["item"].get("engrRat"),
-                engr_epi=xml_to_dict["response"]["body"]["item"].get("engrEpi"),
-                gn_bld_grade=xml_to_dict["response"]["body"]["item"].get("gnBldGrade"),
-                gn_bld_cert=xml_to_dict["response"]["body"]["item"].get("gnBldCert"),
-                rnum=xml_to_dict["response"]["body"]["item"].get("rnum"),
-                plat_plc=xml_to_dict["response"]["body"]["item"].get("platPlc"),
-                sigungu_cd=xml_to_dict["response"]["body"]["item"].get("sigunguCd"),
-                bjdong_cd=xml_to_dict["response"]["body"]["item"].get("bjdongCd"),
-                plat_gb_cd=xml_to_dict["response"]["body"]["item"].get("platGbCd"),
-                bun=xml_to_dict["response"]["body"]["item"].get("bun"),
-                ji=xml_to_dict["response"]["body"]["item"].get("ji"),
-                regstr_gb_cd=xml_to_dict["response"]["body"]["item"].get("regstrGbCd"),
-                regstr_gb_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "regstrGbCdNm"
-                ),
-                regstr_kind_cd=xml_to_dict["response"]["body"]["item"].get(
-                    "regstrKindCd"
-                ),
-                regstr_kind_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "regstrKindCdNm"
-                ),
-                new_old_regstr_gb_cd=xml_to_dict["response"]["body"]["item"].get(
-                    "newOldRegstrGbCd"
-                ),
-                new_old_regstr_gb_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "newOldRegstrGbCdNm"
-                ),
-                new_plat_plc=xml_to_dict["response"]["body"]["item"].get("newPlatPlc"),
-                bld_nm=xml_to_dict["response"]["body"]["item"].get("bldNm"),
-                splot_nm=xml_to_dict["response"]["body"]["item"].get("splotNm"),
-                block=xml_to_dict["response"]["body"]["item"].get("block"),
-                lot=xml_to_dict["response"]["body"]["item"].get("lot"),
-                bylot_cnt=xml_to_dict["response"]["body"]["item"].get("bylotCnt"),
-                na_road_cd=xml_to_dict["response"]["body"]["item"].get("naRoadCd"),
+                mgm_bldrgst_pk=xml_to_dict.get("mgmBldrgstPk"),
+                itg_bld_grade=xml_to_dict.get("itgBldGrade"),
+                itg_bld_cert=xml_to_dict.get("itgBldCert"),
+                crtn_day=xml_to_dict.get("crtnDay"),
+                na_bjdong_cd=xml_to_dict.get("naBjdongCd"),
+                na_ugrnd_cd=xml_to_dict.get("naUgrndCd"),
+                na_main_bun=xml_to_dict.get("naMainBun"),
+                na_sub_bun=xml_to_dict.get("naSubBun"),
+                plat_area=xml_to_dict.get("platArea"),
+                arch_area=xml_to_dict.get("archArea"),
+                bc_rat=xml_to_dict.get("bcRat"),
+                tot_area=xml_to_dict.get("totArea"),
+                vl_rat_estm_tot_area=xml_to_dict.get("vlRatEstmTotArea"),
+                vl_rat=xml_to_dict.get("vlRat"),
+                main_purps_cd=xml_to_dict.get("mainPurpsCd"),
+                main_purps_cd_nm=xml_to_dict.get("mainPurpsCdNm"),
+                etc_purps=xml_to_dict.get("etcPurps"),
+                hhld_cnt=xml_to_dict.get("hhldCnt"),
+                fmly_cnt=xml_to_dict.get("fmlyCnt"),
+                main_bld_cnt=xml_to_dict.get("mainBldCnt"),
+                atch_bld_cnt=xml_to_dict.get("atchBldCnt"),
+                atch_bld_area=xml_to_dict.get("atchBldArea"),
+                tot_pkng_cnt=xml_to_dict.get("totPkngCnt"),
+                indr_mech_utcnt=xml_to_dict.get("indrMechUtcnt"),
+                indr_mech_area=xml_to_dict.get("indrMechArea"),
+                oudr_mech_utcnt=xml_to_dict.get("oudrMechUtcnt"),
+                oudr_mech_area=xml_to_dict.get("oudrMechArea"),
+                indr_auto_utcnt=xml_to_dict.get("indrAutoUtcnt"),
+                indr_auto_area=xml_to_dict.get("indrAutoArea"),
+                oudr_auto_utcnt=xml_to_dict.get("oudrAutoUtcnt"),
+                oudr_auto_area=xml_to_dict.get("oudrAutoArea"),
+                pms_day=xml_to_dict.get("pmsDay"),
+                stcns_day=xml_to_dict.get("stcnsDay"),
+                use_apr_day=xml_to_dict.get("useAprDay"),
+                pmsno_year=xml_to_dict.get("pmsnoYear"),
+                pmsno_kik_cd=xml_to_dict.get("pmsnoKikCd"),
+                pmsno_kik_cd_nm=xml_to_dict.get("pmsnoKikCdNm"),
+                pmsno_gb_cd=xml_to_dict.get("pmsnoGbCd"),
+                pmsno_gb_cd_nm=xml_to_dict.get("pmsnoGbCdNm"),
+                ho_cnt=xml_to_dict.get("hoCnt"),
+                engr_grade=xml_to_dict.get("engrGrade"),
+                engr_rat=xml_to_dict.get("engrRat"),
+                engr_epi=xml_to_dict.get("engrEpi"),
+                gn_bld_grade=xml_to_dict.get("gnBldGrade"),
+                gn_bld_cert=xml_to_dict.get("gnBldCert"),
+                rnum=xml_to_dict.get("rnum"),
+                plat_plc=xml_to_dict.get("platPlc"),
+                sigungu_cd=xml_to_dict.get("sigunguCd"),
+                bjdong_cd=xml_to_dict.get("bjdongCd"),
+                plat_gb_cd=xml_to_dict.get("platGbCd"),
+                bun=xml_to_dict.get("bun"),
+                ji=xml_to_dict.get("ji"),
+                regstr_gb_cd=xml_to_dict.get("regstrGbCd"),
+                regstr_gb_cd_nm=xml_to_dict.get("regstrGbCdNm"),
+                regstr_kind_cd=xml_to_dict.get("regstrKindCd"),
+                regstr_kind_cd_nm=xml_to_dict.get("regstrKindCdNm"),
+                new_old_regstr_gb_cd=xml_to_dict.get("newOldRegstrGbCd"),
+                new_old_regstr_gb_cd_nm=xml_to_dict.get("newOldRegstrGbCdNm"),
+                new_plat_plc=xml_to_dict.get("newPlatPlc"),
+                bld_nm=xml_to_dict.get("bldNm"),
+                splot_nm=xml_to_dict.get("splotNm"),
+                block=xml_to_dict.get("block"),
+                lot=xml_to_dict.get("lot"),
+                bylot_cnt=xml_to_dict.get("bylotCnt"),
+                na_road_cd=xml_to_dict.get("naRoadCd"),
             )
         except KeyError:
             pass
@@ -264,141 +229,94 @@ class GovtBldSpider(Spider):
         xml_to_dict = parse(response.text)
         item: GovtBldMidInfoItem | None = None
 
+        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
+        elif not xml_to_dict["response"]["body"]["items"]:
+            item = None
+        else:
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+
         try:
             item: GovtBldMidInfoItem = GovtBldMidInfoItem(
                 house_id=response.request.meta["house_id"],
-                mgm_bldrgst_pk=xml_to_dict["response"]["body"]["item"].get(
-                    "mgmBldrgstPk"
-                ),
-                main_purps_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "mainPurpsCdNm"
-                ),
-                etc_purps=xml_to_dict["response"]["body"]["item"].get("etcPurps"),
-                roof_cd=xml_to_dict["response"]["body"]["item"].get("roofCd"),
-                roof_cd_nm=xml_to_dict["response"]["body"]["item"].get("roofCdNm"),
-                etc_roof=xml_to_dict["response"]["body"]["item"].get("etcRoof"),
-                hhld_cnt=xml_to_dict["response"]["body"]["item"].get("hhldCnt"),
-                fmly_cnt=xml_to_dict["response"]["body"]["item"].get("fmlyCnt"),
-                heit=xml_to_dict["response"]["body"]["item"].get("heit"),
-                grnd_flr_cnt=xml_to_dict["response"]["body"]["item"].get("grndFlrCnt"),
-                ugrnd_flr_cnt=xml_to_dict["response"]["body"]["item"].get(
-                    "ugrndFlrCnt"
-                ),
-                ride_use_elvt_cnt=xml_to_dict["response"]["body"]["item"].get(
-                    "rideUseElvtCnt"
-                ),
-                emgen_use_elvt_cnt=xml_to_dict["response"]["body"]["item"].get(
-                    "emgenUseElvtCnt"
-                ),
-                atch_bld_cnt=xml_to_dict["response"]["body"]["item"].get("atchBldCnt"),
-                atch_bld_area=xml_to_dict["response"]["body"]["item"].get(
-                    "atchBldArea"
-                ),
-                tot_dong_tot_area=xml_to_dict["response"]["body"]["item"].get(
-                    "totDongTotArea"
-                ),
-                indr_mech_utcnt=xml_to_dict["response"]["body"]["item"].get(
-                    "indrMechUtcnt"
-                ),
-                indr_mech_area=xml_to_dict["response"]["body"]["item"].get(
-                    "indrMechArea"
-                ),
-                oudr_mech_utcnt=xml_to_dict["response"]["body"]["item"].get(
-                    "oudrMechUtcnt"
-                ),
-                oudr_mech_area=xml_to_dict["response"]["body"]["item"].get(
-                    "oudrMechArea"
-                ),
-                indr_auto_utcnt=xml_to_dict["response"]["body"]["item"].get(
-                    "indrAutoUtcnt"
-                ),
-                indr_auto_area=xml_to_dict["response"]["body"]["item"].get(
-                    "indrAutoArea"
-                ),
-                oudr_auto_utcnt=xml_to_dict["response"]["body"]["item"].get(
-                    "oudrAutoUtcnt"
-                ),
-                oudr_auto_area=xml_to_dict["response"]["body"]["item"].get(
-                    "oudrAutoArea"
-                ),
-                pms_day=xml_to_dict["response"]["body"]["item"].get("pmsDay"),
-                stcns_day=xml_to_dict["response"]["body"]["item"].get("stcnsDay"),
-                use_apr_day=xml_to_dict["response"]["body"]["item"].get("useAprDay"),
-                pmsno_year=xml_to_dict["response"]["body"]["item"].get("pmsnoYear"),
-                pmsno_kik_cd=xml_to_dict["response"]["body"]["item"].get("pmsnoKikCd"),
-                pmsno_kik_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "pmsnoKikCdNm"
-                ),
-                pmsno_gb_cd=xml_to_dict["response"]["body"]["item"].get("pmsnoGbCd"),
-                pmsno_gb_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "pmsnoGbCdNm"
-                ),
-                ho_cnt=xml_to_dict["response"]["body"]["item"].get("hoCnt"),
-                engr_grade=xml_to_dict["response"]["body"]["item"].get("engrGrade"),
-                engr_rat=xml_to_dict["response"]["body"]["item"].get("engrRat"),
-                engr_epi=xml_to_dict["response"]["body"]["item"].get("engrEpi"),
-                gn_bld_grade=xml_to_dict["response"]["body"]["item"].get("gnBldGrade"),
-                gn_bld_cert=xml_to_dict["response"]["body"]["item"].get("gnBldCert"),
-                itg_bld_grade=xml_to_dict["response"]["body"]["item"].get(
-                    "itgBldGrade"
-                ),
-                itg_bld_cert=xml_to_dict["response"]["body"]["item"].get("itgBldCert"),
-                crtn_day=xml_to_dict["response"]["body"]["item"].get("crtnDay"),
-                rnum=xml_to_dict["response"]["body"]["item"].get("rnum"),
-                plat_plc=xml_to_dict["response"]["body"]["item"].get("platPlc"),
-                sigungu_cd=xml_to_dict["response"]["body"]["item"].get("sigunguCd"),
-                bjdong_cd=xml_to_dict["response"]["body"]["item"].get("bjdongCd"),
-                plat_gb_cd=xml_to_dict["response"]["body"]["item"].get("platGbCd"),
-                bun=xml_to_dict["response"]["body"]["item"].get("bun"),
-                ji=xml_to_dict["response"]["body"]["item"].get("ji"),
-                regstr_gb_cd=xml_to_dict["response"]["body"]["item"].get("regstrGbCd"),
-                regstr_gb_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "regstrGbCdNm"
-                ),
-                regstr_kind_cd=xml_to_dict["response"]["body"]["item"].get(
-                    "regstrKindCd"
-                ),
-                regstr_kind_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "regstrKindCdNm"
-                ),
-                new_plat_plc=xml_to_dict["response"]["body"]["item"].get("newPlatPlc"),
-                bld_nm=xml_to_dict["response"]["body"]["item"].get("bldNm"),
-                splot_nm=xml_to_dict["response"]["body"]["item"].get("splotNm"),
-                block=xml_to_dict["response"]["body"]["item"].get("block"),
-                lot=xml_to_dict["response"]["body"]["item"].get("lot"),
-                bylot_cnt=xml_to_dict["response"]["body"]["item"].get("bylotCnt"),
-                na_road_cd=xml_to_dict["response"]["body"]["item"].get("naRoadCd"),
-                na_bjdong_cd=xml_to_dict["response"]["body"]["item"].get("naBjdongCd"),
-                na_ugrnd_cd=xml_to_dict["response"]["body"]["item"].get("naUgrndCd"),
-                na_main_bun=xml_to_dict["response"]["body"]["item"].get("naMainBun"),
-                na_sub_bun=xml_to_dict["response"]["body"]["item"].get("naSubBun"),
-                dong_nm=xml_to_dict["response"]["body"]["item"].get("dongNm"),
-                main_atch_gb_cd=xml_to_dict["response"]["body"]["item"].get(
-                    "mainAtchGbCd"
-                ),
-                main_atch_gb_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "mainAtchGbCdNm"
-                ),
-                plat_area=xml_to_dict["response"]["body"]["item"].get("platArea"),
-                arch_area=xml_to_dict["response"]["body"]["item"].get("archArea"),
-                bc_rat=xml_to_dict["response"]["body"]["item"].get("bcRat"),
-                tot_area=xml_to_dict["response"]["body"]["item"].get("totArea"),
-                vl_rat_estm_tot_area=xml_to_dict["response"]["body"]["item"].get(
-                    "vlRatEstmTotArea"
-                ),
-                vl_rat=xml_to_dict["response"]["body"]["item"].get("vlRat"),
-                strct_cd=xml_to_dict["response"]["body"]["item"].get("strctCd"),
-                strct_cd_nm=xml_to_dict["response"]["body"]["item"].get("strctCdNm"),
-                etc_strct=xml_to_dict["response"]["body"]["item"].get("etcStrct"),
-                main_purps_cd=xml_to_dict["response"]["body"]["item"].get(
-                    "mainPurpsCd"
-                ),
-                rserthqk_dsgn_apply_yn=xml_to_dict["response"]["body"]["item"].get(
-                    "rserthqkDsgnApplyYn"
-                ),
-                rserthqk_ablty=xml_to_dict["response"]["body"]["item"].get(
-                    "rserthqkAblty"
-                ),
+                mgm_bldrgst_pk=xml_to_dict.get("mgmBldrgstPk"),
+                main_purps_cd_nm=xml_to_dict.get("mainPurpsCdNm"),
+                etc_purps=xml_to_dict.get("etcPurps"),
+                roof_cd=xml_to_dict.get("roofCd"),
+                roof_cd_nm=xml_to_dict.get("roofCdNm"),
+                etc_roof=xml_to_dict.get("etcRoof"),
+                hhld_cnt=xml_to_dict.get("hhldCnt"),
+                fmly_cnt=xml_to_dict.get("fmlyCnt"),
+                heit=xml_to_dict.get("heit"),
+                grnd_flr_cnt=xml_to_dict.get("grndFlrCnt"),
+                ugrnd_flr_cnt=xml_to_dict.get("ugrndFlrCnt"),
+                ride_use_elvt_cnt=xml_to_dict.get("rideUseElvtCnt"),
+                emgen_use_elvt_cnt=xml_to_dict.get("emgenUseElvtCnt"),
+                atch_bld_cnt=xml_to_dict.get("atchBldCnt"),
+                atch_bld_area=xml_to_dict.get("atchBldArea"),
+                tot_dong_tot_area=xml_to_dict.get("totDongTotArea"),
+                indr_mech_utcnt=xml_to_dict.get("indrMechUtcnt"),
+                indr_mech_area=xml_to_dict.get("indrMechArea"),
+                oudr_mech_utcnt=xml_to_dict.get("oudrMechUtcnt"),
+                oudr_mech_area=xml_to_dict.get("oudrMechArea"),
+                indr_auto_utcnt=xml_to_dict.get("indrAutoUtcnt"),
+                indr_auto_area=xml_to_dict.get("indrAutoArea"),
+                oudr_auto_utcnt=xml_to_dict.get("oudrAutoUtcnt"),
+                oudr_auto_area=xml_to_dict.get("oudrAutoArea"),
+                pms_day=xml_to_dict.get("pmsDay"),
+                stcns_day=xml_to_dict.get("stcnsDay"),
+                use_apr_day=xml_to_dict.get("useAprDay"),
+                pmsno_year=xml_to_dict.get("pmsnoYear"),
+                pmsno_kik_cd=xml_to_dict.get("pmsnoKikCd"),
+                pmsno_kik_cd_nm=xml_to_dict.get("pmsnoKikCdNm"),
+                pmsno_gb_cd=xml_to_dict.get("pmsnoGbCd"),
+                pmsno_gb_cd_nm=xml_to_dict.get("pmsnoGbCdNm"),
+                ho_cnt=xml_to_dict.get("hoCnt"),
+                engr_grade=xml_to_dict.get("engrGrade"),
+                engr_rat=xml_to_dict.get("engrRat"),
+                engr_epi=xml_to_dict.get("engrEpi"),
+                gn_bld_grade=xml_to_dict.get("gnBldGrade"),
+                gn_bld_cert=xml_to_dict.get("gnBldCert"),
+                itg_bld_grade=xml_to_dict.get("itgBldGrade"),
+                itg_bld_cert=xml_to_dict.get("itgBldCert"),
+                crtn_day=xml_to_dict.get("crtnDay"),
+                rnum=xml_to_dict.get("rnum"),
+                plat_plc=xml_to_dict.get("platPlc"),
+                sigungu_cd=xml_to_dict.get("sigunguCd"),
+                bjdong_cd=xml_to_dict.get("bjdongCd"),
+                plat_gb_cd=xml_to_dict.get("platGbCd"),
+                bun=xml_to_dict.get("bun"),
+                ji=xml_to_dict.get("ji"),
+                regstr_gb_cd=xml_to_dict.get("regstrGbCd"),
+                regstr_gb_cd_nm=xml_to_dict.get("regstrGbCdNm"),
+                regstr_kind_cd=xml_to_dict.get("regstrKindCd"),
+                regstr_kind_cd_nm=xml_to_dict.get("regstrKindCdNm"),
+                new_plat_plc=xml_to_dict.get("newPlatPlc"),
+                bld_nm=xml_to_dict.get("bldNm"),
+                splot_nm=xml_to_dict.get("splotNm"),
+                block=xml_to_dict.get("block"),
+                lot=xml_to_dict.get("lot"),
+                bylot_cnt=xml_to_dict.get("bylotCnt"),
+                na_road_cd=xml_to_dict.get("naRoadCd"),
+                na_bjdong_cd=xml_to_dict.get("naBjdongCd"),
+                na_ugrnd_cd=xml_to_dict.get("naUgrndCd"),
+                na_main_bun=xml_to_dict.get("naMainBun"),
+                na_sub_bun=xml_to_dict.get("naSubBun"),
+                dong_nm=xml_to_dict.get("dongNm"),
+                main_atch_gb_cd=xml_to_dict.get("mainAtchGbCd"),
+                main_atch_gb_cd_nm=xml_to_dict.get("mainAtchGbCdNm"),
+                plat_area=xml_to_dict.get("platArea"),
+                arch_area=xml_to_dict.get("archArea"),
+                bc_rat=xml_to_dict.get("bcRat"),
+                tot_area=xml_to_dict.get("totArea"),
+                vl_rat_estm_tot_area=xml_to_dict.get("vlRatEstmTotArea"),
+                vl_rat=xml_to_dict.get("vlRat"),
+                strct_cd=xml_to_dict.get("strctCd"),
+                strct_cd_nm=xml_to_dict.get("strctCdNm"),
+                etc_strct=xml_to_dict.get("etcStrct"),
+                main_purps_cd=xml_to_dict.get("mainPurpsCd"),
+                rserthqk_dsgn_apply_yn=xml_to_dict.get("rserthqkDsgnApplyYn"),
+                rserthqk_ablty=xml_to_dict.get("rserthqkAblty"),
             )
         except KeyError:
             pass
@@ -423,73 +341,60 @@ class GovtBldSpider(Spider):
             )
 
     def parse_bld_area_info(self, response):
-        xml_to_dict = parse(response.text)
+        xml_to_dict: dict = parse(response.text)
         item: GovtBldAreaInfoItem | None = None
+
+        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
+        elif not xml_to_dict["response"]["body"]["items"]:
+            item = None
+        else:
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
 
         try:
             item: GovtBldAreaInfoItem = GovtBldAreaInfoItem(
                 house_id=response.request.meta["house_id"],
-                mgm_bldrgst_pk=xml_to_dict["response"]["body"]["item"].get(
-                    "mgmBldrgstPk"
-                ),
-                regstr_gb_cd=xml_to_dict["response"]["body"]["item"].get("regstrGbCd"),
-                regstr_gb_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "regstrGbCdNm"
-                ),
-                regstr_kind_cd=xml_to_dict["response"]["body"]["item"].get(
-                    "regstrKindCd"
-                ),
-                regstr_kind_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "regstrKindCdNm"
-                ),
-                new_plat_plc=xml_to_dict["response"]["body"]["item"].get("newPlatPlc"),
-                bld_nm=xml_to_dict["response"]["body"]["item"].get("bldNm"),
-                splot_nm=xml_to_dict["response"]["body"]["item"].get("splotNm"),
-                block=xml_to_dict["response"]["body"]["item"].get("block"),
-                lot=xml_to_dict["response"]["body"]["item"].get("lot"),
-                bylot_cnt=xml_to_dict["response"]["body"]["item"].get("bylotCnt"),
-                na_road_cd=xml_to_dict["response"]["body"]["item"].get("naRoadCd"),
-                na_bjdong_cd=xml_to_dict["response"]["body"]["item"].get("naBjdongCd"),
-                na_ugrnd_cd=xml_to_dict["response"]["body"]["item"].get("naUgrndCd"),
-                na_main_bun=xml_to_dict["response"]["body"]["item"].get("naMainBun"),
-                na_sub_bun=xml_to_dict["response"]["body"]["item"].get("naSubBun"),
-                dong_nm=xml_to_dict["response"]["body"]["item"].get("dongNm"),
-                ho_nm=xml_to_dict["response"]["body"]["item"].get("hoNm"),
-                flr_gb_cd=xml_to_dict["response"]["body"]["item"].get("flrGbCd"),
-                flr_gb_cd_nm=xml_to_dict["response"]["body"]["item"].get("flrGbCdNm"),
-                flr_no=xml_to_dict["response"]["body"]["item"].get("flrNo"),
-                flr_no_nm=xml_to_dict["response"]["body"]["item"].get("flrNoNm"),
-                expos_pubuse_gb_cd=xml_to_dict["response"]["body"]["item"].get(
-                    "exposPubuseGbCd"
-                ),
-                expos_pubuse_gb_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "exposPubuseGbCdNm"
-                ),
-                main_atch_gb_cd=xml_to_dict["response"]["body"]["item"].get(
-                    "mainAtchGbCd"
-                ),
-                main_atch_gb_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "mainAtchGbCdNm"
-                ),
-                strct_cd=xml_to_dict["response"]["body"]["item"].get("strctCd"),
-                strct_cd_nm=xml_to_dict["response"]["body"]["item"].get("strctCdNm"),
-                etc_strct=xml_to_dict["response"]["body"]["item"].get("etcStrct"),
-                main_purps_cd=xml_to_dict["response"]["body"]["item"].get(
-                    "mainPurpsCd"
-                ),
-                main_purps_cd_nm=xml_to_dict["response"]["body"]["item"].get(
-                    "mainPurpsCdNm"
-                ),
-                etc_purps=xml_to_dict["response"]["body"]["item"].get("etcPurps"),
-                area=xml_to_dict["response"]["body"]["item"].get("area"),
-                crtn_day=xml_to_dict["response"]["body"]["item"].get("crtnDay"),
-                rnum=xml_to_dict["response"]["body"]["item"].get("rnum"),
-                plat_plc=xml_to_dict["response"]["body"]["item"].get("platPlc"),
-                sigungu_cd=xml_to_dict["response"]["body"]["item"].get("sigunguCd"),
-                bjdong_cd=xml_to_dict["response"]["body"]["item"].get("bjdongCd"),
-                plat_gb_cd=xml_to_dict["response"]["body"]["item"].get("platGbCd"),
-                bun=xml_to_dict["response"]["body"]["item"].get("bun"),
-                ji=xml_to_dict["response"]["body"]["item"].get("ji"),
+                mgm_bldrgst_pk=xml_to_dict.get("mgmBldrgstPk"),
+                regstr_gb_cd=xml_to_dict.get("regstrGbCd"),
+                regstr_gb_cd_nm=xml_to_dict.get("regstrGbCdNm"),
+                regstr_kind_cd=xml_to_dict.get("regstrKindCd"),
+                regstr_kind_cd_nm=xml_to_dict.get("regstrKindCdNm"),
+                new_plat_plc=xml_to_dict.get("newPlatPlc"),
+                bld_nm=xml_to_dict.get("bldNm"),
+                splot_nm=xml_to_dict.get("splotNm"),
+                block=xml_to_dict.get("block"),
+                lot=xml_to_dict.get("lot"),
+                bylot_cnt=xml_to_dict.get("bylotCnt"),
+                na_road_cd=xml_to_dict.get("naRoadCd"),
+                na_bjdong_cd=xml_to_dict.get("naBjdongCd"),
+                na_ugrnd_cd=xml_to_dict.get("naUgrndCd"),
+                na_main_bun=xml_to_dict.get("naMainBun"),
+                na_sub_bun=xml_to_dict.get("naSubBun"),
+                dong_nm=xml_to_dict.get("dongNm"),
+                ho_nm=xml_to_dict.get("hoNm"),
+                flr_gb_cd=xml_to_dict.get("flrGbCd"),
+                flr_gb_cd_nm=xml_to_dict.get("flrGbCdNm"),
+                flr_no=xml_to_dict.get("flrNo"),
+                flr_no_nm=xml_to_dict.get("flrNoNm"),
+                expos_pubuse_gb_cd=xml_to_dict.get("exposPubuseGbCd"),
+                expos_pubuse_gb_cd_nm=xml_to_dict.get("exposPubuseGbCdNm"),
+                main_atch_gb_cd=xml_to_dict.get("mainAtchGbCd"),
+                main_atch_gb_cd_nm=xml_to_dict.get("mainAtchGbCdNm"),
+                strct_cd=xml_to_dict.get("strctCd"),
+                strct_cd_nm=xml_to_dict.get("strctCdNm"),
+                etc_strct=xml_to_dict.get("etcStrct"),
+                main_purps_cd=xml_to_dict.get("mainPurpsCd"),
+                main_purps_cd_nm=xml_to_dict.get("mainPurpsCdNm"),
+                etc_purps=xml_to_dict.get("etcPurps"),
+                area=xml_to_dict.get("area"),
+                crtn_day=xml_to_dict.get("crtnDay"),
+                rnum=xml_to_dict.get("rnum"),
+                plat_plc=xml_to_dict.get("platPlc"),
+                sigungu_cd=xml_to_dict.get("sigunguCd"),
+                bjdong_cd=xml_to_dict.get("bjdongCd"),
+                plat_gb_cd=xml_to_dict.get("platGbCd"),
+                bun=xml_to_dict.get("bun"),
+                ji=xml_to_dict.get("ji"),
             )
         except KeyError:
             pass
@@ -580,6 +485,7 @@ class GovtBldSpider(Spider):
         ji = "0000"
 
         address: str | None = None
+        # new_dong_address 가 있을 경우, 우선적으로 사용, 그렇지 않으면 origin_dong_address 사용
         if bld_info.new_dong_address:
             if bld_info.name in bld_info.new_dong_address:
                 address = bld_info.new_dong_address.replace(" " + bld_info.name, "")
@@ -587,7 +493,12 @@ class GovtBldSpider(Spider):
             if bld_info.name in bld_info.origin_dong_address:
                 address = bld_info.origin_dong_address.replace(" " + bld_info.name, "")
 
-        if address and re.fullmatch(bunji_pattern, address):
+        # pattern: 563-2
+        # <주소 형태>
+        # 1. 서울특별시 서초구 xx동 123-4 xx아파트 -> xx아파트 제거 후 지번 추출
+        # 2. xx시 xx구 xx동 123-4 -> 바로 지번 추출
+        # 3. xx시 xx구 xx동 xx아파트 -> 지번 초기값 사용
+        if address and re.findall(bunji_pattern, address):
             bunji = address.split(" ")[-1]
         else:
             if bld_info.new_dong_address and re.fullmatch(
@@ -605,6 +516,8 @@ class GovtBldSpider(Spider):
             if "-" in bunji:
                 bun = bun[len(bunji.split("-")[0]) :] + bunji.split("-")[0]
                 ji = ji[len(bunji.split("-")[-1]) :] + bunji.split("-")[-1]
+            else:
+                bun = bun[len(bunji.split("-")[0]) :] + bunji.split("-")[0]
 
         if bld_info.bjd_code:
             return GovtBldInputInfo(
