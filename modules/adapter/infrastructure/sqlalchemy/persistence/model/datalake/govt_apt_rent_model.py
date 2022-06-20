@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, BigInteger, Integer
+from sqlalchemy import Column, String, BigInteger, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -6,9 +7,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 )
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
-    GovtAptRentsEntity
+    GovtAptRentsEntity,
+    GovtAptRentsJoinKeyEntity
 )
-
 
 
 class GovtAptRentModel(datalake_base, TimestampMixin):
@@ -33,6 +34,13 @@ class GovtAptRentModel(datalake_base, TimestampMixin):
     regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
 
+    bld_mapping = relationship("BldMappingResultModel",
+                               backref="govt_apt_rents", uselist=False,
+                               primaryjoin="and_(foreign(GovtAptRentModel.regional_cd) == BldMappingResultModel.regional_cd,"
+                                           "foreign(GovtAptRentModel.jibun) == BldMappingResultModel.jibun,"
+                                           "foreign(GovtAptRentModel.dong) == BldMappingResultModel.dong,"
+                                           "foreign(GovtAptRentModel.dong) == BldMappingResultModel.bld_name)")
+
     def to_entity_for_bld_mapping_reuslts(self) -> GovtAptRentsEntity:
         return GovtAptRentsEntity(
             id=self.id,
@@ -43,3 +51,17 @@ class GovtAptRentModel(datalake_base, TimestampMixin):
             apt_name=self.apt_name
         )
 
+    def to_entity_for_apt_rents(self) -> GovtAptRentsJoinKeyEntity:
+        return GovtAptRentsJoinKeyEntity(
+            house_id=self.bld_mapping.house_id,# if self.bld_mapping.house_id else None,  # fixme: 정상적으로 나오는지 확인 필요
+            dong=self.dong,
+            apt_name=self.apt_name,
+            monthly_amount=self.monthly_amount,
+            deal_year=self.deal_year,
+            deal_month=self.deal_month,
+            deal_day=self.deal_day,
+            deposit=self.deposit,
+            exclusive_area=self.exclusive_area,
+            regional_cd=self.regional_cd,
+            floor=self.floor
+        )

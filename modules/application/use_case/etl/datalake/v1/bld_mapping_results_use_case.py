@@ -1,14 +1,14 @@
 from datetime import date
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
-from modules.application.use_case.etl import BaseEtlUseCase
+from modules.application.use_case.etl import BaseETLUseCase
 
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )
 
-from modules.adapter.infrastructure.sqlalchemy.repository.govt_apt_deals_repository import (
-    SyncGovtAptDealsRepository,
+from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
+    SyncGovtDealsRepository,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
@@ -32,19 +32,31 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entit
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptMappingEntity
 )
+from modules.adapter.infrastructure.sqlalchemy.entity.v1.legal_dong_code_entity import (
+    LegalDongCodeEntity,
+)
 
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 
 from modules.adapter.infrastructure.etl.dl_bld_mapping_reuslts import TransferBldMappingResults
 
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_mapping_result_model import (
+    BldMappingResultModel
+)
+
 logger = logger_.getLogger(__name__)
 
 
-class BldMappingResultsUseCase(BaseEtlUseCase):
-    def __init__(self, kapt_repo, govt_repo, dong_code_repo, bld_mapping_repo, *args, **kwargs):
+class BldMappingResultsUseCase(BaseETLUseCase):
+    def __init__(self,
+                 kapt_repo: SyncKaptRepository,
+                 govt_repo: SyncGovtDealsRepository,
+                 dong_code_repo: SyncLegalDongCodeRepository,
+                 bld_mapping_repo: SyncBldMappingResultsRepository,
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._kapt_repo: SyncKaptRepository = kapt_repo
-        self._govt_repo: SyncGovtAptDealsRepository = govt_repo
+        self._govt_repo: SyncGovtDealsRepository = govt_repo
         self._transfer: TransferBldMappingResults = TransferBldMappingResults()
         self._dong_code: SyncLegalDongCodeRepository = dong_code_repo
         self._bld_mapping_repo: SyncBldMappingResultsRepository = bld_mapping_repo
@@ -52,7 +64,7 @@ class BldMappingResultsUseCase(BaseEtlUseCase):
     def execute(self):
         # extract
         today = date.today()
-        dong_codes = self._dong_code.find_all()
+        dong_codes: list[LegalDongCodeEntity] = self._dong_code.find_all()
 
         kapt_basic_infos: list[KaptMappingEntity] = self._kapt_repo.find_by_date_and_type(
             target_date=today,
@@ -84,7 +96,7 @@ class BldMappingResultsUseCase(BaseEtlUseCase):
         )
 
         # transfer
-        bld_mapping_result_models = self._transfer.start_etl(
+        bld_mapping_result_models: list[BldMappingResultModel] = self._transfer.start_transfer( # fixme 자료형 표시 (수정함)
             govt_apt_deals=govt_apt_deals,
             govt_apt_rents=govt_apt_rents,
             govt_ofctl_deals=govt_ofctl_deals,
@@ -96,5 +108,4 @@ class BldMappingResultsUseCase(BaseEtlUseCase):
         )
 
         # Load
-        # result columns : place_id, house_id, regional_cd, jibun, dong, bld_name, created_at, updated_at
-        self._bld_mapping_repo.save_all(bld_mapping_result_models)
+        self._bld_mapping_repo.save_all(models=bld_mapping_result_models)

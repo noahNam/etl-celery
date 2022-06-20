@@ -1,11 +1,13 @@
-from sqlalchemy import Column, String, BigInteger, Integer
+from sqlalchemy import Column, String, BigInteger, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
-    GovtOfctlDealsEntity
+    GovtOfctlDealsEntity,
+    GovtOfctlDealJoinKeyEntity
 )
 
 
@@ -20,19 +22,21 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
     )
     deal_amount = Column(Integer, nullable=True)
     deal_year = Column(String(4), nullable=True)
-    ofctl_name = Column(String(40), nullable=True)
-    dong = Column(String(40), nullable=True)
+    ofctl_name = Column(String(40), ForeignKey("bld_mapping_results.bld_name"), nullable=True)
+    dong = Column(String(40), ForeignKey("bld_mapping_results.dong"), nullable=True)
     sigungu = Column(String(40), nullable=True)
     deal_month = Column(String(2), nullable=True)
     deal_day = Column(String(6), nullable=True)
     exclusive_area = Column(String(20), nullable=True)
-    jibun = Column(String(10), nullable=True)
-    regional_cd = Column(String(5), nullable=True, index=True)
+    jibun = Column(String(10), ForeignKey("bld_mapping_results.jibun"), nullable=True)
+    regional_cd = Column(String(5), ForeignKey("bld_mapping_results.regional_cd"), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
     cancel_deal_type = Column(String(1), nullable=True)
     cancel_deal_day = Column(String(8), nullable=True)
     req_gbn = Column(String(10), nullable=True)
     rdealer_lawdnm = Column(String(150), nullable=True)
+
+    bld_mapping = relationship("BldMappingResultModel", foreign_keys=[regional_cd, jibun, dong, ofctl_name])
 
     def to_entity_for_bld_mapping_results(self) -> GovtOfctlDealsEntity:
         return GovtOfctlDealsEntity(
@@ -41,4 +45,22 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
             dong=self.dong,
             jibun=self.jibun,
             ofctl_name=self.ofctl_name
+        )
+
+    def to_entity_for_ofctl_deals(self) -> GovtOfctlDealJoinKeyEntity:
+        return GovtOfctlDealJoinKeyEntity(
+            house_id=self.bld_mapping.house_id,
+            dong=self.dong,
+            ofctl_name=self.ofctl_name,
+            deal_amount=self.deal_amount,
+            deal_year=self.deal_year,
+            deal_month=self.deal_month,
+            deal_day=self.deal_day,
+            exclusive_area=self.exclusive_area,
+            regional_cd=self.regional_cd,
+            floor=self.floor,
+            cancel_deal_type=self.cancel_deal_type,
+            cancel_deal_day=self.cancel_deal_day,
+            req_gbn=self.req_gbn,
+            rdealer_lawdnm=self.rdealer_lawdnm
         )

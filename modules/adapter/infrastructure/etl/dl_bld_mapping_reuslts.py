@@ -1,6 +1,5 @@
 import re
 from datetime import date
-from typing import Type
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptMappingEntity
@@ -11,8 +10,10 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entit
     GovtOfctlDealsEntity,
     GovtOfctlRentsEntity,
     GovtRightLotOutsEntity,
-    GovtEntity
+    GovtTransferEntity
 )
+from modules.adapter.infrastructure.etl import Transfer
+
 
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_mapping_result_model import (
     BldMappingResultModel
@@ -23,16 +24,16 @@ from modules.adapter.infrastructure.sqlalchemy.entity.v1.legal_dong_code_entity 
 )
 
 
-class TransferBldMappingResults:
-    def start_etl(self,
-                  govt_apt_deals: list[GovtAptDealsEntity],
-                  govt_apt_rents: list[GovtAptRentsEntity],
-                  govt_ofctl_deals: list[GovtOfctlDealsEntity],
-                  govt_ofctl_rents: list[GovtOfctlRentsEntity],
-                  govt_right_lot_outs: list[GovtRightLotOutsEntity],
-                  basices: list[KaptMappingEntity],
-                  dongs: list[LegalDongCodeEntity],
-                  today: date) -> list[BldMappingResultModel]:
+class TransferBldMappingResults(Transfer):
+    def start_transfer(self,
+                       govt_apt_deals: list[GovtAptDealsEntity],
+                       govt_apt_rents: list[GovtAptRentsEntity],
+                       govt_ofctl_deals: list[GovtOfctlDealsEntity],
+                       govt_ofctl_rents: list[GovtOfctlRentsEntity],
+                       govt_right_lot_outs: list[GovtRightLotOutsEntity],
+                       basices: list[KaptMappingEntity],
+                       dongs: list[LegalDongCodeEntity],
+                       today: date) -> list[BldMappingResultModel]:
         """
             input data
             - basics's columns : house_id, sido, sigungu, eubmyun, dongri, use_apr_day, origin_dong_address, name
@@ -55,71 +56,70 @@ class TransferBldMappingResults:
         """
         # 1. govts 전처리
         govts = list()
-        if len(govt_apt_deals) > 0:
+        if govt_apt_deals:
             for govt_apt_deal in govt_apt_deals:
-                address_code = self._get_address_code(govt=govt_apt_deal, dong_codes=None)
-                temp_entity = GovtEntity(
+                address_code: str | None = self._get_address_code(govt_deal=govt_apt_deal, dong_codes=None)
+                govt_transfer_entity = GovtTransferEntity(
                     addr_code=address_code,
                     build_year=govt_apt_deal.build_year,
                     jibun=govt_apt_deal.jibun,
                     dong=govt_apt_deal.dong,
                     apt_name=govt_apt_deal.apt_name
                 )
-                govts.append(temp_entity)
-        if len(govt_apt_rents) > 0:
+                govts.append(govt_transfer_entity)
+        if govt_apt_rents:
             for govt_apt_rent in govt_apt_rents:
-                address_code = self._get_address_code(govt=govt_apt_rent, dong_codes=dongs)
-                temp_entity = GovtEntity(
+                address_code: str | None = self._get_address_code(govt_deal=govt_apt_rent, dong_codes=dongs)
+                govt_transfer_entity = GovtTransferEntity(
                     addr_code=address_code,
                     build_year=govt_apt_rent.build_year,
                     jibun=govt_apt_rent.jibun,
                     dong=govt_apt_rent.dong,
                     apt_name=govt_apt_rent.apt_name
                 )
-                govts.append(temp_entity)
-        if len(govt_ofctl_deals) > 0:
+                govts.append(govt_transfer_entity)
+        if govt_ofctl_deals:
             for govt_ofctl_deal in govt_ofctl_deals:
-                address_code = self._get_address_code(govt=govt_ofctl_deal, dong_codes=dongs)
-                temp_entity = GovtEntity(
+                address_code: str | None = self._get_address_code(govt_deal=govt_ofctl_deal, dong_codes=dongs)
+                govt_transfer_entity = GovtTransferEntity(
                     addr_code=address_code,
                     build_year=None,
                     jibun=govt_ofctl_deal.jibun,
                     dong=govt_ofctl_deal.dong,
                     apt_name=govt_ofctl_deal.ofctl_name
                 )
-                govts.append(temp_entity)
+                govts.append(govt_transfer_entity)
 
-        if len(govt_ofctl_rents) > 0:
+        if govt_ofctl_rents:
             for govt_ofctl_rent in govt_ofctl_rents:
-                address_code = self._get_address_code(govt=govt_ofctl_rent, dong_codes=dongs)
-                temp_entity = GovtEntity(
+                address_code: str | None = self._get_address_code(govt_deal=govt_ofctl_rent, dong_codes=dongs)
+                govt_transfer_entity = GovtTransferEntity(
                     addr_code=address_code,
                     build_year=None,
                     jibun=govt_ofctl_rent.jibun,
                     dong=govt_ofctl_rent.dong,
                     apt_name=govt_ofctl_rent.ofctl_name
                 )
-                govts.append(temp_entity)
+                govts.append(govt_transfer_entity)
 
-        if len(govt_right_lot_outs) > 0:
+        if govt_right_lot_outs:
             for govt_right_lot_out in govt_right_lot_outs:
-                address_code = self._get_address_code(govt=govt_right_lot_out, dong_codes=dongs)
-                temp_entity = GovtEntity(
+                address_code: str | None = self._get_address_code(govt_deal=govt_right_lot_out, dong_codes=dongs)
+                govt_transfer_entity = GovtTransferEntity(
                     addr_code=address_code,
                     build_year=None,
                     jibun=govt_right_lot_out.jibun,
                     dong=govt_right_lot_out.dong,
                     apt_name=govt_right_lot_out.name
                 )
-                govts.append(temp_entity)
-
+                govts.append(govt_transfer_entity)
 
         # 2. basics 전처리
         basic_adress_codes = list()
         basic_jibuns = list()
         for basic_entity in basices:
             # addr_code 10자리 주소코드
-            addr_code = self._get_basic_adress_code(
+            addr_code: str | None = self._get_basic_adress_code(
                 sido=basic_entity.sido,
                 sigungu=basic_entity.sigungu,
                 eubmyun=basic_entity.eubmyun,
@@ -128,7 +128,7 @@ class TransferBldMappingResults:
             basic_adress_codes.append(addr_code)
 
             # 지번
-            basic_jibun = self._get_jibun(
+            basic_jibun: str | None = self._get_jibun(
                 sido=basic_entity.sido,
                 sigungu=basic_entity.sigungu,
                 eubmyun=basic_entity.eubmyun,
@@ -165,7 +165,7 @@ class TransferBldMappingResults:
                 apt_name=govts[i].apt_name
             )
             if basic_index is None:
-                house_id = None
+                continue
             else:
                 house_id = basices[basic_index].house_id
 
@@ -202,6 +202,9 @@ class TransferBldMappingResults:
                                  basic_indexes: list[int],
                                  basic_jibuns: list[str],
                                  jibun: str) -> list[int]:
+        if jibun is None:
+            return basic_indexes
+
         new_basic_indexes = list()
         for idx in basic_indexes:
             if jibun == basic_jibuns[idx]:
@@ -216,7 +219,10 @@ class TransferBldMappingResults:
     def _filter_basices_by_build_year(self,
                                       basic_indexes: list[int],
                                       basices: list[KaptMappingEntity],
-                                      build_year: str) -> list[int]:
+                                      build_year: str | None) -> list[int]:
+        if build_year is None:
+            return basic_indexes
+
         new_basic_indexes = list()
         for idx in basic_indexes:
             if int(build_year) == int(basices[idx].use_apr_day):  # fixme: 자리수가 4자리인지 확인해야함
@@ -256,7 +262,7 @@ class TransferBldMappingResults:
                                eubmyun,
                                dongri,
                                dong_code_entities: list[LegalDongCodeEntity]
-                               )-> str | None:
+                               ) -> str | None:
         regexes = list()
         if sido is None or sido == '':
             return None
@@ -304,28 +310,34 @@ class TransferBldMappingResults:
             return return_addr
 
     def _get_address_code(self,
-                          govt: GovtAptDealsEntity
-                                | GovtAptRentsEntity
-                                | GovtOfctlDealsEntity
-                                | GovtOfctlRentsEntity
-                                | GovtRightLotOutsEntity,
+                          govt_deal: GovtAptDealsEntity
+                                     | GovtAptRentsEntity
+                                     | GovtOfctlDealsEntity
+                                     | GovtOfctlRentsEntity
+                                     | GovtRightLotOutsEntity,
                           dong_codes: list[LegalDongCodeEntity] | None
                           ) -> str | None:
+        """
+        1. GovtAptDealsEntity 인 경우 (아파트 매매 실거래가)
+        - 주소코드 앞 5자리, 주소코드 뒷 5자리 합쳐서 사용
 
-        if type(govt) == GovtAptDealsEntity:
-            sigungu_cd = govt.sigungu_cd
-            eubmyundong_cd = govt.sigungu_cd
+        2. 이외 실거래가
+        - 주소코드 앞 5자리 그대로 사용
+        - 주소코드 6번째자리 ~ 8번째 자리는 읍면동 코드. 읍면동 문자열 데이터를 변환해 사용.
+        - 뒷 두자리(9~10번째 자리) 코드는 '00'으로 고정
+        """
+        if isinstance(govt_deal, GovtAptDealsEntity):
+            sigungu_cd = govt_deal.sigungu_cd
+            eubmyundong_cd = govt_deal.sigungu_cd
 
-            if sigungu_cd is None:
-                address_code = None
-            elif eubmyundong_cd is None:
+            if eubmyundong_cd is None:
                 address_code = ''.join([sigungu_cd, '00000'])
             else:
                 address_code = ''.join([sigungu_cd, eubmyundong_cd])
-            return address_code
+
         else:
-            address_code = str(govt.regional_cd)
-            dong = govt.dong
+            address_code = str(govt_deal.regional_cd)
+            dong = govt_deal.dong
             dong_code = '000'
             for dong_entity in dong_codes:
                 # 시도, 시군구가 같은지 비교
@@ -336,5 +348,5 @@ class TransferBldMappingResults:
                         dong_code = dong_entity.umd_cd
                         break
             address_code = ''.join([address_code, dong_code, '00'])
-            return address_code
+        return address_code
 
