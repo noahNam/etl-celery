@@ -9,8 +9,8 @@ from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository impor
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )
-from modules.adapter.infrastructure.sqlalchemy.repository.govt_apt_deals_repository import (
-    SyncGovtAptDealsRepository
+from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
+    SyncGovtDealsRepository
 )
 
 from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
@@ -19,10 +19,16 @@ from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_reposi
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
     SyncBldMappingResultsRepository
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.building_deal_repository import (
+    SyncBuildingDealRepository
+)
+
 
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
+from modules.application.use_case.etl.warehouse.v1.apt_deal_use_case import AptDealUseCase
 from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import BldMappingResultsUseCase
+from modules.application.use_case.etl.warehouse.v1.apt_rent_use_case import AptRentUseCase
 
 
 def get_task(topic: str):
@@ -36,9 +42,23 @@ def get_task(topic: str):
         return BldMappingResultsUseCase(
             topic=topic,
             kapt_repo=SyncKaptRepository(session_factory=db.session),
-            govt_repo=SyncGovtAptDealsRepository(session_factory=db.session),
+            govt_repo=SyncGovtDealsRepository(session_factory=db.session),
             dong_code_repo=SyncLegalDongCodeRepository(session_factory=db.session),
-            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session)
+            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_WH_APT_DEALS.value:
+        return AptDealUseCase(
+            topic=topic,
+            govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
+            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
+            bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_WH_APT_RENTS.value:
+        return AptRentUseCase(
+            topic=topic,
+            govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
+            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
+            bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session),
         )
 
 

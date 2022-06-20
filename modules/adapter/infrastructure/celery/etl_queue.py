@@ -47,7 +47,9 @@ def setup_periodic_tasks(sender, **kwargs):
     #     etl_tasks.start_worker.s(topic=TopicEnum.ETL_WH_BASIC_INFOS.value),
     #     name=TopicEnum.ETL_WH_BASIC_INFOS.value,
     # )
-    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_BASIC_INFOS.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_BASIC_INFOS.value)
+    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_APT_RENTS.value)
 
     # tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
     # tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAKAO_API.value})

@@ -13,3 +13,7 @@ class GovtFindTypeEnum(Enum):
 
     # Data Warehouse
     APT_DEALS_INPUT = 11
+    APT_RENTS_INPUT = 12
+    OFCTL_DEAL_INPUT = 13
+    OFCTL_RENT_INPUT = 14
+    RIGHT_LOT_OUT_INPUT = 15
