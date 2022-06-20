@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptAreaInfoEntity,
@@ -22,6 +22,7 @@ class KaptAreaInfoModel(datalake_base, TimestampMixin):
     kapt_mparea_136 = Column(String(22), nullable=True)
     priv_area = Column(String(22), nullable=True)
     bjd_code = Column(String(10), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=False)
 
     def to_kapt_area_info_entity(self) -> KaptAreaInfoEntity:
         return KaptAreaInfoEntity(
@@ -35,6 +36,7 @@ class KaptAreaInfoModel(datalake_base, TimestampMixin):
             kapt_mparea_136=self.kapt_mparea_136,
             priv_area=self.priv_area,
             bjd_code=self.bjd_code,
+            updated_needed=self.update_needed,
             created_at=self.created_at,
             updated_at=self.updated_at,
         )

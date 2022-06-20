@@ -60,6 +60,7 @@ class KaptBasicInfoEntity(BaseModel):
     manage_office_contact: str | None
     manage_office_fax: str | None
     welfare: str | None
+    update_needed: bool
     created_at: datetime
     updated_at: datetime
 
@@ -82,6 +83,7 @@ class KaptAreaInfoEntity(BaseModel):
     kapt_mparea_136: str | None
     priv_area: str | None
     bjd_code: str | None
+    update_needed: bool
     created_at: datetime
     updated_at: datetime
 
@@ -96,6 +98,7 @@ class KaptLocationInfoEntity(BaseModel):
     kaptd_wtimesub: str | None
     convenient_facility: str | None
     education_facility: str | None
+    update_needed: bool
     created_at: datetime
     updated_at: datetime
 
@@ -164,5 +167,6 @@ class KaptMgmtCostEntity(BaseModel):
     public_part_total_amount: int | None
     public_part_save_rate: int | None
     etc_income_amount: int | None
+    update_needed: bool
     created_at: datetime
     updated_at: datetime
