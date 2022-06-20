@@ -129,7 +129,6 @@ class GovtBldTopInfoItem(BaseModel):
     lot: str | None
     bylot_cnt: float | None
     na_road_cd: str | None
-    dong_nm: str | None
 
 
 class GovtBldMidInfoItem(BaseModel):
