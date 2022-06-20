@@ -21,9 +21,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_b
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_bld_top_info_model import (
     GovtBldTopInfoModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import (
-    DongInfoModel,
-)
 from modules.adapter.infrastructure.sqlalchemy.repository import BaseSyncRepository
 from modules.adapter.infrastructure.utils.log_helper import logger_
 

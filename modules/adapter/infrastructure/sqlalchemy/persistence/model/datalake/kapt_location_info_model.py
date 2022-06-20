@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptLocationInfoEntity,
@@ -20,6 +20,7 @@ class KaptLocationInfoModel(datalake_base, TimestampMixin):
     kaptd_wtimesub = Column(String(10), nullable=True)
     convenient_facility = Column(String(500), nullable=True)
     education_facility = Column(String(500), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=False)
 
     def to_kapt_location_info_entity(self) -> KaptLocationInfoEntity:
         return KaptLocationInfoEntity(
