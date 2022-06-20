@@ -62,7 +62,7 @@ class KaptMgmtCostModel(datalake_base, TimestampMixin):
     )
     public_part_save_rate = Column(Integer, nullable=True)
     etc_income_amount = Column(Integer, nullable=True)
-    update_needed = Column(Boolean, nullable=False, default=False)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     def to_kapt_mgmt_cost_entity(self) -> KaptMgmtCostEntity:
         return KaptMgmtCostEntity(

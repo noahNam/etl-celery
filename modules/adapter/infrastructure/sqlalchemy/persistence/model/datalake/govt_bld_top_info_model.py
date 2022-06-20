@@ -86,7 +86,7 @@ class GovtBldTopInfoModel(datalake_base, TimestampMixin):
     lot = Column(String(20), nullable=True)
     bylot_cnt = Column(Numeric(5), nullable=True)
     na_road_cd = Column(String(12), nullable=True)
-    update_needed = Column(Boolean, nullable=False, default=False)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     def to_govt_bld_top_info_entity(self) -> GovtBldTopInfoEntity:
         return GovtBldTopInfoEntity(
