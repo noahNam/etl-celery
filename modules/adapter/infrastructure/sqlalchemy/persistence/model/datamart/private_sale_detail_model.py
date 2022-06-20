@@ -40,3 +40,4 @@ class PrivateSaleDetailModel(datamart_base, TimestampMixin):
     floor = Column(Numeric(3), nullable=True)
     trade_type = Column(String(5), nullable=False)
     is_available = Column(Boolean, nullable=False)
+    update_needed = Column(Boolean, nullable=False, default=True)

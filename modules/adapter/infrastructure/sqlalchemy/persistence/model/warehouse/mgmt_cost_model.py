@@ -30,6 +30,7 @@ class MgmtCostModel(warehouse_base, TimestampMixin):
     public_part_imp_cost = Column(Integer, nullable=True)
     etc_income_amount = Column(Integer, nullable=True)
     is_available = Column(Boolean, nullable=True, default=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     def to_calc_mgmt_cost_entity(self, priv_area: int = None) -> CalcMgmtCostEntity:
         return CalcMgmtCostEntity(
@@ -42,4 +43,5 @@ class MgmtCostModel(warehouse_base, TimestampMixin):
             etc_income_amount=self.etc_income_amount,
             priv_area=priv_area,
             is_available=self.is_available,
+            update_needed=self.update_needed,
         )

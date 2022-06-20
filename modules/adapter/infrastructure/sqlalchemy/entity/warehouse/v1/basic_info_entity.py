@@ -82,6 +82,7 @@ class BasicInfoEntity(BaseModel):
     public_ref_id: int | None
     rebuild_ref_id: int | None
     is_available: bool | None
+    update_needed: bool | None
 
 
 class CalcMgmtCostEntity(BaseModel):
@@ -94,3 +95,4 @@ class CalcMgmtCostEntity(BaseModel):
     etc_income_amount: int | None = 0
     priv_area: int | None = 0  # 관리비 계산을 위한 필드 추가
     is_available: bool
+    update_needed: bool

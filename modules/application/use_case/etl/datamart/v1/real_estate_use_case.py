@@ -13,8 +13,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
 )
-from datetime import date
-
 from modules.adapter.infrastructure.sqlalchemy.repository.real_estate_repository import (
     SyncRealEstateRepository,
 )
@@ -49,11 +47,9 @@ class RealEstateUseCase(BaseRealEstateUseCase):
         1. real_estates.id ==  place_id
         2. place_id가 없는 경우 mart로 etl 하지 않음 (의미가 없기 때문에)
         """
-        today = date.today()
-
         # 단지 기본 정보
-        basic_infos: list[BasicInfoEntity] | None = self._basic_repo.find_by_date(
-            target_model=BasicInfoModel, target_date=today
+        basic_infos: list[BasicInfoEntity] | None = self._basic_repo.find_to_update(
+            target_model=BasicInfoModel
         )
         results: list[RealEstateModel] | None = self._transfer.start_etl(
             from_model="basic_infos", target_list=basic_infos

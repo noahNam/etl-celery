@@ -242,20 +242,16 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
 
         return house_id
 
-    def find_by_date(
+    def find_to_update(
         self,
         target_model: Type[BasicInfoModel],
-        target_date: date,
     ) -> list[BasicInfoEntity] | None:
         result_list = None
 
         if target_model == BasicInfoModel:
             with self.session_factory() as session:
                 query = select(BasicInfoModel).where(
-                    or_(
-                        func.date(BasicInfoModel.created_at) == target_date,
-                        func.date(BasicInfoModel.updated_at) == target_date,
-                    ),
+                    BasicInfoModel.update_needed == True,
                     BasicInfoModel.place_id != None,
                 )
                 results = session.execute(query).scalars().all()
