@@ -7,6 +7,7 @@ from sqlalchemy import (
     Float,
     Numeric,
     SmallInteger,
+    Boolean,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
@@ -51,6 +52,7 @@ class SubscriptionManualInfoModel(datalake_base, TimestampMixin):
     cyber_model_house_link = Column(Text, nullable=True)
     supply_rate = Column(SmallInteger, nullable=True)
     supply_rate_etc = Column(SmallInteger, nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=False)
 
     def to_subs_manual_info_entity(self) -> SubscriptionManualInfoEntity:
         return SubscriptionManualInfoEntity(

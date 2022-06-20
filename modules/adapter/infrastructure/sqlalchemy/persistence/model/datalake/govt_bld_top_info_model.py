@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer, Numeric
+from sqlalchemy import Column, String, BigInteger, Integer, Numeric, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
     GovtBldTopInfoEntity,
@@ -86,6 +86,7 @@ class GovtBldTopInfoModel(datalake_base, TimestampMixin):
     lot = Column(String(20), nullable=True)
     bylot_cnt = Column(Numeric(5), nullable=True)
     na_road_cd = Column(String(12), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=False)
 
     def to_govt_bld_top_info_entity(self) -> GovtBldTopInfoEntity:
         return GovtBldTopInfoEntity(

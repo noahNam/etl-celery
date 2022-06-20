@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer
+from sqlalchemy import Column, String, BigInteger, Integer, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -30,3 +30,4 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
     cancel_deal_day = Column(String(8), nullable=True)
     req_gbn = Column(String(10), nullable=True)
     rdealer_lawdnm = Column(String(150), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=False)
