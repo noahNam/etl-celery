@@ -19,8 +19,8 @@ from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_reposi
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
     SyncBldMappingResultsRepository
 )
-from modules.adapter.infrastructure.sqlalchemy.repository.building_deal_repository import (
-    SyncBuildingDealRepository
+from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
+    SyncBldDealRepository
 )
 
 
@@ -54,32 +54,32 @@ def get_task(topic: str):
             topic=topic,
             govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
             bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
-            bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session),
+            bld_deal_repo=SyncBldDealRepository(session_factory=db.session),
         )
     elif topic == TopicEnum.ETL_WH_APT_RENTS.value:
         return AptRentUseCase(
             topic=topic,
             govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
             bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
-            bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session),
+            bld_deal_repo=SyncBldDealRepository(session_factory=db.session),
         )
     elif topic == TopicEnum.ETL_WH_OFCTL_DEALS:
         return OfctlDealUseCase(
             govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
             bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
-            bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session)
+            bld_deal_repo=SyncBldDealRepository(session_factory=db.session)
         )
     elif topic == TopicEnum.ETL_WH_OFCTL_RENTS.value:
         return OfctlRentsUseCase(
             govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
             bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
-            bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session)
+            bld_deal_repo=SyncBldDealRepository(session_factory=db.session)
         )
     elif topic == TopicEnum.ETL_WH_RIGHT_LOG_OUTS.value:
         return RightLotOutUseCase(
             govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
             bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
-            bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session)
+            bld_deal_repo=SyncBldDealRepository(session_factory=db.session)
         )
     elif topic == TopicEnum.ETL_WH_UPDATE_SUPPLY_AREA.value:
         return

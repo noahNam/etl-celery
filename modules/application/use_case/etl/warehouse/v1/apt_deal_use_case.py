@@ -8,8 +8,8 @@ from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_re
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
     SyncGovtDealsRepository,
 )
-from modules.adapter.infrastructure.sqlalchemy.repository.building_deal_repository import (
-    SyncBuildingDealRepository
+from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
+    SyncBldDealRepository
 )
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
@@ -22,11 +22,11 @@ from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
 
 
 class AptDealUseCase(BaseETLUseCase):
-    def __init__(self, govt_deal_repo, bld_mapping_repo, bld_deal_repo, *args, **kwargs): # fixme: 명칭변경 및 통일 (수정함)
+    def __init__(self, govt_deal_repo, bld_mapping_repo, bld_deal_repo, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._bld_mapping_repo: SyncBldMappingResultsRepository = bld_mapping_repo  # input_table
-        self._govt_deal_repo: SyncGovtDealsRepository = govt_deal_repo   # input_table # fixme: 명칭 변경 -> deal (수정함)
-        self._bld_deal_reop: SyncBuildingDealRepository = bld_deal_repo  # result_table # fixme: 명칭 변경 , +ing, bld (수정함)
+        self._govt_deal_repo: SyncGovtDealsRepository = govt_deal_repo   # input_table
+        self._bld_deal_reop: SyncBldDealRepository = bld_deal_repo  # result_table
         self._transfer: TransferAptDeals = TransferAptDeals()
 
     def execute(self):

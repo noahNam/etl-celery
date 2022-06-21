@@ -5,7 +5,7 @@ from exceptions.base import NotUniqueErrorException
 
 from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.adapter.infrastructure.sqlalchemy.repository import BaseSyncRepository
-from core.domain.warehouse.building_deal.interface.building_deal_repository import BuildingDealsRepository
+from core.domain.warehouse.bld_deal.interface.bld_deal_repository import BldDealsRepository
 
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_deal_model import AptDealModel
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_rent_model import AptRentModel
@@ -16,15 +16,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.right
 logger = logger_.getLogger(__name__)
 
 
-class SyncBuildingDealRepository(BaseSyncRepository, BuildingDealsRepository):
+class SyncBldDealRepository(BaseSyncRepository, BldDealsRepository):
     def __init__(self, session_factory: Callable[..., ContextManager[Session]]):
         super().__init__(session_factory=session_factory)
-
-    def find_by_id(self, pk: int):
-        return None
-
-    def save(self, model):
-        pass
 
     def save_all(self,
                  models: list[AptDealModel] | list[AptRentModel] | list[OfctlDealModel] | list[OfctlRentModel] | list[RightLotOutModel]
