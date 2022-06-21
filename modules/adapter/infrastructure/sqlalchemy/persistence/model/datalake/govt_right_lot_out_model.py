@@ -36,7 +36,7 @@ class GovtRightLotOutModel(datalake_base, TimestampMixin):
     update_needed = Column(Boolean, nullable=False, default=True)
 
     bld_mapping = relationship("BldMappingResultModel",
-                               backref="govt_right_lot_outs", uselist=False,
+                               backref="govt_right_lot_outs", uselist=False, lazy='joined',
                                primaryjoin="and_(foreign(GovtRightLotOutModel.regional_cd) == BldMappingResultModel.regional_cd,"
                                            "foreign(GovtRightLotOutModel.jibun) == BldMappingResultModel.jibun,"
                                            "foreign(GovtRightLotOutModel.dong) == BldMappingResultModel.dong,"

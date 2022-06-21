@@ -37,7 +37,7 @@ class AptRentUseCase(BaseETLUseCase):
 
         # Transfer
         apt_rents: list[AptRentModel] = self._transfer.start_transfer(
-            transfer_type=GovtFindTypeEnum.APT_DEALS_INPUT.value,
+            transfer_type=GovtFindTypeEnum.APT_RENTS_INPUT.value,
             entities=govt_apt_rents)
 
         self._bld_deal_reop.save_all(models=apt_rents)
