@@ -113,3 +113,8 @@ class TypeInfoEntity(BaseModel):
     private_area: float | None
     supply_area: float | None
     update_needed: bool
+
+
+class SupplyAreaEntity(BaseModel):
+    house_id: int
+    supply_area: float | None
