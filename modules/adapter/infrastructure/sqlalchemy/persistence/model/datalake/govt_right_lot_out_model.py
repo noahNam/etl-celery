@@ -24,17 +24,23 @@ class GovtRightLotOutModel(datalake_base, TimestampMixin):
     deal_amount = Column(Integer, nullable=True)
     classification_owner_ship = Column(String(2), nullable=True)
     deal_year = Column(String(4), nullable=True)
-    name = Column(String(40), ForeignKey("bld_mapping_results.bld_name"), nullable=True)
-    dong = Column(String(40), ForeignKey("bld_mapping_results.dong"), nullable=True)
+    name = Column(String(40), nullable=True)
+    dong = Column(String(40), nullable=True)
     sigungu = Column(String(40), nullable=True)
     deal_month = Column(String(2), nullable=True)
     deal_day = Column(String(6), nullable=True)
     exclusive_area = Column(String(20), nullable=True)
-    jibun = Column(String(10), ForeignKey("bld_mapping_results.jibun"), nullable=True)
-    regional_cd = Column(String(5), ForeignKey("bld_mapping_results.regional_cd"), nullable=True, index=True)
+    jibun = Column(String(10), nullable=True)
+    regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
 
-    bld_mapping = relationship("BldMappingResultModel", foreign_keys=[regional_cd, jibun, dong, name])
+    bld_mapping = relationship("BldMappingResultModel",
+                               backref="govt_right_lot_outs", uselist=False,
+                               primaryjoin="and_(foreign(GovtRightLotOutModel.regional_cd) == BldMappingResultModel.regional_cd,"
+                                           "foreign(GovtRightLotOutModel.jibun) == BldMappingResultModel.jibun,"
+                                           "foreign(GovtRightLotOutModel.dong) == BldMappingResultModel.dong,"
+                                           "foreign(GovtRightLotOutModel.name) == BldMappingResultModel.bld_name)"
+                               )
 
     # GovtRightLotOutsEntity
     def to_entity_for_bld_mapping_results(self) -> GovtRightLotOutsEntity:

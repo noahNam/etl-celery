@@ -261,17 +261,7 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
         if find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
             with self.session_factory() as session:
                 query = select(
-                    KaptBasicInfoModel.house_id,
-                    KaptBasicInfoModel.sido,
-                    KaptBasicInfoModel.sigungu,
-                    KaptBasicInfoModel.eubmyun,
-                    KaptBasicInfoModel.dongri,
-                    KaptBasicInfoModel.use_apr_day,
-                    KaptBasicInfoModel.origin_dong_address,
-                    KaptBasicInfoModel.name
-                ).where(
-                    func.date(KaptBasicInfoModel.updated_at) == target_date
-                    or func.date(KaptBasicInfoModel.updated_at) == target_date
+                    KaptBasicInfoModel
                 )
                 kapt_basic_info_ls = session.execute(query).scalars().all()
 
