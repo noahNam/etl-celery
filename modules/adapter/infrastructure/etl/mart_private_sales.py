@@ -145,6 +145,7 @@ class TransformPrivateSale:
                     public_ref_id=basic_info.public_ref_id,
                     rebuild_ref_id=basic_info.rebuild_ref_id,
                     is_available=basic_info.is_available,
+                    update_needed=basic_info.update_needed,
                 )
             )
         return result
