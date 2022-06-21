@@ -100,13 +100,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         if find_type == GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value:
             with self.session_factory() as session:
                 query = select(
-                    GovtAptDealModel.id,
-                    GovtAptDealModel.sigungu_cd,
-                    GovtAptDealModel.eubmyundong_cd,
-                    GovtAptDealModel.build_year,
-                    GovtAptDealModel.jibun,
-                    GovtAptDealModel.apt_name,
-                    GovtAptDealModel.dong
+                    GovtAptDealModel
                 ).where(
                     func.date(GovtAptDealModel.created_at) == target_date
                     or func.date(GovtAptDealModel.updated_at) == target_date
@@ -122,15 +116,10 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         elif find_type == GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value:
             with self.session_factory() as session:
                 query = select(
-                    GovtAptRentModel.id,
-                    GovtAptRentModel.regional_cd,
-                    GovtAptRentModel.dong,
-                    GovtAptRentModel.build_year,
-                    GovtAptRentModel.jibun,
-                    GovtAptRentModel.apt_name
+                    GovtAptRentModel
                 ).where(
-                    func.date(GovtAptRentModel.created_at) == target_date
-                    or func.date(GovtAptRentModel.updated_at) == target_date
+                   func.date(GovtAptRentModel.created_at) == target_date
+                   or func.date(GovtAptRentModel.updated_at) == target_date
                 )
                 govt_apt_rents = session.execute(query).scalars().all()
 
@@ -143,11 +132,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         elif find_type == GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value:
             with self.session_factory() as session:
                 query = select(
-                    GovtOfctlDealModel.id,
-                    GovtOfctlDealModel.regional_cd,
-                    GovtOfctlDealModel.dong,
-                    GovtOfctlDealModel.jibun,
-                    GovtOfctlDealModel.ofctl_name
+                    GovtOfctlDealModel
                 ).where(
                     func.date(GovtOfctlDealModel.created_at) == target_date
                     or func.date(GovtOfctlDealModel.updated_at) == target_date
@@ -163,11 +148,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         elif find_type == GovtFindTypeEnum.GOV_OFCTL_RENT_MAPPING.value:
             with self.session_factory() as session:
                 query = select(
-                    GovtOfctlRentModel.id,
-                    GovtOfctlRentModel.regional_cd,
-                    GovtOfctlRentModel.dong,
-                    GovtOfctlRentModel.jibun,
-                    GovtOfctlRentModel.ofctl_name,
+                    GovtOfctlRentModel
                 ).where(
                     func.date(GovtOfctlRentModel.created_at) == target_date
                     or func.date(GovtOfctlRentModel.updated_at) == target_date
@@ -183,11 +164,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         elif find_type == GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value:
             with self.session_factory() as session:
                 query = select(
-                    GovtRightLotOutModel.id,
-                    GovtRightLotOutModel.regional_cd,
-                    GovtRightLotOutModel.dong,
-                    GovtRightLotOutModel.jibun,
-                    GovtRightLotOutModel.name
+                    GovtRightLotOutModel
                 ).where(
                     func.date(GovtRightLotOutModel.created_at) == target_date
                     or func.date(GovtRightLotOutModel.updated_at) == target_date
@@ -203,20 +180,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         elif find_type == GovtFindTypeEnum.APT_DEALS_INPUT.value:
             with self.session_factory() as session:
                 query = select(
-                    GovtAptDealModel.dong,
-                    GovtAptDealModel.apt_name,
-                    GovtAptDealModel.deal_amount,
-                    GovtAptDealModel.deal_year,
-                    GovtAptDealModel.deal_month,
-                    GovtAptDealModel.deal_day,
-                    GovtAptDealModel.serial_no,
-                    GovtAptDealModel.exclusive_area,
-                    GovtAptDealModel.regional_cd,
-                    GovtAptDealModel.floor,
-                    GovtAptDealModel.cancel_deal_type,
-                    GovtAptDealModel.cancel_deal_day,
-                    GovtAptDealModel.req_gbn,
-                    GovtAptDealModel.rdealer_lawdnm
+                    GovtAptDealModel
                 ).join(
                     GovtAptDealModel.bld_mapping
                 ).where(

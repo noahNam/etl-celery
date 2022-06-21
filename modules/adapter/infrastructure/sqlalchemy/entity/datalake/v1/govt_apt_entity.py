@@ -125,10 +125,6 @@ class GovtTransferEntity(BaseModel):  # fixme: 명칭 변경 (수정함)
 
 
 class GovtAptDealsJoinKeyEntity(BaseModel):
-    def __init__(__pydantic_self__, **data: Any):
-        super().__init__(data)
-        __pydantic_self__.monthly_amount = None
-
     """
         govt_apt_deals 와 bld_mapping_results table의 키값을 join 함
     """

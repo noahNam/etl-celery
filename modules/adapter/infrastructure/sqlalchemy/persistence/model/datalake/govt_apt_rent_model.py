@@ -39,9 +39,9 @@ class GovtAptRentModel(datalake_base, TimestampMixin):
                                primaryjoin="and_(foreign(GovtAptRentModel.regional_cd) == BldMappingResultModel.regional_cd,"
                                            "foreign(GovtAptRentModel.jibun) == BldMappingResultModel.jibun,"
                                            "foreign(GovtAptRentModel.dong) == BldMappingResultModel.dong,"
-                                           "foreign(GovtAptRentModel.dong) == BldMappingResultModel.bld_name)")
+                                           "foreign(GovtAptRentModel.apt_name) == BldMappingResultModel.bld_name)")
 
-    def to_entity_for_bld_mapping_reuslts(self) -> GovtAptRentsEntity:
+    def to_entity_for_bld_mapping_results(self) -> GovtAptRentsEntity:
         return GovtAptRentsEntity(
             id=self.id,
             regional_cd=self.regional_cd,

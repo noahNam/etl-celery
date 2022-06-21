@@ -117,7 +117,11 @@ class TransferBldMappingResults(Transfer):
         # 2. basics 전처리
         basic_adress_codes = list()
         basic_jibuns = list()
-        for basic_entity in basices:
+        i = 0
+        for basic_entity in [basices[0]]:
+            i+=1
+            if i % 100 == 0:
+                print(i)
             # addr_code 10자리 주소코드
             addr_code: str | None = self._get_basic_adress_code(
                 sido=basic_entity.sido,
@@ -225,7 +229,7 @@ class TransferBldMappingResults(Transfer):
 
         new_basic_indexes = list()
         for idx in basic_indexes:
-            if int(build_year) == int(basices[idx].use_apr_day):  # fixme: 자리수가 4자리인지 확인해야함
+            if int(build_year) == int(str(basices[idx].use_apr_day)[0:4]):
                 new_basic_indexes.append(idx)
             else:
                 pass
