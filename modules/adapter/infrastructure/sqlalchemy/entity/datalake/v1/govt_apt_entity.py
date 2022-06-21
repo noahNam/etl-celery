@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class GovtAptDealsEntity(BaseModel):
-    id: int | None
+    id: int
     deal_amount: int | None
     build_year: str | None
     deal_year: str | None
@@ -38,7 +38,7 @@ class GovtAptDealsEntity(BaseModel):
 
 
 class GovtAptRentsEntity(BaseModel):
-    id: int | None
+    id: int
     build_year: str | None
     deal_year: str | None
     dong: str | None
@@ -56,7 +56,7 @@ class GovtAptRentsEntity(BaseModel):
 
 
 class GovtOfctlDealsEntity(BaseModel):
-    id: int | None
+    id: int
     deal_amount: int | None
     deal_year: str | None
     ofctl_name: str | None
@@ -77,7 +77,7 @@ class GovtOfctlDealsEntity(BaseModel):
 
 
 class GovtOfctlRentsEntity(BaseModel):
-    id: int | None
+    id: int
     deal_year: str | None
     ofctl_name: str | None
     dong: str | None
@@ -95,7 +95,7 @@ class GovtOfctlRentsEntity(BaseModel):
 
 
 class GovtRightLotOutsEntity(BaseModel):
-    id: int | None
+    id: int
     deal_amount: int | None
     classification_owner_ship: str | None
     deal_year: str | None
@@ -146,7 +146,7 @@ class GovtAptDealsJoinKeyEntity(BaseModel):
 
 
 class GovtAptRentsJoinKeyEntity(BaseModel):
-    house_id: int  # fixme: 매핑 안되어있으면 넘어가지 않도록 (수정함)
+    house_id: int
     dong: str | None
     apt_name: str | None
     monthly_amount: int | None
