@@ -7,8 +7,8 @@ from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_re
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
     SyncGovtDealsRepository,
 )
-from modules.adapter.infrastructure.sqlalchemy.repository.building_deal_repository import (
-    SyncBuildingDealRepository
+from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
+    SyncBldDealRepository
 )
 
 from modules.application.use_case.etl import BaseETLUseCase
@@ -25,7 +25,7 @@ class RightLotOutUseCase(BaseETLUseCase):
         super().__init__(*args, **kwargs)
         self._bld_mapping_repo: SyncBldMappingResultsRepository = bld_mapping_repo  # input_table
         self._govt_deal_repo: SyncGovtDealsRepository = govt_deal_repo   # input_table
-        self._bld_deal_reop: SyncBuildingDealRepository = bld_deal_repo  # result_table
+        self._bld_deal_reop: SyncBldDealRepository = bld_deal_repo  # result_table
         self._transfer: TransferAptDeals = TransferAptDeals()
 
     def execute(self):
