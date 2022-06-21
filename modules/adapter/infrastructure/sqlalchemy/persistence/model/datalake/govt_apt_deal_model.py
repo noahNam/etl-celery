@@ -72,7 +72,8 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
 
     def to_entity_for_apt_deals(self) -> GovtAptDealsJoinKeyEntity:
         return GovtAptDealsJoinKeyEntity(
-            house_id=self.bld_mapping.house_id,  # fixme: 정상적으로 나오는지 확인 필요
+            id=self.id,
+            house_id=self.bld_mapping.house_id,
             dong=self.dong,
             apt_name=self.apt_name,
             deal_amount=self.deal_amount,

@@ -128,6 +128,7 @@ class GovtAptDealsJoinKeyEntity(BaseModel):
     """
         govt_apt_deals 와 bld_mapping_results table의 키값을 join 함
     """
+    id: int
     house_id: int
     dong: str | None
     apt_name: str | None
@@ -146,6 +147,7 @@ class GovtAptDealsJoinKeyEntity(BaseModel):
 
 
 class GovtAptRentsJoinKeyEntity(BaseModel):
+    id: int
     house_id: int
     dong: str | None
     apt_name: str | None
@@ -160,6 +162,7 @@ class GovtAptRentsJoinKeyEntity(BaseModel):
 
 
 class GovtOfctlDealJoinKeyEntity(BaseModel):
+    id: int
     house_id: int
     dong: str | None
     ofctl_name: str | None
@@ -177,6 +180,7 @@ class GovtOfctlDealJoinKeyEntity(BaseModel):
 
 
 class GovtOfctlRentJoinKeyEntity(BaseModel):
+    id: int
     house_id: int
     dong: str | None
     ofctl_name: str | None

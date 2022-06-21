@@ -7,7 +7,7 @@ from core.domain.warehouse.basic.interface.basic_repository import BasicReposito
 from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     BasicInfoEntity,
-    CalcMgmtCostEntity, DongInfoEntity, TypeInfoEntity,
+    CalcMgmtCostEntity, DongInfoEntity, TypeInfoEntity, SupplyAreaEntity
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
@@ -297,4 +297,24 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
 
             return [
                 query.to_calc_mgmt_cost_entity(priv_area=options) for query in queryset
+            ]
+
+    def find_supply_areas_by_house_ids(self, house_ids: list[int]) -> list[SupplyAreaEntity] | None:
+        with self.session_factory() as session:
+            query = select(
+                DongInfoModel
+            ).join(
+                TypeInfoModel,
+                TypeInfoModel.dong_id == DongInfoModel.id
+            ).where(
+                DongInfoModel.house_id.in_(house_ids)
+            )
+
+            supply_areas = session.execute(query).scalars().all()
+
+            if not supply_areas:
+                return None
+
+            return [
+                supply_area.to_supply_area_entity for supply_area in supply_areas
             ]

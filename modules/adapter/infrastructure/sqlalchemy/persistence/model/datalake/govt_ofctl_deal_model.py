@@ -56,6 +56,7 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
 
     def to_entity_for_ofctl_deals(self) -> GovtOfctlDealJoinKeyEntity:
         return GovtOfctlDealJoinKeyEntity(
+            id=self.id,
             house_id=self.bld_mapping.house_id,
             dong=self.dong,
             ofctl_name=self.ofctl_name,

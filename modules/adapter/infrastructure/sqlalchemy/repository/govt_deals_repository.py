@@ -1,5 +1,4 @@
-from sqlalchemy import select
-from datetime import date
+from sqlalchemy import select, update
 from typing import Callable, ContextManager
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -55,7 +54,6 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         super().__init__(session_factory=session_factory)
 
     def find_by_update_needed(self,
-                              target_date: date,
                               find_type: int = 0) -> list[GovtAptDealsEntity] \
                                             | list[GovtAptRentsEntity] \
                                             | list[GovtOfctlDealsEntity] \
@@ -253,3 +251,24 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 return return_ls
         else:
             return None
+
+    def alter_update_needed_by_id(self,
+                                  ids: list[int],
+                                  model: type[GovtAptDealModel
+                                              | GovtAptRentModel
+                                              | GovtOfctlDealModel
+                                              | GovtOfctlRentModel
+                                              | GovtRightLotOutModel],
+                                  ) -> None:
+        with self.session_factory() as session:
+            try:
+                session.execute(
+                    update(model)
+                        .where(model.id.in_(ids))
+                        .values(
+                            update_needed=False
+                        )
+                )
+                session.commit()
+            except:
+                session.rollback()

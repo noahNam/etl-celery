@@ -54,6 +54,7 @@ class GovtOfctlRentModel(datalake_base, TimestampMixin):
 
     def to_entity_for_ofctl_rents(self) -> GovtOfctlRentJoinKeyEntity:
         return GovtOfctlRentJoinKeyEntity(
+            id=self.id,
             house_id=self.bld_mapping.house_id,
             dong=self.dong,
             ofctl_name=self.ofctl_name,
