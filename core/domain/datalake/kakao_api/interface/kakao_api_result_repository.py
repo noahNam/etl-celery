@@ -10,7 +10,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kakao_
 
 class KakaoApiRepository(ABC):
     @abstractmethod
-    def find_by_id(self, house_id: int) -> KakaoApiResultEntity | None:
+    def find_by_id(self, id: int) -> KakaoApiResultEntity | None:
         pass
 
     @abstractmethod

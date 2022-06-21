@@ -135,7 +135,7 @@ def test_sync_find_all(sync_session):
 
 
 def test_exists_by_kapt_code(sync_session):
-    repo: KaptRepository = SyncKaptRepository(sync_session)
+    repo: SyncKaptRepository = SyncKaptRepository(sync_session)
     house_ids: list[str] = ["abcde123", "qwert456", "no_saved"]
     names = ["test_apt_1", "test_api_2", "test_api_3"]
 
@@ -159,8 +159,8 @@ def test_exists_by_kapt_code(sync_session):
         session.add_all([test_kapt_1, test_kapt_2])
         session.commit()
 
-        result_kapt_1 = repo.exists_by_kapt_code(kapt_orm=test_kapt_1)
-        result_kapt_3 = repo.exists_by_kapt_code(kapt_orm=test_kapt_3)
+        result_kapt_1 = repo.is_exists_by_kapt_code(kapt_orm=test_kapt_1)
+        result_kapt_3 = repo.is_exists_by_kapt_code(kapt_orm=test_kapt_3)
 
     SessionContextManager.reset_context(context=context)
 

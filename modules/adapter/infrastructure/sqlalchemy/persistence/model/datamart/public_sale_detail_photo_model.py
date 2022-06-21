@@ -29,3 +29,4 @@ class PublicSaleDetailPhotoModel(datamart_base, TimestampMixin):
     path = Column(String(150), nullable=True)
     extension = Column(String(4), nullable=True)
     is_available = Column(Boolean, nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)

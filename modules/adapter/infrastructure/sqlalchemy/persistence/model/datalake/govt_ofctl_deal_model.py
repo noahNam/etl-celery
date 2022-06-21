@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer, ForeignKey
+from sqlalchemy import Column, String, BigInteger, Integer, Boolean
 from sqlalchemy.orm import relationship
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
@@ -35,6 +35,7 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
     cancel_deal_day = Column(String(8), nullable=True)
     req_gbn = Column(String(10), nullable=True)
     rdealer_lawdnm = Column(String(150), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     bld_mapping = relationship("BldMappingResultModel",
                                backref="govt_ofctl_deals", uselist=False,

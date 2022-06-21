@@ -35,3 +35,4 @@ class HousePhotoModel(datamart_base, TimestampMixin):
     is_thumbnail = Column(Boolean, nullable=True)
     seq = Column(SmallInteger, nullable=True)
     is_available = Column(Boolean, nullable=False)
+    update_needed = Column(Boolean, nullable=False, default=True)

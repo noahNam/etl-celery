@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer, ForeignKey
+from sqlalchemy import Column, String, BigInteger, Integer, Boolean
 from sqlalchemy.orm import relationship
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
@@ -33,6 +33,7 @@ class GovtRightLotOutModel(datalake_base, TimestampMixin):
     jibun = Column(String(10), nullable=True)
     regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     bld_mapping = relationship("BldMappingResultModel",
                                backref="govt_right_lot_outs", uselist=False,

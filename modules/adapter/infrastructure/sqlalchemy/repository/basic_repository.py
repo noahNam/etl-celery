@@ -1,10 +1,14 @@
-from typing import Callable, ContextManager, Type
-from sqlalchemy import update, exc
+from typing import Callable, ContextManager, Type, Any
+from sqlalchemy import update, exc, desc
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 
 from core.domain.warehouse.basic.interface.basic_repository import BasicRepository
 from exceptions.base import NotUniqueErrorException
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
+    BasicInfoEntity,
+    CalcMgmtCostEntity, DongInfoEntity, TypeInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
 )
@@ -49,13 +53,10 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
 
     def update(
         self,
-        target_model: Type[
-            BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel
-        ],
-        value: [BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel],
+        value: BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel,
     ) -> None:
         with self.session_factory() as session:
-            if target_model == BasicInfoModel:
+            if isinstance(value, BasicInfoModel):
                 session.execute(
                     update(BasicInfoModel)
                     .where(BasicInfoModel.kapt_code == value.kapt_code)
@@ -65,11 +66,14 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                         eubmyun=value.eubmyun,
                         dongri=value.dongri,
                         name=value.name,
+                        bld_name=value.bld_name,
                         code_apt_nm=value.code_apt_nm,
                         origin_dong_address=value.origin_dong_address,
                         origin_road_address=value.origin_road_address,
                         new_dong_address=value.new_dong_address,
                         new_road_address=value.new_road_address,
+                        place_dong_address=value.place_dong_address,
+                        place_road_address=value.place_road_address,
                         place_id=value.place_id,
                         right_lot_out_type=value.right_lot_out_type,
                         use_apr_day=value.use_apr_day,
@@ -117,17 +121,15 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                         road_number=value.road_number,
                         road_name=value.road_name,
                         land_number=value.land_number,
+                        x_vl=value.x_vl,
+                        y_vl=value.y_vl,
                     )
                 )
-                session.commit()
 
-            elif target_model == MgmtCostModel:
+            elif isinstance(value, MgmtCostModel):
                 session.execute(
                     update(MgmtCostModel)
-                    .where(
-                        MgmtCostModel.house_id == value.house_id
-                        and MgmtCostModel.payment_date == value.payment_date
-                    )
+                    .where(MgmtCostModel.id == value.id)
                     .values(
                         common_manage_cost=value.common_manage_cost,
                         individual_fee=value.individual_fee,
@@ -135,9 +137,42 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                         etc_income_amount=value.etc_income_amount,
                     )
                 )
-                session.commit()
 
-        return None
+            elif isinstance(value, DongInfoModel):
+                session.execute(
+                    update(DongInfoModel)
+                    .where(DongInfoModel.id == value.id)
+                    .values(
+                        name=value.name,
+                        hhld_cnt=value.hhld_cnt,
+                        grnd_flr_cnt=value.grnd_flr_cnt,
+                    )
+                )
+
+            elif isinstance(value, TypeInfoModel):
+                session.execute(
+                    update(TypeInfoModel)
+                    .where(TypeInfoModel.id == value.id)
+                    .values(
+                        private_area=value.private_area,
+                        supply_area=value.supply_area,
+                    )
+                )
+
+            session.commit()
+
+    def dynamic_update(self, target_model: Type[BasicInfoModel], value: dict) -> None:
+        with self.session_factory() as session:
+            key = value.get("key")
+            items = value.get("items")
+            query = select(BasicInfoModel).where(target_model.house_id == key)
+            col_info = session.execute(query).scalars().first()
+
+            if col_info:
+                for (key, value) in items.items():
+                    if hasattr(target_model, key):
+                        setattr(col_info, key, value)
+                        session.commit()
 
     def exists_by_key(
         self, value: BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel
@@ -149,6 +184,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     .where(BasicInfoModel.kapt_code == value.kapt_code)
                     .limit(1)
                 )
+                result = session.execute(query).scalars().first()
 
             elif isinstance(value, DongInfoModel):
                 query = (
@@ -159,6 +195,8 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     )
                     .limit(1)
                 )
+                result = session.execute(query).scalars().first()
+                value.id = result
 
             elif isinstance(value, TypeInfoModel):
                 query = (
@@ -170,6 +208,8 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     )
                     .limit(1)
                 )
+                result = session.execute(query).scalars().first()
+                value.id = result
 
             elif isinstance(value, MgmtCostModel):
                 query = (
@@ -180,7 +220,7 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
                     )
                     .limit(1)
                 )
-            result = session.execute(query).scalars().first()
+                result = session.execute(query).scalars().first()
 
         if result:
             return True
@@ -200,3 +240,61 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
             return None
 
         return house_id
+
+    def find_to_update(
+        self,
+        target_model: Type[BasicInfoModel | DongInfoModel | TypeInfoModel],
+    ) -> list[BasicInfoEntity | DongInfoEntity | TypeInfoEntity] | None:
+        result_list = None
+
+        if target_model == BasicInfoModel:
+            with self.session_factory() as session:
+                query = select(BasicInfoModel).where(
+                    BasicInfoModel.update_needed == True,
+                    BasicInfoModel.place_id != None,
+                )
+                results = session.execute(query).scalars().all()
+            if results:
+                result_list = [result.to_basic_info_entity() for result in results]
+
+        elif target_model == DongInfoModel:
+            with self.session_factory() as session:
+                query = select(DongInfoModel).where(
+                    DongInfoModel.update_needed == True,
+                )
+                results = session.execute(query).scalars().all()
+            if results:
+                result_list = [result.to_dong_info_entity() for result in results]
+
+        elif target_model == TypeInfoModel:
+            with self.session_factory() as session:
+                query = select(TypeInfoModel).where(
+                    TypeInfoModel.update_needed == True,
+                )
+                results = session.execute(query).scalars().all()
+            if results:
+                result_list = [result.to_type_info_entity() for result in results]
+
+        return result_list
+
+    def find_all(
+        self, target_model: Type[MgmtCostModel], id: int | None, options: Any
+    ) -> list[CalcMgmtCostEntity] | None:
+        if target_model == MgmtCostModel:
+            with self.session_factory() as session:
+                queryset = (
+                    session.execute(
+                        select(MgmtCostModel)
+                        .where(target_model.house_id == id)
+                        .order_by(desc(MgmtCostModel.payment_date))
+                    )
+                    .scalars()
+                    .all()
+                )
+
+            if not queryset:
+                return None
+
+            return [
+                query.to_calc_mgmt_cost_entity(priv_area=options) for query in queryset
+            ]

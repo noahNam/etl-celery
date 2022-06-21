@@ -6,6 +6,12 @@ from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.govt_bld_repository import (
+    SyncGovtBldRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repository import (
+    SyncKakaoApiRepository,
+)
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )
@@ -24,7 +30,29 @@ from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository im
 )
 
 
+from modules.adapter.infrastructure.sqlalchemy.repository.private_sale_repository import (
+    SyncPrivateSaleRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.real_estate_repository import (
+    SyncRealEstateRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository import (
+    SyncSubscriptionInfoRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repository import (
+    SyncSubscriptionRepository,
+)
 from modules.adapter.presentation.cli.enum import TopicEnum
+from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
+    SubscriptionInfoUseCase,
+)
+from modules.application.use_case.etl.datamart.v1.dong_type_use_case import DongTypeUseCase
+from modules.application.use_case.etl.datamart.v1.private_sale_use_case import (
+    PrivateSaleUseCase,
+)
+from modules.application.use_case.etl.datamart.v1.real_estate_use_case import (
+    RealEstateUseCase,
+)
 from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
 from modules.application.use_case.etl.warehouse.v1.apt_deal_use_case import AptDealUseCase
 from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import BldMappingResultsUseCase
@@ -32,6 +60,9 @@ from modules.application.use_case.etl.warehouse.v1.apt_rent_use_case import AptR
 from modules.application.use_case.etl.warehouse.v1.ofctl_deal_use_case import OfctlDealUseCase
 from modules.application.use_case.etl.warehouse.v1.ofctl_rent_use_case import OfctlRentsUseCase
 from modules.application.use_case.etl.warehouse.v1.right_lot_out_use_case import RightLotOutUseCase
+from modules.application.use_case.etl.warehouse.v1.subscription_use_case import (
+    SubscriptionUseCase,
+)
 
 
 def get_task(topic: str):
@@ -40,6 +71,37 @@ def get_task(topic: str):
             topic=topic,
             basic_repo=SyncBasicRepository(session_factory=db.session),
             kapt_repo=SyncKaptRepository(session_factory=db.session),
+            kakao_repo=SyncKakaoApiRepository(session_factory=db.session),
+            govt_bld_repo=SyncGovtBldRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_DL_SUBS_INFOS.value:
+        return SubscriptionInfoUseCase(
+            topic=topic,
+            subs_info_repo=SyncSubscriptionInfoRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_WH_SUBS_INFOS.value:
+        return SubscriptionUseCase(
+            topic=topic,
+            subscription_repo=SyncSubscriptionRepository(session_factory=db.session),
+            subs_info_repo=SyncSubscriptionInfoRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_MART_REAL_ESTATES.value:
+        return RealEstateUseCase(
+            topic=topic,
+            basic_repo=SyncBasicRepository(session_factory=db.session),
+            real_estate_repo=SyncRealEstateRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_MART_PRIVATE_SALES.value:
+        return PrivateSaleUseCase(
+            topic=topic,
+            basic_repo=SyncBasicRepository(session_factory=db.session),
+            private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
+        )
+    elif topic == TopicEnum.ETL_MART_DONG_TYPE_INFOS.value:
+        return DongTypeUseCase(
+            topic=topic,
+            basic_repo=SyncBasicRepository(session_factory=db.session),
+            private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
         )
     elif topic == TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value:
         return BldMappingResultsUseCase(

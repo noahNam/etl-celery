@@ -48,11 +48,19 @@ def setup_periodic_tasks(sender, **kwargs):
     #     name=TopicEnum.ETL_WH_BASIC_INFOS.value,
     # )
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_BASIC_INFOS.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_DL_SUBS_INFOS.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_SUBS_INFOS.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_REAL_ESTATES.value)
+    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PRIVATE_SALES.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_DONG_TYPE_INFOS.value)
 
-    # tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
-    # tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAKAO_API.value})
-    # tasks.start_worker.apply_async(
+    # etl_tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
+    # etl_tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAKAO_API.value})
+    # etl_tasks.start_worker.apply_async(
     #     kwargs={"topic": TopicEnum.CRAWL_LEGAL_DONG_CODE.value}
+    # )
+    # etl_tasks.start_worker.apply_async(
+    #     kwargs={"topic": TopicEnum.CRAWL_BUILDING_MANAGE.value}
     # )
 
     # DL 아파트 실거래가 매핑테이블

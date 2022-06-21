@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer, Numeric, ForeignKey
+from sqlalchemy import Column, String, BigInteger, Integer, Numeric, ForeignKey, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datamart_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_model import (
@@ -24,3 +24,4 @@ class DongInfoModel(datamart_base, TimestampMixin):
     name = Column(String(30), nullable=True)
     hhld_cnt = Column(Numeric(5), nullable=True)
     grnd_flr_cnt = Column(Numeric(5), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Integer, String
+from sqlalchemy import Column, BigInteger, Integer, String, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptMgmtCostEntity,
@@ -62,6 +62,7 @@ class KaptMgmtCostModel(datalake_base, TimestampMixin):
     )
     public_part_save_rate = Column(Integer, nullable=True)
     etc_income_amount = Column(Integer, nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     def to_kapt_mgmt_cost_entity(self) -> KaptMgmtCostEntity:
         return KaptMgmtCostEntity(
@@ -108,6 +109,7 @@ class KaptMgmtCostModel(datalake_base, TimestampMixin):
             public_part_total_amount=self.public_part_total_amount,
             public_part_save_rate=self.public_part_save_rate,
             etc_income_amount=self.etc_income_amount,
+            update_needed=self.update_needed,
             created_at=self.created_at,
             updated_at=self.updated_at,
         )

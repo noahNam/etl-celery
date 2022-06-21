@@ -17,14 +17,23 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncKakaoApiRepository(BaseSyncRepository, KakaoApiRepository):
-    def find_by_id(self, house_id: int) -> KakaoApiResultEntity | None:
+    def find_by_id(self, id: int) -> KakaoApiResultEntity | None:
         with self.session_factory() as session:
-            kakao_info = session.get(KakaoApiResultModel, house_id)
+            kakao_info = session.get(KakaoApiResultModel, id)
 
         if not kakao_info:
             return None
 
         return kakao_info.to_entity()
+
+    # def find_by_place_id(self, place_id: int) -> KakaoApiResultEntity | None:
+    #     with self.session_factory() as session:
+    #         kakao_info = session.get(KakaoApiResultModel, place_id)
+    #
+    #     if not kakao_info:
+    #         return None
+    #
+    #     return kakao_info.to_entity()
 
     def save(self, kakao_orm: KakaoApiResultModel | None) -> int | None:
         if not kakao_orm:

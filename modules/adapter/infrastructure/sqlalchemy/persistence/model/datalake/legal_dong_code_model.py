@@ -5,7 +5,7 @@ from sqlalchemy import (
     Integer,
 )
 
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.legal_dong_code_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
