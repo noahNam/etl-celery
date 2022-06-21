@@ -51,7 +51,7 @@ class DongTypeUseCase(BaseDongTypeUseCase):
         )
 
         if results:
-            self.__upsert_to_warehouse(results=results)
+            self.__upsert_to_datamart(results=results)
 
         # 타입 기본 정보
         type_infos: list[TypeInfoEntity] | None = self._basic_repo.find_to_update(
@@ -62,13 +62,13 @@ class DongTypeUseCase(BaseDongTypeUseCase):
         )
 
         if results:
-            self.__upsert_to_warehouse(results=results)
+            self.__upsert_to_datamart(results=results)
 
     """
     insert, update
     """
 
-    def __upsert_to_warehouse(
+    def __upsert_to_datamart(
         self,
         results: list[DongInfoModel | TypeInfoModel],
     ) -> None:

@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, BigInteger, Integer, Float, Boolean, Numeric
 
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.bld_deal_entity import AptRentEntity
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
@@ -30,3 +31,23 @@ class AptRentModel(warehouse_base, TimestampMixin):
     regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
     is_available = Column(Boolean, nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_apt_deal_entity(self) -> AptRentEntity:
+        return AptRentEntity(
+            id=self.id,
+            house_id=self.house_id,
+            dong=self.dong,
+            bld_name=self.bld_name,
+            monthly_amount=self.monthly_amount,
+            deal_year=self.deal_year,
+            deal_month=self.deal_month,
+            deal_day=self.deal_day,
+            deposit=self.deposit,
+            private_area=self.private_area,
+            supply_area=self.supply_area,
+            regional_cd=self.regional_cd,
+            floor=self.floor,
+            is_available=self.is_available,
+            update_needed=self.update_needed
+        )
