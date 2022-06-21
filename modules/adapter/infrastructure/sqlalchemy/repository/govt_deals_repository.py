@@ -50,43 +50,9 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
     def __init__(self, session_factory: Callable[..., ContextManager[Session]]):
         super().__init__(session_factory=session_factory)
 
-    def find_by_id(self, pk: int) -> GovtAptDealsEntity | None:
-        return None
-
-    def save(self, model: GovtAptDealModel) -> None:
-        pass
-
-    def find_by_id_ls(self,
-                      primary_key_ls: list[int],
-                      find_type: int = 0) -> list[GovtAptDealsEntity] | None:
-        """
-        아파트 실거래가 데이터 가져옴
-        매핑 테이블 생성에 사용
-        """
-
-        if find_type == GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value:
-            with self.session_factory() as session:
-                govt_apt_deals_ls = session.query(
-                    GovtAptDealModel.id,
-                    GovtAptDealModel.sigungu_cd,
-                    GovtAptDealModel.eubmyundong_cd,
-                    GovtAptDealModel.build_year,
-                    GovtAptDealModel.jibun,
-                    GovtAptDealModel.apt_name,
-                    GovtAptDealModel.dong
-                ).filter(GovtAptDealModel.id.in_(primary_key_ls)).all()
-
-            if not govt_apt_deals_ls:
-                return None
-            else:
-                return_ls = [govt_apt_deals.to_entity_for_bld_mapping_results() for govt_apt_deals in govt_apt_deals_ls]
-                return return_ls
-        else:
-            return None
-
-    def find_by_date(self,
-                     target_date: date,
-                     find_type: int = 0) -> list[GovtAptDealsEntity] \
+    def find_by_update_needed(self,
+                              target_date: date,
+                              find_type: int = 0) -> list[GovtAptDealsEntity] \
                                             | list[GovtAptRentsEntity] \
                                             | list[GovtOfctlDealsEntity] \
                                             | list[GovtOfctlRentsEntity] \
@@ -102,8 +68,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 query = select(
                     GovtAptDealModel
                 ).where(
-                    func.date(GovtAptDealModel.created_at) == target_date
-                    or func.date(GovtAptDealModel.updated_at) == target_date
+                    GovtAptDealModel.update_needed is True
                 )
                 govt_apt_deals = session.execute(query).scalars().all()
 
@@ -118,8 +83,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 query = select(
                     GovtAptRentModel
                 ).where(
-                   func.date(GovtAptRentModel.created_at) == target_date
-                   or func.date(GovtAptRentModel.updated_at) == target_date
+                   GovtAptRentModel.update_needed is True
                 )
                 govt_apt_rents = session.execute(query).scalars().all()
 
@@ -134,8 +98,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 query = select(
                     GovtOfctlDealModel
                 ).where(
-                    func.date(GovtOfctlDealModel.created_at) == target_date
-                    or func.date(GovtOfctlDealModel.updated_at) == target_date
+                    GovtOfctlDealModel.update_needed is True
                 )
                 govt_ofctl_deals = session.execute(query).scalars().all()
             if not govt_ofctl_deals:
@@ -150,8 +113,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 query = select(
                     GovtOfctlRentModel
                 ).where(
-                    func.date(GovtOfctlRentModel.created_at) == target_date
-                    or func.date(GovtOfctlRentModel.updated_at) == target_date
+                    GovtOfctlRentModel.update_needed is True
                 )
                 govt_ofctl_rents = session.execute(query).scalars().all()
             if not govt_ofctl_rents:
@@ -166,8 +128,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 query = select(
                     GovtRightLotOutModel
                 ).where(
-                    func.date(GovtRightLotOutModel.created_at) == target_date
-                    or func.date(GovtRightLotOutModel.updated_at) == target_date
+                    GovtRightLotOutModel.update_needed is True
                 )
                 govt_right_lot_outs = session.execute(query).scalars().all()
             if not govt_right_lot_outs:
@@ -184,8 +145,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 ).join(
                     GovtAptDealModel.bld_mapping
                 ).where(
-                    func.date(GovtAptDealModel.created_at) == target_date
-                    or func.date(GovtAptDealModel.updated_at) == target_date
+                    GovtAptDealModel.update_needed is True
                 )
                 govt_apt_deals = session.execute(query).scalars().all()
 
@@ -198,8 +158,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         elif find_type == GovtFindTypeEnum.APT_RENTS_INPUT.value:
             with self.session_factory() as session:
                 query = select(GovtAptRentModel).join(GovtAptRentModel.bld_mapping).where(
-                    func.date(GovtAptRentModel.created_at) == target_date
-                    or func.date(GovtAptRentModel.updated_at) == target_date
+                    GovtAptRentModel.update_needed is True
                 )
                 govt_apt_rents = session.execute(query).scalars().all()
 
@@ -212,8 +171,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         elif find_type == GovtFindTypeEnum.OFCTL_DEAL_INPUT.value:
             with self.session_factory() as session:
                 query = select(GovtOfctlDealModel).join(GovtOfctlDealModel.bld_mapping).where(
-                    func.date(GovtOfctlDealModel.created_at) == target_date
-                    or func.date(GovtOfctlDealModel.updated_at) == target_date
+                    GovtOfctlDealModel.update_needed is True
                 )
                 govt_ofctl_deals = session.execute(query).scalars().all()
 
@@ -226,8 +184,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         elif find_type == GovtFindTypeEnum.OFCTL_RENT_INPUT.value:
             with self.session_factory() as session:
                 query = select(GovtOfctlRentModel).join(GovtOfctlRentModel.bld_mapping).where(
-                    func.date(GovtOfctlRentModel.created_at) == target_date
-                    or func.date(GovtOfctlRentModel.updated_at) == target_date
+                    GovtOfctlRentModel.update_needed is True
                 )
                 govt_ofctl_rents = session.execute(query).scalars().all()
             if not govt_ofctl_rents:
@@ -239,8 +196,7 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
         elif find_type == GovtFindTypeEnum.RIGHT_LOT_OUT_INPUT.value:
             with self.session_factory() as session:
                 query = select(GovtRightLotOutModel).join(GovtRightLotOutModel.bld_mapping).where(
-                    func.date(GovtRightLotOutModel.created_at) == target_date
-                    or func.date(GovtRightLotOutModel.updated_at) == target_date
+                    GovtRightLotOutModel.update_needed is True
                 )
                 govt_right_lot_outs = session.execute(query).scalars().all()
             if not govt_right_lot_outs:

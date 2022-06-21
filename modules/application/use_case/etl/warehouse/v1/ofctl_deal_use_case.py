@@ -30,7 +30,7 @@ class OfctlDealUseCase(BaseETLUseCase):
 
     def execute(self):
         today = date.today()
-        govt_ofctl_deals: list[GovtOfctlDealJoinKeyEntity] = self._govt_deal_repo.find_by_date(
+        govt_ofctl_deals: list[GovtOfctlDealJoinKeyEntity] = self._govt_deal_repo.find_by_update_needed(
             target_date=today,
             find_type=GovtFindTypeEnum.OFCTL_DEAL_INPUT.value
         )

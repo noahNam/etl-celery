@@ -30,7 +30,7 @@ class AptRentUseCase(BaseETLUseCase):
 
     def execute(self):
         today = date.today()
-        govt_apt_rents: list[GovtAptRentsJoinKeyEntity] = self._govt_deal_repo.find_by_date(
+        govt_apt_rents: list[GovtAptRentsJoinKeyEntity] = self._govt_deal_repo.find_by_update_needed(
             target_date=today,
             find_type=GovtFindTypeEnum.APT_RENTS_INPUT.value
         )

@@ -104,7 +104,7 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
 
     def find_all(
         self, find_type: int = 0
-    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity]:
+    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | list[KaptMappingEntity]:
         with self.session_factory() as session:
             queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
 
@@ -113,6 +113,8 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
 
         if find_type == KaptFindTypeEnum.KAKAO_API_INPUT.value:
             return [query.to_kakao_api_input_entity() for query in queryset]
+        elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
+            return [result.to_entity_for_bld_mapping_results() for result in queryset]
 
         return [query.to_open_api_input_entity() for query in queryset]
 
@@ -276,23 +278,3 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
                 result_list = [result.to_kapt_mgmt_cost_entity() for result in results]
 
         return result_list
-
-    def find_by_date_and_type(
-            self,
-            find_type: int,
-            target_date: date
-    ) -> list[KaptMappingEntity] | None:
-        if find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
-            with self.session_factory() as session:
-                query = select(
-                    KaptBasicInfoModel
-                )
-                kapt_basic_info_ls = session.execute(query).scalars().all()
-
-            if not kapt_basic_info_ls:
-                return None
-            else:
-                return_ls = [result.to_entity_for_bld_mapping_results() for result in kapt_basic_info_ls]
-                return return_ls
-        else:
-            return None

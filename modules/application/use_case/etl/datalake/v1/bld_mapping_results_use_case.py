@@ -66,37 +66,36 @@ class BldMappingResultsUseCase(BaseETLUseCase):
         today = date.today()
         dong_codes: list[LegalDongCodeEntity] = self._dong_code.find_all()
 
-        kapt_basic_infos: list[KaptMappingEntity] = self._kapt_repo.find_by_date_and_type(
-            target_date=today,
+        kapt_basic_infos: list[KaptMappingEntity] = self._kapt_repo.find_all(
             find_type=KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value
         )
 
-        govt_apt_deals: list[GovtAptDealsEntity] = self._govt_repo.find_by_date(
+        govt_apt_deals: list[GovtAptDealsEntity] = self._govt_repo.find_by_update_needed(
             target_date=today,
             find_type=GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value
         )
 
-        govt_apt_rents: list[GovtAptRentsEntity] = self._govt_repo.find_by_date(
+        govt_apt_rents: list[GovtAptRentsEntity] = self._govt_repo.find_by_update_needed(
             target_date=today,
             find_type=GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value
         )
 
-        govt_ofctl_deals: list[GovtOfctlDealsEntity] = self._govt_repo.find_by_date(
+        govt_ofctl_deals: list[GovtOfctlDealsEntity] = self._govt_repo.find_by_update_needed(
             target_date=today,
             find_type=GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value
         )
 
-        govt_ofctl_rents: list[GovtOfctlRentsEntity] = self._govt_repo.find_by_date(
+        govt_ofctl_rents: list[GovtOfctlRentsEntity] = self._govt_repo.find_by_update_needed(
             target_date=today,
             find_type=GovtFindTypeEnum.GOV_OFCTL_RENT_MAPPING.value
         )
-        govt_right_lot_outs: list[GovtRightLotOutsEntity] = self._govt_repo.find_by_date(
+        govt_right_lot_outs: list[GovtRightLotOutsEntity] = self._govt_repo.find_by_update_needed(
             target_date=today,
             find_type=GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value
         )
 
         # transfer
-        bld_mapping_result_models: list[BldMappingResultModel] = self._transfer.start_transfer( # fixme 자료형 표시 (수정함)
+        bld_mapping_result_models: list[BldMappingResultModel] = self._transfer.start_transfer(
             govt_apt_deals=govt_apt_deals,
             govt_apt_rents=govt_apt_rents,
             govt_ofctl_deals=govt_ofctl_deals,

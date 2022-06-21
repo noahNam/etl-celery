@@ -30,7 +30,7 @@ class RightLotOutUseCase(BaseETLUseCase):
 
     def execute(self):
         today = date.today()
-        govt_right_lot_outs: list[GovtRightLotOutJoinKeyEntity] = self._govt_deal_repo.find_by_date(
+        govt_right_lot_outs: list[GovtRightLotOutJoinKeyEntity] = self._govt_deal_repo.find_by_update_needed(
             target_date=today,
             find_type=GovtFindTypeEnum.RIGHT_LOT_OUT_INPUT.value
         )

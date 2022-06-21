@@ -32,7 +32,7 @@ class AptDealUseCase(BaseETLUseCase):
     def execute(self):
         #Extract
         today = date.today()
-        govt_apt_deals: list[GovtAptDealsJoinKeyEntity] = self._govt_deal_repo.find_by_date(
+        govt_apt_deals: list[GovtAptDealsJoinKeyEntity] = self._govt_deal_repo.find_by_update_needed(
             target_date=today,
             find_type=GovtFindTypeEnum.APT_DEALS_INPUT.value
         )
