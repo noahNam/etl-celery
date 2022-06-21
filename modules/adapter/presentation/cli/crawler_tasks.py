@@ -15,6 +15,9 @@ from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.crawling.govt_bld_info.v1.govt_bld_use_case import (
     GovtBldUseCase,
 )
+from modules.application.use_case.crawling.govt_deal.v1.govt_deal_use_case import (
+    GovtDealUseCase,
+)
 from modules.application.use_case.crawling.kakao_api.v1.kakao_api_use_case import (
     KakaoApiUseCase,
 )
@@ -40,9 +43,13 @@ def get_task(topic: str):
         return LegalCodeUseCase(
             topic=topic, repo=SyncLegalDongCodeRepository(session_factory=db.session)
         )
-    if topic == TopicEnum.CRAWL_BUILDING_MANAGE.value:
+    elif topic == TopicEnum.CRAWL_BUILDING_MANAGE.value:
         return GovtBldUseCase(
             topic=topic, repo=SyncKaptRepository(session_factory=db.session)
+        )
+    elif topic == TopicEnum.CRAWL_GOVT_DEAL_INFOS.value:
+        return GovtDealUseCase(
+            topic=topic, repo=SyncLegalDongCodeRepository(session_factory=db.session)
         )
 
 

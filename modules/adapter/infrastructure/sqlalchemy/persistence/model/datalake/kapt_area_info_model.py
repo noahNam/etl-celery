@@ -36,7 +36,7 @@ class KaptAreaInfoModel(datalake_base, TimestampMixin):
             kapt_mparea_136=self.kapt_mparea_136,
             priv_area=self.priv_area,
             bjd_code=self.bjd_code,
-            updated_needed=self.update_needed,
+            update_needed=self.update_needed,
             created_at=self.created_at,
             updated_at=self.updated_at,
         )

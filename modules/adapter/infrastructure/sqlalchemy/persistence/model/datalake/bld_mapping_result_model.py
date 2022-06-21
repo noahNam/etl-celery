@@ -24,3 +24,4 @@ class BldMappingResultModel(datalake_base, TimestampMixin):
     regional_cd = Column(String(5), nullable=True, index=True)
     dong = Column(String(40), nullable=True)
     bld_name = Column(String(40), nullable=True)
+    jibun = Column(String(10), nullable=True)

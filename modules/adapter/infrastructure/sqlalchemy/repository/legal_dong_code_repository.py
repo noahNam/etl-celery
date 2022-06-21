@@ -61,3 +61,12 @@ class SyncLegalDongCodeRepository(LegalDongCodeRepository, BaseSyncRepository):
         if result:
             return True
         return False
+
+    def find_all(self) -> list[LegalDongCodeEntity]:
+        with self.session_factory() as session:
+            queryset = session.execute(select(LegalDongCodeModel)).scalars().all()
+
+        if not queryset:
+            return list()
+
+        return [query.to_entity() for query in queryset]
