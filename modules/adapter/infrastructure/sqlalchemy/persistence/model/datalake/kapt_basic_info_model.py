@@ -75,7 +75,7 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     manage_office_contact = Column(String(16), nullable=True)
     manage_office_fax = Column(String(16), nullable=True)
     welfare = Column(String(200), nullable=True)
-    update_needed = Column(Boolean, nullable=False, default=False)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     # relationship
     kapt_mgmt_costs = relationship(
