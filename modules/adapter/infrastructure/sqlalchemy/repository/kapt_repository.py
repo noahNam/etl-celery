@@ -18,6 +18,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
     KaptMgmtCostEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.code_rule_model import CodeRuleModel
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_area_info_model import (
     KaptAreaInfoModel,
 )
@@ -275,3 +276,24 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
                 result_list = [result.to_kapt_mgmt_cost_entity() for result in results]
 
         return result_list
+
+    def find_id_by_code_rules(
+        self, key_div: str
+    ) -> int:
+        with self.session_factory() as session:
+            query = (
+                select(func.max(CodeRuleModel.last_seq) + 1)
+                    .where(
+                        CodeRuleModel.key_div == key_div
+                    )
+            )
+            return session.execute(query).scalars().first()
+
+    def update_id_to_code_rules(self, key_div: str, last_id: int) -> None:
+        with self.session_factory() as session:
+            session.execute(
+                update(CodeRuleModel)
+                .where(CodeRuleModel.key_div == key_div)
+                .values(last_seq=last_id)
+            )
+            session.commit()

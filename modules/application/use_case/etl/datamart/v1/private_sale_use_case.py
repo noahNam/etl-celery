@@ -87,13 +87,13 @@ class PrivateSaleUseCase(BasePrivateSaleUseCase):
         )
 
         if results:
-            self.__upsert_to_warehouse(results=results)
+            self.__upsert_to_datamart(results=results)
 
     """
     insert, update
     """
 
-    def __upsert_to_warehouse(
+    def __upsert_to_datamart(
         self,
         results: list[PrivateSaleModel],
     ) -> None:

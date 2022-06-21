@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 
 from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import DongInfoModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_detail_model import \
+    PrivateSaleDetailModel
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_model import (
     PrivateSaleModel,
 )
@@ -18,7 +20,7 @@ class SyncPrivateSaleRepository(BaseSyncRepository):
     def __init__(self, session_factory: Callable[..., ContextManager[Session]]):
         super().__init__(session_factory=session_factory)
 
-    def save(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel) -> None:
+    def save(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel) -> None:
         with self.session_factory() as session:
             try:
                 session.add(value)
@@ -30,7 +32,7 @@ class SyncPrivateSaleRepository(BaseSyncRepository):
                 session.rollback()
                 raise NotUniqueErrorException
 
-    def update(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel) -> None:
+    def update(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel) -> None:
         if isinstance(value, PrivateSaleModel):
             with self.session_factory() as session:
                 session.execute(
@@ -96,7 +98,30 @@ class SyncPrivateSaleRepository(BaseSyncRepository):
 
                 session.commit()
 
-    def exists_by_key(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel) -> bool:
+        elif isinstance(value, PrivateSaleDetailModel):
+            with self.session_factory() as session:
+                session.execute(
+                    update(PrivateSaleDetailModel)
+                    .where(PrivateSaleDetailModel.id == value.id)
+                    .values(
+                        private_sale_id=value.private_sale_id,
+                        private_area=value.private_area,
+                        supply_area=value.supply_area,
+                        contract_date=value.contract_date,
+                        contract_ym=value.contract_ym,
+                        deposit_price=value.deposit_price,
+                        rent_price=value.rent_price,
+                        trade_price=value.trade_price,
+                        floor=value.floor,
+                        trade_type=value.trade_type,
+                        is_available=value.is_available,
+                        update_needed=value.update_needed,
+                    )
+                )
+
+                session.commit()
+
+    def exists_by_key(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel) -> bool:
         if isinstance(value, PrivateSaleModel):
             with self.session_factory() as session:
                 query = select(PrivateSaleModel.id).where(PrivateSaleModel.id == value.id)
@@ -110,6 +135,11 @@ class SyncPrivateSaleRepository(BaseSyncRepository):
         elif isinstance(value, TypeInfoModel):
             with self.session_factory() as session:
                 query = select(TypeInfoModel.id).where(TypeInfoModel.id == value.id)
+                result = session.execute(query).scalars().first()
+
+        elif isinstance(value, PrivateSaleDetailModel):
+            with self.session_factory() as session:
+                query = select(PrivateSaleDetailModel.id).where(PrivateSaleDetailModel.id == value.id)
                 result = session.execute(query).scalars().first()
 
         if result:

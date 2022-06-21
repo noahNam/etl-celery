@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, BigInteger, Integer, Float, Boolean, Numeric
 
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.bld_deal_entity import AptDealEntity
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
@@ -34,3 +35,27 @@ class AptDealModel(warehouse_base, TimestampMixin):
     req_gbn = Column(String(10), nullable=True)
     rdealer_lawdnm = Column(String(150), nullable=True)
     is_available = Column(Boolean, nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_apt_deal_entity(self) -> AptDealEntity:
+        return AptDealEntity(
+            id=self.id,
+            house_id=self.house_id,
+            dong=self.dong,
+            bld_name=self.bld_name,
+            deal_amount=self.deal_amount,
+            deal_year=self.deal_year,
+            deal_month=self.deal_month,
+            deal_day=self.deal_day,
+            serial_no=self.serial_no,
+            private_area=self.private_area,
+            supply_area=self.supply_area,
+            regional_cd=self.regional_cd,
+            floor=self.floor,
+            cancel_deal_type=self.cancel_deal_type,
+            cancel_deal_day=self.cancel_deal_day,
+            req_gbn=self.req_gbn,
+            rdealer_lawdnm=self.rdealer_lawdnm,
+            is_available=self.is_available,
+            update_needed=self.update_needed
+        )

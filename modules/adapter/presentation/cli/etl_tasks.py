@@ -6,6 +6,7 @@ from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import SyncBldDealRepository
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_bld_repository import (
     SyncGovtBldRepository,
 )
@@ -86,8 +87,9 @@ def get_task(topic: str):
     elif topic == TopicEnum.ETL_MART_PRIVATE_SALE_DETAILS.value:
         return PrivateSaleDetailUseCase(
             topic=topic,
-            basic_repo=SyncBasicRepository(session_factory=db.session),
+            bld_deal_repo=SyncBldDealRepository(session_factory=db.session),
             private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
+            kapt_repo=SyncKaptRepository(session_factory=db.session),
         )
 
 
