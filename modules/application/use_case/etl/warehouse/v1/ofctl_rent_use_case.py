@@ -20,7 +20,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl
 from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
 
 
-class OfctlDealUseCase(BaseETLUseCase):
+class OfctlRentsUseCase(BaseETLUseCase):
     def __init__(self, govt_deal_repo, bld_mapping_repo, bld_deal_repo, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._bld_mapping_repo: SyncBldMappingResultsRepository = bld_mapping_repo  # input_table

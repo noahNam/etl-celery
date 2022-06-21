@@ -29,6 +29,9 @@ from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUs
 from modules.application.use_case.etl.warehouse.v1.apt_deal_use_case import AptDealUseCase
 from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import BldMappingResultsUseCase
 from modules.application.use_case.etl.warehouse.v1.apt_rent_use_case import AptRentUseCase
+from modules.application.use_case.etl.warehouse.v1.ofctl_deal_use_case import OfctlDealUseCase
+from modules.application.use_case.etl.warehouse.v1.ofctl_rent_use_case import OfctlRentsUseCase
+from modules.application.use_case.etl.warehouse.v1.right_lot_out_use_case import RightLotOutUseCase
 
 
 def get_task(topic: str):
@@ -60,6 +63,26 @@ def get_task(topic: str):
             bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
             bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session),
         )
+    elif topic == TopicEnum.ETL_WH_OFCTL_DEALS:
+        return OfctlDealUseCase(
+            govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
+            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
+            bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session)
+        )
+    elif topic == TopicEnum.ETL_WH_OFCTL_RENTS.value:
+        return OfctlRentsUseCase(
+            govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
+            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
+            bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session)
+        )
+    elif topic == TopicEnum.ETL_WH_RIGHT_LOG_OUTS.value:
+        return RightLotOutUseCase(
+            govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
+            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
+            bld_deal_repo=SyncBuildingDealRepository(session_factory=db.session)
+        )
+    elif topic == TopicEnum.ETL_WH_UPDATE_SUPPLY_AREA.value:
+        return
 
 
 @etl_celery.task
