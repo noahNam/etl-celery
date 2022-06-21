@@ -104,6 +104,7 @@ class BasicInfoModel(warehouse_base, TimestampMixin):
     public_ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
     rebuild_ref_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=True)
     is_available = Column(Boolean, nullable=True, default=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     def to_basic_info_entity(self) -> BasicInfoEntity:
         return BasicInfoEntity(
@@ -187,4 +188,5 @@ class BasicInfoModel(warehouse_base, TimestampMixin):
             public_ref_id=self.public_ref_id,
             rebuild_ref_id=self.rebuild_ref_id,
             is_available=self.is_available,
+            update_needed=self.update_needed
         )

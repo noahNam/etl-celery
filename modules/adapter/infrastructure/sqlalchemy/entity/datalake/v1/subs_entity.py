@@ -184,6 +184,7 @@ class SubscriptionInfoEntity(BaseModel):
     avg_win_point: str | None
     avg_win_point_gyeonggi: str | None
     avg_win_point_etc: str | None
+    update_needed: bool
 
 
 class SubscriptionManualInfoEntity(BaseModel):
@@ -210,3 +211,4 @@ class SubscriptionManualInfoEntity(BaseModel):
     cyber_model_house_link: str | None
     supply_rate: int | None
     supply_rate_etc: int | None
+    update_needed: bool

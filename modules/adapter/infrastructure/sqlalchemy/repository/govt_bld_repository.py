@@ -83,12 +83,11 @@ class SyncGovtBldRepository(BaseSyncRepository, GovtBldRepository):
             return True
         return False
 
-    def find_by_date(
+    def find_to_update(
         self,
         target_model: Type[
             GovtBldTopInfoModel | GovtBldMiddleInfoModel | GovtBldAreaInfoModel
         ],
-        target_date: date,
     ) -> list[
         GovtBldTopInfoEntity | GovtBldMiddleInfoEntity | GovtBldAreaInfoEntity
     ] | None:
@@ -100,8 +99,7 @@ class SyncGovtBldRepository(BaseSyncRepository, GovtBldRepository):
                 query = (
                     select(GovtBldTopInfoModel)
                     .where(
-                        func.date(GovtBldTopInfoModel.updated_at) == target_date
-                        or func.date(GovtBldTopInfoModel.updated_at) == target_date
+                        GovtBldTopInfoModel.update_needed == True
                     )
                     .order_by(GovtBldTopInfoModel.id)
                 )
@@ -115,8 +113,7 @@ class SyncGovtBldRepository(BaseSyncRepository, GovtBldRepository):
                 query = (
                     select(GovtBldMiddleInfoModel)
                     .where(
-                        func.date(GovtBldMiddleInfoModel.created_at) == target_date
-                        or func.date(GovtBldMiddleInfoModel.updated_at) == target_date
+                        GovtBldMiddleInfoModel.update_needed == True
                     )
                     .order_by(GovtBldMiddleInfoModel.id)
                 )
@@ -132,8 +129,7 @@ class SyncGovtBldRepository(BaseSyncRepository, GovtBldRepository):
                 query = (
                     select(GovtBldAreaInfoModel)
                     .where(
-                        func.date(GovtBldAreaInfoModel.created_at) == target_date
-                        or func.date(GovtBldAreaInfoModel.updated_at) == target_date
+                        GovtBldAreaInfoModel.update_needed == True
                     )
                     .order_by(GovtBldAreaInfoModel.id)
                 )

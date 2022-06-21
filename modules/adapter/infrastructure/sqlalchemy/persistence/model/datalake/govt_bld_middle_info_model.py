@@ -115,4 +115,5 @@ class GovtBldMiddleInfoModel(datalake_base, TimestampMixin):
             dong_nm=self.dong_nm,
             hhld_cnt=self.hhld_cnt,
             grnd_flr_cnt=self.grnd_flr_cnt,
+            update_needed=self.update_needed
         )

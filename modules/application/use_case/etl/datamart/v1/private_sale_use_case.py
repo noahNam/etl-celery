@@ -17,8 +17,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.mgmt_
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
 )
-from datetime import date
-
 from modules.adapter.infrastructure.sqlalchemy.repository.private_sale_repository import (
     SyncPrivateSaleRepository,
 )
@@ -62,11 +60,10 @@ class PrivateSaleUseCase(BasePrivateSaleUseCase):
         ** trade_status(3개월 거래), deposit_status(3개월 거래)
         위 두 필드는 private_sale_details(실거래가) ETL시 계산하여 업데이트
         """
-        today = date.today()
 
         # 단지 기본 정보
-        basic_infos: list[BasicInfoEntity] | None = self._basic_repo.find_by_date(
-            target_model=BasicInfoModel, target_date=today
+        basic_infos: list[BasicInfoEntity] | None = self._basic_repo.find_to_update(
+            target_model=BasicInfoModel
         )
         # 관리비 정보
         mgmt_costs = list()

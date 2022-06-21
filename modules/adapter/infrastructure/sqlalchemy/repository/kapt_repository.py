@@ -213,7 +213,7 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
 
         return bld_input_entities
 
-    def find_by_date(
+    def find_to_update(
         self,
         target_model: Type[
             KaptBasicInfoModel
@@ -221,7 +221,6 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
             | KaptLocationInfoModel
             | KaptMgmtCostModel
         ],
-        target_date: date,
     ) -> list[
         KaptBasicInfoEntity
         | KaptAreaInfoEntity
@@ -234,8 +233,7 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
             # 단지 기본정보
             with self.session_factory() as session:
                 query = select(KaptBasicInfoModel).where(
-                    func.date(KaptBasicInfoModel.updated_at) == target_date
-                    or func.date(KaptBasicInfoModel.updated_at) == target_date
+                    KaptBasicInfoModel.update_needed == True
                 )
                 results = session.execute(query).scalars().all()
             if results:
@@ -245,8 +243,7 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
             # 단지 면적정보
             with self.session_factory() as session:
                 query = select(KaptAreaInfoModel).where(
-                    func.date(KaptAreaInfoModel.created_at) == target_date
-                    or func.date(KaptAreaInfoModel.updated_at) == target_date
+                    KaptAreaInfoModel.update_needed == True
                 )
                 results = session.execute(query).scalars().all()
             if results:
@@ -256,8 +253,7 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
             # 단지 주변정보
             with self.session_factory() as session:
                 query = select(KaptLocationInfoModel).where(
-                    func.date(KaptLocationInfoModel.created_at) == target_date
-                    or func.date(KaptLocationInfoModel.updated_at) == target_date
+                    KaptLocationInfoModel.update_needed == True
                 )
                 results = session.execute(query).scalars().all()
             if results:
@@ -270,10 +266,8 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
             with self.session_factory() as session:
                 query = (
                     select(KaptMgmtCostModel)
-                    # .join(KaptBasicInfoModel.kapt_mgmt_costs)
                     .where(
-                        func.date(KaptMgmtCostModel.created_at) == target_date
-                        or func.date(KaptMgmtCostModel.updated_at) == target_date
+                        KaptMgmtCostModel.update_needed == True
                     )
                 )
                 results = session.execute(query).scalars().all()
