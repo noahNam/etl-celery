@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Integer, ForeignKey, Numeric
+from sqlalchemy import Column, BigInteger, Integer, ForeignKey, Numeric, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datamart_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import (
@@ -23,3 +23,4 @@ class TypeInfoModel(datamart_base, TimestampMixin):
     )
     private_area = Column(Numeric(6, 2), nullable=True)
     supply_area = Column(Numeric(6, 2), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)

@@ -55,7 +55,7 @@ class SyncRealEstateRepository(BaseSyncRepository):
 
             session.commit()
 
-    def exists_by_key(self, value: RealEstateModel) -> bool | list:
+    def exists_by_key(self, value: RealEstateModel) -> bool:
         with self.session_factory() as session:
             query = select(RealEstateModel.id).where(RealEstateModel.id == value.id)
             result = session.execute(query).scalars().first()

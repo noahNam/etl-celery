@@ -1,5 +1,4 @@
 import os
-from datetime import date
 from typing import Type
 
 from modules.adapter.infrastructure.etl.wh_subscriptions import TransformSubscription
@@ -52,13 +51,11 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
         super().__init__(*args, **kwargs)
 
     def execute(self):
-        today = date.today()
-
         # DL:subscription_infos -> WH: subscriptions, subscription_details
         subscription_infos: list[
             SubscriptionInfoEntity
-        ] | None = self._subs_info_repo.find_by_date(
-            target_model=SubscriptionInfoModel, target_date=today
+        ] | None = self._subs_info_repo.find_to_update(
+            target_model=SubscriptionInfoModel
         )
 
         results: dict[
@@ -74,8 +71,8 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
         # Only update
         subscription_manual_infos: list[
             SubscriptionManualInfoEntity
-        ] | None = self._subs_info_repo.find_by_date(
-            target_model=SubscriptionManualInfoModel, target_date=today
+        ] | None = self._subs_info_repo.find_to_update(
+            target_model=SubscriptionManualInfoModel
         )
 
         results: dict[str, [dict]] | None = self._transfer.start_etl(
