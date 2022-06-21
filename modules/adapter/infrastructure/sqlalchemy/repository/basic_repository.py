@@ -1,6 +1,5 @@
-from datetime import date
 from typing import Callable, ContextManager, Type, Any
-from sqlalchemy import update, exc, func, desc, or_
+from sqlalchemy import update, exc, desc
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 
@@ -8,7 +7,7 @@ from core.domain.warehouse.basic.interface.basic_repository import BasicReposito
 from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     BasicInfoEntity,
-    CalcMgmtCostEntity,
+    CalcMgmtCostEntity, DongInfoEntity, TypeInfoEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
@@ -242,25 +241,39 @@ class SyncBasicRepository(BasicRepository, BaseSyncRepository):
 
         return house_id
 
-    def find_by_date(
+    def find_to_update(
         self,
-        target_model: Type[BasicInfoModel],
-        target_date: date,
-    ) -> list[BasicInfoEntity] | None:
+        target_model: Type[BasicInfoModel | DongInfoModel | TypeInfoModel],
+    ) -> list[BasicInfoEntity | DongInfoEntity | TypeInfoEntity] | None:
         result_list = None
 
         if target_model == BasicInfoModel:
             with self.session_factory() as session:
                 query = select(BasicInfoModel).where(
-                    or_(
-                        func.date(BasicInfoModel.created_at) == target_date,
-                        func.date(BasicInfoModel.updated_at) == target_date,
-                    ),
+                    BasicInfoModel.update_needed == True,
                     BasicInfoModel.place_id != None,
                 )
                 results = session.execute(query).scalars().all()
             if results:
                 result_list = [result.to_basic_info_entity() for result in results]
+
+        elif target_model == DongInfoModel:
+            with self.session_factory() as session:
+                query = select(DongInfoModel).where(
+                    DongInfoModel.update_needed == True,
+                )
+                results = session.execute(query).scalars().all()
+            if results:
+                result_list = [result.to_dong_info_entity() for result in results]
+
+        elif target_model == TypeInfoModel:
+            with self.session_factory() as session:
+                query = select(TypeInfoModel).where(
+                    TypeInfoModel.update_needed == True,
+                )
+                results = session.execute(query).scalars().all()
+            if results:
+                result_list = [result.to_type_info_entity() for result in results]
 
         return result_list
 

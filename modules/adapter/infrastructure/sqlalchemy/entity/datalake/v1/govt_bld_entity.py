@@ -9,6 +9,7 @@ class GovtBldTopInfoEntity(BaseModel):
     ji: str | None
     bc_rat: float | None
     vl_rat: float | None
+    update_needed: bool
 
 
 class GovtBldMiddleInfoEntity(BaseModel):
@@ -17,6 +18,7 @@ class GovtBldMiddleInfoEntity(BaseModel):
     dong_nm: str | None
     hhld_cnt: int | None
     grnd_flr_cnt: int | None
+    update_needed: bool
 
 
 class GovtBldAreaInfoEntity(BaseModel):
@@ -32,3 +34,4 @@ class GovtBldAreaInfoEntity(BaseModel):
     etc_purps: str | None
     expos_pubuse_gb_cd_nm: str | None
     rnum: int | None
+    update_needed: bool
