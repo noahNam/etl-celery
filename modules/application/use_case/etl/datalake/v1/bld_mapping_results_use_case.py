@@ -32,7 +32,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entit
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptMappingEntity
 )
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.legal_dong_code_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
 )
 

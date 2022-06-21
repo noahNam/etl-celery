@@ -38,7 +38,7 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
     update_needed = Column(Boolean, nullable=False, default=True)
 
     bld_mapping = relationship("BldMappingResultModel",
-                               backref="govt_ofctl_deals", uselist=False,
+                               backref="govt_ofctl_deals", uselist=False, lazy='joined',
                                primaryjoin="and_(foreign(GovtOfctlDealModel.regional_cd) == BldMappingResultModel.regional_cd,"
                                            "foreign(GovtOfctlDealModel.jibun) == BldMappingResultModel.jibun,"
                                            "foreign(GovtOfctlDealModel.dong) == BldMappingResultModel.dong,"

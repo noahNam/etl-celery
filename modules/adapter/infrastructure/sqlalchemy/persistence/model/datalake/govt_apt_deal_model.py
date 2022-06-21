@@ -52,12 +52,12 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
     update_needed = Column(Boolean, nullable=False, default=True)
 
     bld_mapping = relationship("BldMappingResultModel",
-                               backref="govt_apt_deals",
+                               backref="govt_apt_deals", uselist=False, lazy='joined',
                                primaryjoin="and_(foreign(GovtAptDealModel.regional_cd) == BldMappingResultModel.regional_cd,"
                                            "foreign(GovtAptDealModel.jibun) == BldMappingResultModel.jibun,"
                                            "foreign(GovtAptDealModel.dong) == BldMappingResultModel.dong,"
                                            "foreign(GovtAptDealModel.apt_name) == BldMappingResultModel.bld_name)",
-                               uselist=False)
+                               )
 
     def to_entity_for_bld_mapping_reuslts(self) -> GovtAptDealsEntity:
         return GovtAptDealsEntity(

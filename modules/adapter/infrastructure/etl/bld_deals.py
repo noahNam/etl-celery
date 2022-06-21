@@ -32,9 +32,9 @@ class TransferAptDeals(Transfer):
                             | None:
 
         if transfer_type == GovtFindTypeEnum.APT_DEALS_INPUT.value:
-            apt_daels = list()  # fixme: 명칭 변경(수정됨)
+            apt_daels = list()
             for govt_apt_deal in entities:
-                apt_dael = AptDealModel(  # fixme: 이름 변경 temp (수정됨)
+                apt_dael = AptDealModel(
                     house_id=govt_apt_deal.house_id,
                     dong=govt_apt_deal.dong,
                     bld_name=govt_apt_deal.apt_name,
@@ -43,7 +43,7 @@ class TransferAptDeals(Transfer):
                     deal_month=govt_apt_deal.deal_month,
                     deal_day=govt_apt_deal.deal_day,
                     serial_no=govt_apt_deal.serial_no,
-                    private_area=MathHelper().round(float(govt_apt_deal.exclusive_area), 2),  # fixme: round 변경(수정됨)
+                    private_area=MathHelper().round(float(govt_apt_deal.exclusive_area), 2),
                     supply_area=None,  # fixme: 채워넣기
                     regional_cd=govt_apt_deal.regional_cd,
                     floor=govt_apt_deal.floor,
@@ -51,7 +51,7 @@ class TransferAptDeals(Transfer):
                     cancel_deal_day=govt_apt_deal.cancel_deal_day,
                     req_gbn=govt_apt_deal.req_gbn,
                     rdealer_lawdnm=govt_apt_deal.rdealer_lawdnm,
-                    is_available=True,  # fixme: True (수정됨)
+                    is_available=True,
                 )
                 apt_daels.append(apt_dael)
             return apt_daels

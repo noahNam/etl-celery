@@ -36,7 +36,7 @@ class GovtAptRentModel(datalake_base, TimestampMixin):
     update_needed = Column(Boolean, nullable=False, default=True)
 
     bld_mapping = relationship("BldMappingResultModel",
-                               backref="govt_apt_rents", uselist=False,
+                               backref="govt_apt_rents", uselist=False, lazy='joined',
                                primaryjoin="and_(foreign(GovtAptRentModel.regional_cd) == BldMappingResultModel.regional_cd,"
                                            "foreign(GovtAptRentModel.jibun) == BldMappingResultModel.jibun,"
                                            "foreign(GovtAptRentModel.dong) == BldMappingResultModel.dong,"
