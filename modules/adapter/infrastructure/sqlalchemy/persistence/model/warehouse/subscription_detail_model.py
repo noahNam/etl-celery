@@ -4,7 +4,8 @@ from sqlalchemy import (
     BigInteger,
     Integer,
     Float,
-    ForeignKey, Boolean,
+    ForeignKey,
+    Boolean,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
