@@ -1,8 +1,6 @@
 import os
 from typing import Type, Any
 
-from sqlalchemy import and_
-
 from modules.adapter.infrastructure.etl.wh_basic_infos import TransformBasic
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
     GovtBldTopInfoEntity,
@@ -95,13 +93,11 @@ class BasicUseCase(BaseBasicUseCase):
         super().__init__(*args, **kwargs)
 
     def execute(self):
-        today = date.today()
-
         # 단지 기본 정보
         kapt_basic_infos: list[
             KaptBasicInfoEntity
-        ] | None = self._kapt_repo.find_by_date(
-            target_model=KaptBasicInfoModel, target_date=today
+        ] | None = self._kapt_repo.find_to_update(
+            target_model=KaptBasicInfoModel
         )
         results: list[BasicInfoModel] | None = self._transfer.start_etl(
             from_model="kapt_basic_infos", target_list=kapt_basic_infos
@@ -125,8 +121,8 @@ class BasicUseCase(BaseBasicUseCase):
             self.__upsert_to_warehouse(results=results)
 
         # 단지 관리비 정보
-        kapt_mgmt_costs: list[KaptMgmtCostEntity] | None = self._kapt_repo.find_by_date(
-            target_model=KaptMgmtCostModel, target_date=today
+        kapt_mgmt_costs: list[KaptMgmtCostEntity] | None = self._kapt_repo.find_to_update(
+            target_model=KaptMgmtCostModel
         )
         self.__bind_house_id(target_list=kapt_mgmt_costs)
 
@@ -140,8 +136,8 @@ class BasicUseCase(BaseBasicUseCase):
         # 단지 주변 정보
         kapt_location_infos: list[
             KaptLocationInfoEntity
-        ] | None = self._kapt_repo.find_by_date(
-            target_model=KaptLocationInfoModel, target_date=today
+        ] | None = self._kapt_repo.find_to_update(
+            target_model=KaptLocationInfoModel
         )
         self.__bind_house_id(target_list=kapt_location_infos)
 
@@ -153,8 +149,8 @@ class BasicUseCase(BaseBasicUseCase):
             self.__update_to_warehouse(target_model=BasicInfoModel, results=results)
 
         # 단지 면적 정보
-        kapt_area_infos: list[KaptAreaInfoEntity] | None = self._kapt_repo.find_by_date(
-            target_model=KaptAreaInfoModel, target_date=today
+        kapt_area_infos: list[KaptAreaInfoEntity] | None = self._kapt_repo.find_to_update(
+            target_model=KaptAreaInfoModel
         )
         self.__bind_house_id(target_list=kapt_area_infos)
 
@@ -166,8 +162,8 @@ class BasicUseCase(BaseBasicUseCase):
             self.__update_to_warehouse(target_model=BasicInfoModel, results=results)
 
         # 카카오 place 좌표 맵핑
-        kapt_area_infos: list[KaptAreaInfoEntity] | None = self._kapt_repo.find_by_date(
-            target_model=KaptAreaInfoModel, target_date=today
+        kapt_area_infos: list[KaptAreaInfoEntity] | None = self._kapt_repo.find_to_update(
+            target_model=KaptAreaInfoModel
         )
         self.__bind_house_id(target_list=kapt_area_infos)
 
@@ -182,8 +178,8 @@ class BasicUseCase(BaseBasicUseCase):
         # 총괄부 표제 단지 정보
         govt_bld_top_infos: list[
             GovtBldTopInfoEntity
-        ] | None = self._govt_bld_repo.find_by_date(
-            target_model=GovtBldTopInfoModel, target_date=today
+        ] | None = self._govt_bld_repo.find_to_update(
+            target_model=GovtBldTopInfoModel
         )
         results: list[dict] | None = self._transfer.start_etl(
             from_model="govt_bld_top_infos", target_list=govt_bld_top_infos
@@ -194,8 +190,8 @@ class BasicUseCase(BaseBasicUseCase):
         # 총괄부 표제 동 정보
         govt_bld_middle_infos: list[
             GovtBldMiddleInfoEntity
-        ] | None = self._govt_bld_repo.find_by_date(
-            target_model=GovtBldMiddleInfoModel, target_date=today
+        ] | None = self._govt_bld_repo.find_to_update(
+            target_model=GovtBldMiddleInfoModel
         )
 
         results: list[DongInfoModel] | None = self._transfer.start_etl(
@@ -208,8 +204,8 @@ class BasicUseCase(BaseBasicUseCase):
         # 총괄부 표제 타입 정보
         govt_bld_area_infos: list[
             GovtBldAreaInfoEntity
-        ] | None = self._govt_bld_repo.find_by_date(
-            target_model=GovtBldAreaInfoModel, target_date=today
+        ] | None = self._govt_bld_repo.find_to_update(
+            target_model=GovtBldAreaInfoModel
         )
 
         results: list[TypeInfoModel] | None = self._transfer.start_etl(

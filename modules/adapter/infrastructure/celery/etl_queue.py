@@ -52,6 +52,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_SUBS_INFOS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_REAL_ESTATES.value)
     etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PRIVATE_SALES.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_DONG_TYPE_INFOS.value)
 
     # etl_tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
     # etl_tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAKAO_API.value})

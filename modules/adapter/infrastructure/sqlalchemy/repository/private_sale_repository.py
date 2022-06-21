@@ -3,9 +3,11 @@ from sqlalchemy import exc, select, update
 from sqlalchemy.orm import Session
 
 from exceptions.base import NotUniqueErrorException
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import DongInfoModel
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_model import (
     PrivateSaleModel,
 )
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.type_info_model import TypeInfoModel
 from modules.adapter.infrastructure.sqlalchemy.repository import BaseSyncRepository
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
@@ -16,21 +18,21 @@ class SyncPrivateSaleRepository(BaseSyncRepository):
     def __init__(self, session_factory: Callable[..., ContextManager[Session]]):
         super().__init__(session_factory=session_factory)
 
-    def save(self, value: PrivateSaleModel) -> None:
+    def save(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel) -> None:
         with self.session_factory() as session:
             try:
                 session.add(value)
                 session.commit()
             except exc.IntegrityError as e:
                 logger.error(
-                    f"[SyncPrivateSaleRepository][save] target_model PrivateSaleModel error : {e}"
+                    f"[SyncPrivateSaleRepository][save] target_model {type(value)} error : {e}"
                 )
                 session.rollback()
                 raise NotUniqueErrorException
 
-    def update(self, value: PrivateSaleModel) -> None:
-        with self.session_factory() as session:
-            if isinstance(value, PrivateSaleModel):
+    def update(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel) -> None:
+        if isinstance(value, PrivateSaleModel):
+            with self.session_factory() as session:
                 session.execute(
                     update(PrivateSaleModel)
                     .where(PrivateSaleModel.id == value.id)
@@ -61,12 +63,54 @@ class SyncPrivateSaleRepository(BaseSyncRepository):
                     )
                 )
 
-            session.commit()
+                session.commit()
 
-    def exists_by_key(self, value: PrivateSaleModel) -> bool | list:
-        with self.session_factory() as session:
-            query = select(PrivateSaleModel.id).where(PrivateSaleModel.id == value.id)
-            result = session.execute(query).scalars().first()
+        elif isinstance(value, DongInfoModel):
+            with self.session_factory() as session:
+                session.execute(
+                    update(DongInfoModel)
+                    .where(DongInfoModel.id == value.id)
+                    .values(
+                        private_sale_id=value.private_sale_id,
+                        name=value.name,
+                        hhld_cnt=value.hhld_cnt,
+                        grnd_flr_cnt=value.grnd_flr_cnt,
+                        update_needed=value.update_needed,
+                    )
+                )
+
+                session.commit()
+
+        elif isinstance(value, TypeInfoModel):
+            with self.session_factory() as session:
+                session.execute(
+                    update(TypeInfoModel)
+                    .where(TypeInfoModel.id == value.id)
+                    .values(
+                        dong_id=value.dong_id,
+                        private_area=value.private_area,
+                        supply_area=value.supply_area,
+                        update_needed=value.update_needed,
+                    )
+                )
+
+                session.commit()
+
+    def exists_by_key(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel) -> bool:
+        if isinstance(value, PrivateSaleModel):
+            with self.session_factory() as session:
+                query = select(PrivateSaleModel.id).where(PrivateSaleModel.id == value.id)
+                result = session.execute(query).scalars().first()
+
+        elif isinstance(value, DongInfoModel):
+            with self.session_factory() as session:
+                query = select(DongInfoModel.id).where(DongInfoModel.id == value.id)
+                result = session.execute(query).scalars().first()
+
+        elif isinstance(value, TypeInfoModel):
+            with self.session_factory() as session:
+                query = select(TypeInfoModel.id).where(TypeInfoModel.id == value.id)
+                result = session.execute(query).scalars().first()
 
         if result:
             return True

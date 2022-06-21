@@ -210,18 +210,16 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository, BaseSyncReposit
 
         return False
 
-    def find_by_date(
+    def find_to_update(
         self,
         target_model: Type[SubscriptionInfoModel | SubscriptionManualInfoModel],
-        target_date: date,
     ) -> list[SubscriptionInfoEntity | SubscriptionManualInfoEntity] | None:
         result_list = None
 
         if target_model == SubscriptionInfoModel:
             with self.session_factory() as session:
                 query = select(SubscriptionInfoModel).where(
-                    func.date(SubscriptionInfoModel.updated_at) == target_date
-                    or func.date(SubscriptionInfoModel.updated_at) == target_date
+                    SubscriptionInfoModel.update_needed == True
                 )
                 results = session.execute(query).scalars().all()
             if results:
@@ -230,8 +228,7 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository, BaseSyncReposit
         elif target_model == SubscriptionManualInfoModel:
             with self.session_factory() as session:
                 query = select(SubscriptionManualInfoModel).where(
-                    func.date(SubscriptionManualInfoModel.created_at) == target_date
-                    or func.date(SubscriptionManualInfoModel.updated_at) == target_date
+                    SubscriptionManualInfoModel.update_needed == True
                 )
                 results = session.execute(query).scalars().all()
             if results:

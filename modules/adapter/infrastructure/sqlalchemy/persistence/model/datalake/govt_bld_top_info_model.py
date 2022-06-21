@@ -97,4 +97,5 @@ class GovtBldTopInfoModel(datalake_base, TimestampMixin):
             ji=self.ji,
             bc_rat=self.bc_rat,
             vl_rat=self.vl_rat,
+            update_needed=self.update_needed
         )

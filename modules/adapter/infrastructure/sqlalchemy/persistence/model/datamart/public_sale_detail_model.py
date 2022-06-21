@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer, Numeric, ForeignKey, Text
+from sqlalchemy import Column, String, BigInteger, Integer, Numeric, ForeignKey, Text, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datamart_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_model import (
@@ -38,3 +38,4 @@ class PublicSaleDetailModel(datamart_base, TimestampMixin):
     direct_window = Column(String(1), nullable=True)
     alpha_room = Column(String(1), nullable=True)
     cyber_model_house_link = Column(Text, nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
