@@ -16,9 +16,9 @@ class Config(BaseSettings):
     RELOAD: bool = False
 
     # Sqlalchemy
-    DATA_WAREHOUSE_URL: str = "sqlite+aiosqlite:///:memory:"
-    DATA_LAKE_URL: str = "sqlite+aiosqlite:///:memory:"
-    DATA_MART_URL: str = "sqlite+aiosqlite:///:memory:"
+    DATA_WAREHOUSE_URL: str = "sqlite:///:memory:"
+    DATA_LAKE_URL: str = "sqlite:///:memory:"
+    DATA_MART_URL: str = "sqlite:///:memory:"
     DB_ECHO: bool = True
     DB_PRE_PING: bool = True
 
@@ -65,11 +65,9 @@ class TestConfig(Config):
 
 class DevelopmentConfig(Config):
     ENV: str = "development"
-    DATA_LAKE_URL: str = os.getenv("DEV_DATA_LAKE_URL", "sqlite+aiosqlite:///:memory:")
-    DATA_WAREHOUSE_URL: str = os.getenv(
-        "DEV_DATA_WAREHOUSE_URL", "sqlite+aiosqlite:///:memory:"
-    )
-    DATA_MART_URL: str = os.getenv("DEV_DATA_MART_URL", "sqlite+aiosqlite:///:memory:")
+    DATA_LAKE_URL: str = os.getenv("DEV_DATA_LAKE_URL", "sqlite:///:memory:")
+    DATA_WAREHOUSE_URL: str = os.getenv("DEV_DATA_WAREHOUSE_URL", "sqlite:///:memory:")
+    DATA_MART_URL: str = os.getenv("DEV_DATA_MART_URL", "sqlite:///:memory:")
 
     RELOAD: bool = True
     SENTRY_ENVIRONMENT: str = "development"

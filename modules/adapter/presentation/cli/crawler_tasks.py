@@ -1,10 +1,7 @@
-from uuid import uuid4
-
 from billiard.context import Process
 
 from modules.adapter.infrastructure.celery.crawler_queue import crawler_celery
-from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
-from modules.adapter.infrastructure.sqlalchemy.database import db
+from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )
@@ -33,31 +30,20 @@ def get_task(topic: str):
     if topic == TopicEnum.CRAWL_KAPT.value:
         return KaptOpenApiUseCase(
             topic=topic,
-            repo=SyncKaptRepository(session_factory=db.session),
+            repo=SyncKaptRepository(),
         )
     elif topic == TopicEnum.CRAWL_KAKAO_API.value:
-        return KakaoApiUseCase(
-            topic=topic, repo=SyncKaptRepository(session_factory=db.session)
-        )
+        return KakaoApiUseCase(topic=topic, repo=SyncKaptRepository())
     elif topic == TopicEnum.CRAWL_LEGAL_DONG_CODE.value:
-        return LegalCodeUseCase(
-            topic=topic, repo=SyncLegalDongCodeRepository(session_factory=db.session)
-        )
+        return LegalCodeUseCase(topic=topic, repo=SyncLegalDongCodeRepository())
     elif topic == TopicEnum.CRAWL_BUILDING_MANAGE.value:
-        return GovtBldUseCase(
-            topic=topic, repo=SyncKaptRepository(session_factory=db.session)
-        )
+        return GovtBldUseCase(topic=topic, repo=SyncKaptRepository())
     elif topic == TopicEnum.CRAWL_GOVT_DEAL_INFOS.value:
-        return GovtDealUseCase(
-            topic=topic, repo=SyncLegalDongCodeRepository(session_factory=db.session)
-        )
+        return GovtDealUseCase(topic=topic, repo=SyncLegalDongCodeRepository())
 
 
 @crawler_celery.task
 def start_crawler(topic):
-    session_id = str(uuid4())
-    context = SessionContextManager.set_context_value(session_id)
-
     uc = get_task(topic=topic)
     uc.execute()
 
@@ -65,4 +51,4 @@ def start_crawler(topic):
     process.start()
     process.join()
 
-    SessionContextManager.reset_context(context=context)
+    session.remove()

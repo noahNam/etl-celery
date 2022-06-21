@@ -4,8 +4,6 @@ from scrapy.crawler import CrawlerProcess, Crawler
 from scrapy.settings import Settings
 from scrapy.utils.project import get_project_settings
 
-from modules.adapter.infrastructure.sqlalchemy.repository import BaseSyncRepository
-
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
@@ -15,11 +13,11 @@ class BaseSyncUseCase:
     def __init__(
         self,
         topic: str,
-        repo: BaseSyncRepository,
+        repo,
         scrapy_settings: Settings | None = None,
     ):
         self._topic: str = topic
-        self._repo: BaseSyncRepository = repo
+        self._repo = repo
         self._scrapy_settings: Settings = (
             scrapy_settings if scrapy_settings else get_project_settings()
         )

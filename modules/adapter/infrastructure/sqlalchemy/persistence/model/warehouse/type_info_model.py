@@ -1,6 +1,8 @@
 from sqlalchemy import Column, BigInteger, Integer, ForeignKey, Numeric, Boolean
 
-from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import TypeInfoEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
+    TypeInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,

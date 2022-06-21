@@ -13,7 +13,6 @@ from modules.adapter.infrastructure.crawler.crawler.items import (
     GovtOfctlRentInfoItem,
     GovtRightLotOutInfoItem,
 )
-from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_deal_model import (
     GovtAptDealModel,
 )
@@ -63,7 +62,7 @@ from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_reposi
 
 class KaptPipeline:
     def __init__(self):
-        self._repo: SyncKaptRepository = SyncKaptRepository(session_factory=db.session)
+        self._repo: SyncKaptRepository = SyncKaptRepository()
 
     def process_item(
         self, item: KaptAreaInfoItem | KaptLocationInfoItem, spider: Spider
@@ -83,9 +82,7 @@ class KaptPipeline:
 
 class LegalCodePipeline:
     def __init__(self):
-        self._repo: SyncLegalDongCodeRepository = SyncLegalDongCodeRepository(
-            session_factory=db.session
-        )
+        self._repo: SyncLegalDongCodeRepository = SyncLegalDongCodeRepository()
 
     def process_item(self, item: LegalDongCodeItem, spider: Spider):
         """spider parameter: 사용하지 않지만 남겨두어야 제대로 작동합니다."""
@@ -99,9 +96,7 @@ class LegalCodePipeline:
 
 class GovtBldPipeline:
     def __init__(self):
-        self._repo: SyncGovtBldRepository = SyncGovtBldRepository(
-            session_factory=db.session
-        )
+        self._repo: SyncGovtBldRepository = SyncGovtBldRepository()
 
     def process_item(
         self,
@@ -126,9 +121,7 @@ class GovtBldPipeline:
 
 class GovtHouseDealPipeline:
     def __init__(self):
-        self._repo: SyncGovtHouseDealRepository = SyncGovtHouseDealRepository(
-            session_factory=db.session
-        )
+        self._repo: SyncGovtHouseDealRepository = SyncGovtHouseDealRepository()
 
     def process_item(
         self,
