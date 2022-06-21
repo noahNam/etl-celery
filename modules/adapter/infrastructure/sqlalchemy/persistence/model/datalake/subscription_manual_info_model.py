@@ -52,7 +52,7 @@ class SubscriptionManualInfoModel(datalake_base, TimestampMixin):
     cyber_model_house_link = Column(Text, nullable=True)
     supply_rate = Column(SmallInteger, nullable=True)
     supply_rate_etc = Column(SmallInteger, nullable=True)
-    update_needed = Column(Boolean, nullable=False, default=False)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     def to_subs_manual_info_entity(self) -> SubscriptionManualInfoEntity:
         return SubscriptionManualInfoEntity(

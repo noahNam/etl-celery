@@ -43,4 +43,4 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
     cancel_deal_day = Column(String(8), nullable=True)
     req_gbn = Column(String(10), nullable=True)
     rdealer_lawdnm = Column(String(150), nullable=True)
-    update_needed = Column(Boolean, nullable=False, default=False)
+    update_needed = Column(Boolean, nullable=False, default=True)
