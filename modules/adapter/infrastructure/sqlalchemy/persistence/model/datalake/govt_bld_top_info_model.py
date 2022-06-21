@@ -1,5 +1,8 @@
-from sqlalchemy import Column, String, BigInteger, Integer, Numeric
+from sqlalchemy import Column, String, BigInteger, Integer, Numeric, Boolean
 
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
+    GovtBldTopInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
@@ -83,4 +86,16 @@ class GovtBldTopInfoModel(datalake_base, TimestampMixin):
     lot = Column(String(20), nullable=True)
     bylot_cnt = Column(Numeric(5), nullable=True)
     na_road_cd = Column(String(12), nullable=True)
-    dong_nm = Column(String(100), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_govt_bld_top_info_entity(self) -> GovtBldTopInfoEntity:
+        return GovtBldTopInfoEntity(
+            house_id=self.house_id,
+            bjdong_cd=self.bjdong_cd,
+            sigungu_cd=self.sigungu_cd,
+            bun=self.bun,
+            ji=self.ji,
+            bc_rat=self.bc_rat,
+            vl_rat=self.vl_rat,
+            update_needed=self.update_needed
+        )

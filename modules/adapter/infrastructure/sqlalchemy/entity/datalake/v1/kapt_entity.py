@@ -60,6 +60,7 @@ class KaptBasicInfoEntity(BaseModel):
     manage_office_contact: str | None
     manage_office_fax: str | None
     welfare: str | None
+    update_needed: bool
     created_at: datetime
     updated_at: datetime
 
@@ -72,6 +73,7 @@ class KaptOpenApiInputEntity(BaseModel):
 
 class KaptAreaInfoEntity(BaseModel):
     kapt_code: str
+    house_id: int | None  # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언(kapt_code는 추후 다른 크롤링 방법으로 메타데이터를 끌어올때 없을 수 있음)(kapt_code는 추후 다른 크롤링 방법으로 메타데이터를 끌어올때 없을 수 있음)
     name: str | None
     kapt_tarea: str | None
     kapt_marea: str | None
@@ -81,12 +83,14 @@ class KaptAreaInfoEntity(BaseModel):
     kapt_mparea_136: str | None
     priv_area: str | None
     bjd_code: str | None
+    update_needed: bool
     created_at: datetime
     updated_at: datetime
 
 
 class KaptLocationInfoEntity(BaseModel):
     kapt_code: str
+    house_id: int | None  # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언(kapt_code는 추후 다른 크롤링 방법으로 메타데이터를 끌어올때 없을 수 있음)(kapt_code는 추후 다른 크롤링 방법으로 메타데이터를 끌어올때 없을 수 있음)
     name: str | None
     kaptd_wtimebus: str | None
     subway_line: str | None
@@ -94,6 +98,7 @@ class KaptLocationInfoEntity(BaseModel):
     kaptd_wtimesub: str | None
     convenient_facility: str | None
     education_facility: str | None
+    update_needed: bool
     created_at: datetime
     updated_at: datetime
 
@@ -108,10 +113,19 @@ class KakaoApiInputEntity(BaseModel):
     new_road_address: str | None
 
 
+class GovtBldInputEntity(BaseModel):
+    house_id: int
+    kapt_code: str | None
+    name: str | None
+    origin_dong_address: str | None
+    new_dong_address: str | None
+    bjd_code: str | None
+
+
 class KaptMgmtCostEntity(BaseModel):
     id: int
     kapt_code: str
-    house_id: int | None  # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언
+    house_id: int | None  # schema model 에는 없지만 ETL시 관계 참조용 변수로 선언(kapt_code는 추후 다른 크롤링 방법으로 메타데이터를 끌어올때 없을 수 있음)
     name: str | None
     payment_date: str | None
     common_manage_cost: int | None
@@ -153,6 +167,7 @@ class KaptMgmtCostEntity(BaseModel):
     public_part_total_amount: int | None
     public_part_save_rate: int | None
     etc_income_amount: int | None
+    update_needed: bool
     created_at: datetime
     updated_at: datetime
 

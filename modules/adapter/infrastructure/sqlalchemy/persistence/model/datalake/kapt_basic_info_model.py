@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Numeric
+from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Boolean
 from sqlalchemy.orm import relationship
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
@@ -31,7 +31,7 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     new_dong_address = Column(String(100), nullable=True)
     new_road_address = Column(String(100), nullable=True)
     place_id = Column(
-        BigInteger().with_variant(Integer, "sqlite"), index=True, nullable=False
+        BigInteger().with_variant(Integer, "sqlite"), index=True, nullable=True
     )
     right_lot_out_type = Column(String(16), nullable=True)
     use_apr_day = Column(String(8), nullable=True)
@@ -76,6 +76,7 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
     manage_office_contact = Column(String(16), nullable=True)
     manage_office_fax = Column(String(16), nullable=True)
     welfare = Column(String(200), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
 
     # relationship
     kapt_mgmt_costs = relationship(
@@ -159,6 +160,7 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
             manage_office_contact=self.manage_office_contact,
             manage_office_fax=self.manage_office_fax,
             welfare=self.welfare,
+            update_needed=self.update_needed,
             created_at=self.created_at,
             updated_at=self.updated_at,
         )

@@ -71,3 +71,4 @@ class PublicSaleModel(datamart_base, TimestampMixin):
     hallway_type = Column(String(4), nullable=True)
     is_checked = Column(Boolean, nullable=False, default=False)
     is_available = Column(Boolean, nullable=False, default=False)
+    update_needed = Column(Boolean, nullable=False, default=True)

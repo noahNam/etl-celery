@@ -51,3 +51,4 @@ class PrivateSaleModel(datamart_base, TimestampMixin):
     trade_status = Column(Numeric(1), nullable=True, default=0)
     deposit_status = Column(Numeric(1), nullable=True, default=0)
     is_available = Column(Boolean, nullable=False)
+    update_needed = Column(Boolean, nullable=False, default=True)

@@ -3,7 +3,7 @@ from scrapy.crawler import Crawler
 from modules.adapter.infrastructure.crawler.crawler.spiders.legal_code_spider import (
     LegalCodeSpider,
 )
-from modules.adapter.infrastructure.sqlalchemy.entity.v1.legal_dong_code_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
 )
 from modules.application.use_case import BaseSyncUseCase

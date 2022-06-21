@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer, Numeric, ForeignKey
+from sqlalchemy import Column, String, BigInteger, Integer, Numeric, ForeignKey, Boolean
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datamart_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_detail_model import (
@@ -27,3 +27,4 @@ class SpecialSupplyResultModel(datamart_base, TimestampMixin):
     newlywed_vol = Column(Numeric(5), nullable=True)
     old_parent_vol = Column(Numeric(5), nullable=True)
     first_life_vol = Column(Numeric(5), nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)

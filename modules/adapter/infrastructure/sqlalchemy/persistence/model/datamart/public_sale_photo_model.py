@@ -35,3 +35,4 @@ class PublicSalePhotoModel(datamart_base, TimestampMixin):
     is_thumbnail = Column(Boolean, nullable=True)
     seq = Column(SmallInteger, nullable=True)
     is_available = Column(Boolean, nullable=True)
+    update_needed = Column(Boolean, nullable=False, default=True)
