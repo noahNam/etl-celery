@@ -17,14 +17,6 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncLegalDongCodeRepository(LegalDongCodeRepository):
-    def find_all(self) -> list[LegalDongCodeEntity] | None:
-        queryset = session.execute(select(LegalDongCodeModel)).scalars().all()
-
-        if not queryset:
-            return list()
-        else:
-            return [query.to_entity() for query in queryset]
-
     def find_by_id(self, legal_dong_code_id: int) -> LegalDongCodeEntity | None:
         legal_code_info = session.get(LegalDongCodeModel, legal_dong_code_id)
 

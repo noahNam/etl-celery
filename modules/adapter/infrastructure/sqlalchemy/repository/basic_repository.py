@@ -2,7 +2,6 @@ from typing import Type, Any
 
 from sqlalchemy import update, exc, desc
 from sqlalchemy.future import select
-from sqlalchemy.orm import Session
 
 from core.domain.warehouse.basic.interface.basic_repository import BasicRepository
 from exceptions.base import NotUniqueErrorException
@@ -291,42 +290,40 @@ class SyncBasicRepository(BasicRepository):
             ]
 
     def find_supply_areas_by_house_ids(self, house_ids: list[int]) -> list[SupplyAreaEntity] | None:
-        with self.session_factory() as session:
-            query = select(
-                DongInfoModel
-            ).join(
-                TypeInfoModel,
-                TypeInfoModel.dong_id == DongInfoModel.id
-            ).where(
-                DongInfoModel.house_id.in_(house_ids)
-            )
+        query = select(
+            DongInfoModel
+        ).join(
+            TypeInfoModel,
+            TypeInfoModel.dong_id == DongInfoModel.id
+        ).where(
+            DongInfoModel.house_id.in_(house_ids)
+        )
 
-            supply_areas = session.execute(query).scalars().all()
+        supply_areas = session.execute(query).scalars().all()
 
-            if not supply_areas:
-                return None
+        if not supply_areas:
+            return None
 
-            return [
-                supply_area.to_supply_area_entity for supply_area in supply_areas
-            ]
+        return [
+            supply_area.to_supply_area_entity for supply_area in supply_areas
+        ]
 
     def find_supply_areas_by_update_needed(self) -> list[SupplyAreaEntity] | None:
-        with self.session_factory() as session:
-            query = select(
-                DongInfoModel
-            ).join(
-                TypeInfoModel,
-                TypeInfoModel.dong_id == DongInfoModel.id
-            ).where(
-                TypeInfoModel.update_needed == True
-            )
+        query = select(
+            DongInfoModel
+        ).join(
+            TypeInfoModel,
+            TypeInfoModel.dong_id == DongInfoModel.id
+        ).where(
+            TypeInfoModel.update_needed == True
+        )
 
-            supply_areas = session.execute(query).scalars().all()
+        supply_areas = session.execute(query).scalars().all()
 
-            if not supply_areas:
-                return None
+        if not supply_areas:
+            return None
 
-            return [
-                supply_area.to_supply_area_entity for supply_area in supply_areas
-            ]
+        return [
+            supply_area.to_supply_area_entity for supply_area in supply_areas
+        ]
 

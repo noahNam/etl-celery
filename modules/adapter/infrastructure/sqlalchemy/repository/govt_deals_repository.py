@@ -3,16 +3,14 @@ from typing import Callable, ContextManager
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
+from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.utils.log_helper import logger_
-
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_deal_model import (
     GovtAptDealModel,
 )
-
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_rent_model import (
     GovtAptRentModel
 )
-
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_ofctl_deal_model import (
     GovtOfctlDealModel
 )
@@ -27,7 +25,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_r
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_mapping_result_model import (
     BldMappingResultModel
 )
-
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     GovtAptDealsEntity,
     GovtAptRentsEntity,
@@ -40,16 +37,13 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entit
     GovtOfctlRentJoinKeyEntity,
     GovtRightLotOutJoinKeyEntity
 )
-
-from modules.adapter.infrastructure.sqlalchemy.repository import BaseSyncRepository
 from core.domain.datalake.govt_deal.interface.govt_deal_repository import GovtDealsRepository
-
 from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTypeEnum
 
 logger = logger_.getLogger(__name__)
 
 
-class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
+class SyncGovtDealsRepository(GovtDealsRepository):
     def __init__(self, session_factory: Callable[..., ContextManager[Session]]):
         super().__init__(session_factory=session_factory)
 
@@ -66,13 +60,12 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                                             | list[GovtRightLotOutJoinKeyEntity]\
                                             | None:
         if find_type == GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value:
-            with self.session_factory() as session:
-                query = select(
-                    GovtAptDealModel
-                ).where(
-                    GovtAptDealModel.update_needed == True
-                )
-                govt_apt_deals = session.execute(query).scalars().all()
+            query = select(
+                GovtAptDealModel
+            ).where(
+                GovtAptDealModel.update_needed == True
+            )
+            govt_apt_deals = session.execute(query).scalars().all()
 
             if not govt_apt_deals:
                 return None
@@ -81,13 +74,12 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 return return_ls
 
         elif find_type == GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value:
-            with self.session_factory() as session:
-                query = select(
-                    GovtAptRentModel
-                ).where(
-                   GovtAptRentModel.update_needed == True
-                )
-                govt_apt_rents = session.execute(query).scalars().all()
+            query = select(
+                GovtAptRentModel
+            ).where(
+               GovtAptRentModel.update_needed == True
+            )
+            govt_apt_rents = session.execute(query).scalars().all()
 
             if not govt_apt_rents:
                 return None
@@ -96,13 +88,12 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 return return_ls
 
         elif find_type == GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value:
-            with self.session_factory() as session:
-                query = select(
-                    GovtOfctlDealModel
-                ).where(
-                    GovtOfctlDealModel.update_needed == True
-                )
-                govt_ofctl_deals = session.execute(query).scalars().all()
+            query = select(
+                GovtOfctlDealModel
+            ).where(
+                GovtOfctlDealModel.update_needed == True
+            )
+            govt_ofctl_deals = session.execute(query).scalars().all()
             if not govt_ofctl_deals:
                 return None
             else:
@@ -111,13 +102,12 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 return return_ls
 
         elif find_type == GovtFindTypeEnum.GOV_OFCTL_RENT_MAPPING.value:
-            with self.session_factory() as session:
-                query = select(
-                    GovtOfctlRentModel
-                ).where(
-                    GovtOfctlRentModel.update_needed == True
-                )
-                govt_ofctl_rents = session.execute(query).scalars().all()
+            query = select(
+                GovtOfctlRentModel
+            ).where(
+                GovtOfctlRentModel.update_needed == True
+            )
+            govt_ofctl_rents = session.execute(query).scalars().all()
             if not govt_ofctl_rents:
                 return None
             else:
@@ -126,13 +116,12 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 return return_ls
 
         elif find_type == GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value:
-            with self.session_factory() as session:
-                query = select(
-                    GovtRightLotOutModel
-                ).where(
-                    GovtRightLotOutModel.update_needed == True
-                )
-                govt_right_lot_outs = session.execute(query).scalars().all()
+            query = select(
+                GovtRightLotOutModel
+            ).where(
+                GovtRightLotOutModel.update_needed == True
+            )
+            govt_right_lot_outs = session.execute(query).scalars().all()
             if not govt_right_lot_outs:
                 return None
             else:
@@ -141,20 +130,19 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 return return_ls
 
         elif find_type == GovtFindTypeEnum.APT_DEALS_INPUT.value:
-            with self.session_factory() as session:
-                query = select(
-                    GovtAptDealModel
-                ).join(BldMappingResultModel,
-                    and_(
-                        BldMappingResultModel.regional_cd == GovtAptDealModel.regional_cd,
-                        BldMappingResultModel.jibun == GovtAptDealModel.jibun,
-                        BldMappingResultModel.dong == GovtAptDealModel.dong,
-                        BldMappingResultModel.bld_name == GovtAptDealModel.apt_name
-                    )
-                ).where(
-                    GovtAptDealModel.update_needed == True
+            query = select(
+                GovtAptDealModel
+            ).join(BldMappingResultModel,
+                and_(
+                    BldMappingResultModel.regional_cd == GovtAptDealModel.regional_cd,
+                    BldMappingResultModel.jibun == GovtAptDealModel.jibun,
+                    BldMappingResultModel.dong == GovtAptDealModel.dong,
+                    BldMappingResultModel.bld_name == GovtAptDealModel.apt_name
                 )
-                govt_apt_deals = session.execute(query).scalars().all()
+            ).where(
+                GovtAptDealModel.update_needed == True
+            )
+            govt_apt_deals = session.execute(query).scalars().all()
 
             if not govt_apt_deals:
                 return None
@@ -163,20 +151,19 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 return return_ls
 
         elif find_type == GovtFindTypeEnum.APT_RENTS_INPUT.value:
-            with self.session_factory() as session:
-                query = select(
-                    GovtAptRentModel
-                ).join(BldMappingResultModel,
-                    and_(
-                        BldMappingResultModel.regional_cd == GovtAptRentModel.regional_cd,
-                        BldMappingResultModel.jibun == GovtAptRentModel.jibun,
-                        BldMappingResultModel.dong == GovtAptRentModel.dong,
-                        BldMappingResultModel.bld_name == GovtAptRentModel.apt_name
-                    )
-                ).where(
-                     GovtAptRentModel.update_needed == True
+            query = select(
+                GovtAptRentModel
+            ).join(BldMappingResultModel,
+                and_(
+                    BldMappingResultModel.regional_cd == GovtAptRentModel.regional_cd,
+                    BldMappingResultModel.jibun == GovtAptRentModel.jibun,
+                    BldMappingResultModel.dong == GovtAptRentModel.dong,
+                    BldMappingResultModel.bld_name == GovtAptRentModel.apt_name
                 )
-                govt_apt_rents = session.execute(query).scalars().all()
+            ).where(
+                 GovtAptRentModel.update_needed == True
+            )
+            govt_apt_rents = session.execute(query).scalars().all()
 
             if not govt_apt_rents:
                 return None
@@ -185,21 +172,20 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 return return_ls
 
         elif find_type == GovtFindTypeEnum.OFCTL_DEAL_INPUT.value:
-            with self.session_factory() as session:
-                query = select(
-                    GovtOfctlDealModel
-                ).join(
-                    BldMappingResultModel,
-                    and_(
-                        BldMappingResultModel.regional_cd == GovtOfctlDealModel.regional_cd,
-                        BldMappingResultModel.jibun == GovtOfctlDealModel.jibun,
-                        BldMappingResultModel.dong == GovtOfctlDealModel.dong,
-                        BldMappingResultModel.bld_name == GovtOfctlDealModel.ofctl_name
-                    )
-                ).where(
-                    GovtOfctlDealModel.update_needed == True
+            query = select(
+                GovtOfctlDealModel
+            ).join(
+                BldMappingResultModel,
+                and_(
+                    BldMappingResultModel.regional_cd == GovtOfctlDealModel.regional_cd,
+                    BldMappingResultModel.jibun == GovtOfctlDealModel.jibun,
+                    BldMappingResultModel.dong == GovtOfctlDealModel.dong,
+                    BldMappingResultModel.bld_name == GovtOfctlDealModel.ofctl_name
                 )
-                govt_ofctl_deals = session.execute(query).scalars().all()
+            ).where(
+                GovtOfctlDealModel.update_needed == True
+            )
+            govt_ofctl_deals = session.execute(query).scalars().all()
 
             if not govt_ofctl_deals:
                 return None
@@ -208,20 +194,20 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 return return_ls
 
         elif find_type == GovtFindTypeEnum.OFCTL_RENT_INPUT.value:
-            with self.session_factory() as session:
-                query = select(
-                    GovtOfctlRentModel
-                ).join(BldMappingResultModel,
-                    and_(
-                        BldMappingResultModel.regional_cd == GovtOfctlRentModel.regional_cd,
-                        BldMappingResultModel.jibun == GovtOfctlRentModel.jibun,
-                        BldMappingResultModel.dong == GovtOfctlRentModel.dong,
-                        BldMappingResultModel.bld_name == GovtOfctlRentModel.ofctl_name
-                    )
-                ).where(
-                    GovtOfctlRentModel.update_needed == True
+            query = select(
+                GovtOfctlRentModel
+            ).join(BldMappingResultModel,
+                and_(
+                    BldMappingResultModel.regional_cd == GovtOfctlRentModel.regional_cd,
+                    BldMappingResultModel.jibun == GovtOfctlRentModel.jibun,
+                    BldMappingResultModel.dong == GovtOfctlRentModel.dong,
+                    BldMappingResultModel.bld_name == GovtOfctlRentModel.ofctl_name
                 )
-                govt_ofctl_rents = session.execute(query).scalars().all()
+            ).where(
+                GovtOfctlRentModel.update_needed == True
+            )
+            govt_ofctl_rents = session.execute(query).scalars().all()
+
             if not govt_ofctl_rents:
                 return None
             else:
@@ -229,21 +215,21 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                 return return_ls
 
         elif find_type == GovtFindTypeEnum.RIGHT_LOT_OUT_INPUT.value:
-            with self.session_factory() as session:
-                query = select(
-                    GovtRightLotOutModel
-                ).join(
-                    BldMappingResultModel,
-                    and_(
-                        BldMappingResultModel.regional_cd == GovtRightLotOutModel.regional_cd,
-                        BldMappingResultModel.jibun == GovtRightLotOutModel.jibun,
-                        BldMappingResultModel.dong == GovtRightLotOutModel.dong,
-                        BldMappingResultModel.bld_name == GovtRightLotOutModel.name
-                    )
-                ).where(
-                    GovtRightLotOutModel.update_needed == True
+            query = select(
+                GovtRightLotOutModel
+            ).join(
+                BldMappingResultModel,
+                and_(
+                    BldMappingResultModel.regional_cd == GovtRightLotOutModel.regional_cd,
+                    BldMappingResultModel.jibun == GovtRightLotOutModel.jibun,
+                    BldMappingResultModel.dong == GovtRightLotOutModel.dong,
+                    BldMappingResultModel.bld_name == GovtRightLotOutModel.name
                 )
-                govt_right_lot_outs = session.execute(query).scalars().all()
+            ).where(
+                GovtRightLotOutModel.update_needed == True
+            )
+            govt_right_lot_outs = session.execute(query).scalars().all()
+
             if not govt_right_lot_outs:
                 return None
             else:
@@ -260,15 +246,14 @@ class SyncGovtDealsRepository(BaseSyncRepository, GovtDealsRepository):
                                               | GovtOfctlRentModel
                                               | GovtRightLotOutModel],
                                   ) -> None:
-        with self.session_factory() as session:
-            try:
-                session.execute(
-                    update(model)
-                        .where(model.id.in_(ids))
-                        .values(
-                            update_needed=False
-                        )
-                )
-                session.commit()
-            except:
-                session.rollback()
+        try:
+            session.execute(
+                update(model)
+                    .where(model.id.in_(ids))
+                    .values(
+                        update_needed=False
+                    )
+            )
+            session.commit()
+        except:
+            session.rollback()
