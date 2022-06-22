@@ -38,6 +38,9 @@ class OfctlDealUseCase(BaseETLUseCase):
         govt_ofctl_deals: list[GovtOfctlDealJoinKeyEntity] = self._govt_deal_repo.find_by_update_needed(
             find_type=GovtFindTypeEnum.OFCTL_DEAL_INPUT.value
         )
+        if not govt_ofctl_deals:
+            print('govt_apt_deals 업데이트 필요한 데이터 없음')
+            return
 
         house_ids = list()
         for govt_apt_rent in govt_ofctl_deals:

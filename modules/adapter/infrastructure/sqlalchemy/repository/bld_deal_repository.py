@@ -39,11 +39,11 @@ class SyncBldDealRepository(BldDealsRepository):
     def save_all(self,
                  insert_models: list[AptDealModel | AptRentModel | OfctlDealModel | OfctlRentModel | RightLotOutModel],
                  ids: list[int],
-                 update_model: GovtAptDealModel
-                               | GovtAptRentModel
-                               | GovtOfctlDealModel
-                               | GovtOfctlRentModel
-                               | GovtRightLotOutModel
+                 update_model: type[GovtAptDealModel
+                                    | GovtAptRentModel
+                                    | GovtOfctlDealModel
+                                    | GovtOfctlRentModel
+                                    | GovtRightLotOutModel]
                  ) -> None:
         if not insert_models:
             return None
@@ -69,43 +69,43 @@ class SyncBldDealRepository(BldDealsRepository):
         try:
             for supply_area in supply_areas:
                 query = update(AptDealModel
-                               ).where(
-                    AptDealModel.house_id == supply_area.house_id
-                ).values(
-                    supply_area=supply_area.supply_area,
-                )
+                        ).where(
+                            AptDealModel.house_id == supply_area.house_id
+                        ).values(
+                            supply_area=supply_area.supply_area,
+                        )
                 session.execute(query)
 
                 query = update(AptRentModel
-                               ).where(
-                    AptRentModel.house_id == supply_area.house_id
-                ).values(
-                    supply_area=supply_area.supply_area,
-                )
+                        ).where(
+                            AptRentModel.house_id == supply_area.house_id
+                        ).values(
+                            supply_area=supply_area.supply_area,
+                        )
                 session.execute(query)
 
                 query = update(OfctlDealModel
-                               ).where(
-                    OfctlDealModel.house_id == supply_area.house_id
-                ).values(
-                    supply_area=supply_area.supply_area,
-                )
+                        ).where(
+                            OfctlDealModel.house_id == supply_area.house_id
+                        ).values(
+                            supply_area=supply_area.supply_area,
+                        )
                 session.execute(query)
 
                 query = update(OfctlRentModel
-                               ).where(
-                    OfctlRentModel.house_id == supply_area.house_id
-                ).values(
-                    supply_area=supply_area.supply_area,
-                )
+                        ).where(
+                            OfctlRentModel.house_id == supply_area.house_id
+                        ).values(
+                            supply_area=supply_area.supply_area,
+                        )
                 session.execute(query)
 
                 query = update(RightLotOutModel
-                               ).where(
-                    RightLotOutModel.house_id == supply_area.house_id
-                ).values(
-                    supply_area=supply_area.supply_area,
-                )
+                        ).where(
+                            RightLotOutModel.house_id == supply_area.house_id
+                        ).values(
+                            supply_area=supply_area.supply_area,
+                        )
                 session.execute(query)
 
             session.commit()
