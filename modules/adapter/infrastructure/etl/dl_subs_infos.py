@@ -120,6 +120,7 @@ class TransformSubsInfo:
                     avg_win_point=target_entity.avg_win_point,
                     avg_win_point_gyeonggi=target_entity.avg_win_point_gyeonggi,
                     avg_win_point_etc=target_entity.avg_win_point_etc,
+                    update_needed=True,
                 )
             )
         return result
@@ -154,6 +155,7 @@ class TransformSubsInfo:
                     cyber_model_house_link=target_entity.cyber_house_link,
                     supply_rate=target_entity.cyber_house_link,
                     supply_rate_etc=target_entity.cyber_house_link,
+                    update_needed=True
                 )
             )
         return result

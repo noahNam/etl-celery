@@ -115,11 +115,17 @@ class TransformPrivateSale:
                 if manage_cost_results
                 else None
             )
+
+            # test_code
+            is_available = True
+            if basic_info.house_id == 19000:
+                is_available = "AAAAA"
+
             result.append(
                 PrivateSaleModel(
                     id=basic_info.house_id,
                     real_estate_id=basic_info.place_id,
-                    name=basic_info.bld_name,
+                    name=basic_info.name,
                     building_type=basic_info.code_apt_nm,
                     build_year=basic_info.use_apr_day,
                     move_in_date=basic_info.use_apr_day,
@@ -144,7 +150,8 @@ class TransformPrivateSale:
                     avg_mgmt_cost=manage_cost_result[2] if manage_cost_result else None,
                     public_ref_id=basic_info.public_ref_id,
                     rebuild_ref_id=basic_info.rebuild_ref_id,
-                    is_available=basic_info.is_available,
+                    is_available=is_available,
+                    # is_available=basic_info.is_available,
                     update_needed=basic_info.update_needed,
                 )
             )

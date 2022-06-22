@@ -123,6 +123,8 @@ class PrivateSaleDetailUseCase(BasePrivateSaleDetailUseCase):
                 # update
                 self._private_sale_repo.update(value=result)
 
+            # self._bld_deal_repo.change_update_needed_status(value=result)
+
         if last_seq:
             self._kapt_repo.update_id_to_code_rules(key_div=CodeRuleKeyEnum.PRIVATE_SALE_DETAIL_ID.value, last_id=last_seq)
 

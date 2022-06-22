@@ -1,6 +1,5 @@
-from sqlalchemy import exc, select, update
+from sqlalchemy import select, update
 
-from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import DongInfoModel
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_detail_model import \
@@ -17,16 +16,8 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncPrivateSaleRepository:
-    def save(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel) -> None:
-        try:
-            session.add(value)
-            session.commit()
-        except exc.IntegrityError as e:
-            logger.error(
-                f"[SyncPrivateSaleRepository][save] target_model {type(value)} error : {e}"
-            )
-            session.rollback()
-            raise NotUniqueErrorException
+    def save(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel) -> None:
+        session.add(value)
 
     def update(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel) -> None:
         if isinstance(value, PrivateSaleModel):
@@ -57,10 +48,9 @@ class SyncPrivateSaleRepository:
                     public_ref_id=value.public_ref_id,
                     rebuild_ref_id=value.rebuild_ref_id,
                     is_available=value.is_available,
+                    update_needed=value.update_needed,
                 )
             )
-
-            session.commit()
 
         elif isinstance(value, DongInfoModel):
             session.execute(
@@ -75,8 +65,6 @@ class SyncPrivateSaleRepository:
                 )
             )
 
-            session.commit()
-
         elif isinstance(value, TypeInfoModel):
             session.execute(
                 update(TypeInfoModel)
@@ -88,8 +76,6 @@ class SyncPrivateSaleRepository:
                     update_needed=value.update_needed,
                 )
             )
-
-            session.commit()
 
         elif isinstance(value, PrivateSaleDetailModel):
             session.execute(
@@ -110,8 +96,6 @@ class SyncPrivateSaleRepository:
                     update_needed=value.update_needed,
                 )
             )
-
-            session.commit()
 
     def exists_by_key(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel) -> bool:
         result = None
