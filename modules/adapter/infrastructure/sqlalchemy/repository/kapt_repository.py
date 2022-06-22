@@ -1,13 +1,12 @@
-from datetime import date
-from typing import Callable, AsyncContextManager, ContextManager, Type
+from typing import Callable, AsyncContextManager, Type
 
-from sqlalchemy import exc, update, func
+from sqlalchemy import exc, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import Session
 
 from core.domain.datalake.kapt.interface.kapt_repository import KaptRepository
 from exceptions.base import NotUniqueErrorException
+from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptOpenApiInputEntity,
     KakaoApiInputEntity,
@@ -33,7 +32,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_m
 )
 from modules.adapter.infrastructure.sqlalchemy.repository import (
     BaseAsyncRepository,
-    BaseSyncRepository,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
@@ -84,15 +82,11 @@ class AsyncKaptRepository(KaptRepository, BaseAsyncRepository):
         return None
 
 
-class SyncKaptRepository(KaptRepository, BaseSyncRepository):
-    def __init__(self, session_factory: Callable[..., ContextManager[Session]]):
-        super().__init__(session_factory=session_factory)
-
+class SyncKaptRepository(KaptRepository):
     def find_by_id(
         self, house_id: int, find_type: int = 0
     ) -> KaptOpenApiInputEntity | KakaoApiInputEntity | None:
-        with self.session_factory() as session:
-            kapt_basic_info = session.get(KaptBasicInfoModel, house_id)
+        kapt_basic_info = session.get(KaptBasicInfoModel, house_id)
 
         if not kapt_basic_info:
             return None
@@ -105,8 +99,7 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
     def find_all(
         self, find_type: int = 0
     ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | list[KaptMappingEntity]:
-        with self.session_factory() as session:
-            queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
+        queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
 
         if not queryset:
             return list()
@@ -122,38 +115,37 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
         if not kapt_orm:
             return None
 
-        with self.session_factory() as session:
-            try:
-                session.add(kapt_orm)
-                session.commit()
-            except exc.IntegrityError as e:
-                logger.error(
-                    f"[SyncKaptRepository][save] kapt_code : {kapt_orm.kapt_code} error : {e}"
-                )
-                session.rollback()
-                raise NotUniqueErrorException
+        try:
+            session.add(kapt_orm)
+            session.commit()
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncKaptRepository][save] kapt_code : {kapt_orm.kapt_code} error : {e}"
+            )
+            session.rollback()
+            raise NotUniqueErrorException
 
         return None
 
     def is_exists_by_kapt_code(
         self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None
     ) -> bool:
-        with self.session_factory() as session:
-            if isinstance(kapt_orm, KaptAreaInfoModel):
-                query = (
-                    select(KaptAreaInfoModel.kapt_code)
-                    .filter_by(kapt_code=kapt_orm.kapt_code)
-                    .limit(1)
-                )
-                result = session.execute(query).scalars().first()
+        result = None
+        if isinstance(kapt_orm, KaptAreaInfoModel):
+            query = (
+                select(KaptAreaInfoModel.kapt_code)
+                .filter_by(kapt_code=kapt_orm.kapt_code)
+                .limit(1)
+            )
+            result = session.execute(query).scalars().first()
 
-            elif isinstance(kapt_orm, KaptLocationInfoModel):
-                query = (
-                    select(KaptLocationInfoModel.kapt_code)
-                    .filter_by(kapt_code=kapt_orm.kapt_code)
-                    .limit(1)
-                )
-                result = session.execute(query).scalars().first()
+        elif isinstance(kapt_orm, KaptLocationInfoModel):
+            query = (
+                select(KaptLocationInfoModel.kapt_code)
+                .filter_by(kapt_code=kapt_orm.kapt_code)
+                .limit(1)
+            )
+            result = session.execute(query).scalars().first()
 
         if result:
             return True
@@ -162,13 +154,12 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
     def update_place_id(self, house_id: int, place_id: int) -> None:
         if not house_id or not place_id:
             return None
-        with self.session_factory() as session:
-            session.execute(
-                update(KaptBasicInfoModel)
-                .where(KaptBasicInfoModel.house_id == house_id)
-                .values(place_id=place_id)
-            )
-            session.commit()
+        session.execute(
+            update(KaptBasicInfoModel)
+            .where(KaptBasicInfoModel.house_id == house_id)
+            .values(place_id=place_id)
+        )
+        session.commit()
         return None
 
     def find_all_bld_infos(self) -> list[GovtBldInputEntity] | None:
@@ -176,31 +167,28 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
         basic_entities: list[KaptBasicInfoEntity] = list()
         bld_input_entities: list[GovtBldInputEntity] = list()
 
-        with self.session_factory() as session:
-            # step_1
-            query = select(KaptAreaInfoModel)
-            queryset: list[KaptAreaInfoModel] = session.execute(query).scalars().all()
+        # step_1
+        query = select(KaptAreaInfoModel)
+        queryset: list[KaptAreaInfoModel] = session.execute(query).scalars().all()
 
-            if queryset:
-                [
-                    area_entities.append(query.to_kapt_area_info_entity())
-                    for query in queryset
-                ]
-            else:
-                return None
+        if queryset:
+            [
+                area_entities.append(query.to_kapt_area_info_entity())
+                for query in queryset
+            ]
+        else:
+            return None
 
-            # step_2
-            for area_info in area_entities:
-                query = (
-                    select(KaptBasicInfoModel)
-                    .filter_by(kapt_code=area_info.kapt_code)
-                    .limit(1)
-                )
-                result: KaptBasicInfoModel | None = (
-                    session.execute(query).scalars().first()
-                )
-                if result:
-                    basic_entities.append(result.to_kapt_basic_info_entity())
+        # step_2
+        for area_info in area_entities:
+            query = (
+                select(KaptBasicInfoModel)
+                .filter_by(kapt_code=area_info.kapt_code)
+                .limit(1)
+            )
+            result: KaptBasicInfoModel | None = session.execute(query).scalars().first()
+            if result:
+                basic_entities.append(result.to_kapt_basic_info_entity())
 
         for area, basic in zip(area_entities, basic_entities):
             bld_input_entities.append(
@@ -234,31 +222,28 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
 
         if target_model == KaptBasicInfoModel:
             # 단지 기본정보
-            with self.session_factory() as session:
-                query = select(KaptBasicInfoModel).where(
-                    KaptBasicInfoModel.update_needed == True
-                )
-                results = session.execute(query).scalars().all()
+            query = select(KaptBasicInfoModel).where(
+                KaptBasicInfoModel.update_needed == True
+            )
+            results = session.execute(query).scalars().all()
             if results:
                 result_list = [result.to_kapt_basic_info_entity() for result in results]
 
         elif target_model == KaptAreaInfoModel:
             # 단지 면적정보
-            with self.session_factory() as session:
-                query = select(KaptAreaInfoModel).where(
-                    KaptAreaInfoModel.update_needed == True
-                )
-                results = session.execute(query).scalars().all()
+            query = select(KaptAreaInfoModel).where(
+                KaptAreaInfoModel.update_needed == True
+            )
+            results = session.execute(query).scalars().all()
             if results:
                 result_list = [result.to_kapt_area_info_entity() for result in results]
 
         elif target_model == KaptLocationInfoModel:
             # 단지 주변정보
-            with self.session_factory() as session:
-                query = select(KaptLocationInfoModel).where(
-                    KaptLocationInfoModel.update_needed == True
-                )
-                results = session.execute(query).scalars().all()
+            query = select(KaptLocationInfoModel).where(
+                KaptLocationInfoModel.update_needed == True
+            )
+            results = session.execute(query).scalars().all()
             if results:
                 result_list = [
                     result.to_kapt_location_info_entity() for result in results
@@ -266,14 +251,10 @@ class SyncKaptRepository(KaptRepository, BaseSyncRepository):
 
         elif target_model == KaptMgmtCostModel:
             # 단지 관리비정보
-            with self.session_factory() as session:
-                query = (
-                    select(KaptMgmtCostModel)
-                    .where(
-                        KaptMgmtCostModel.update_needed == True
-                    )
-                )
-                results = session.execute(query).scalars().all()
+            query = select(KaptMgmtCostModel).where(
+                KaptMgmtCostModel.update_needed == True
+            )
+            results = session.execute(query).scalars().all()
             if results:
                 result_list = [result.to_kapt_mgmt_cost_entity() for result in results]
 

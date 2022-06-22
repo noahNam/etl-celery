@@ -6,7 +6,8 @@ from sqlalchemy import (
     Text,
     Float,
     Numeric,
-    SmallInteger, Boolean,
+    SmallInteger,
+    Boolean,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
