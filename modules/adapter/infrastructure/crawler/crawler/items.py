@@ -349,3 +349,7 @@ class GovtRightLotOutInfoItem(BaseModel):
     jibun: str | None
     regional_cd: str | None
     floor: str | None
+
+
+class GovtHouseDealInputInfo(BaseModel):
+    bjd_front_code: str
