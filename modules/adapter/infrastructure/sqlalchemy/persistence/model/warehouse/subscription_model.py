@@ -6,13 +6,15 @@ from sqlalchemy import (
     Text,
     Float,
     Numeric,
-    SmallInteger,
     Boolean,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
+)
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
+    SubsToPublicEntity
 )
 
 
@@ -67,3 +69,43 @@ class SubscriptionModel(warehouse_base, TimestampMixin):
     special_supply_status = Column(String(6), nullable=True)
     cmptt_rank = Column(String(6), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_entity_for_public_sales(self) -> SubsToPublicEntity:
+        return SubsToPublicEntity(
+            name=self.name,
+            region=self.region,
+            housing_category=self.housing_category,
+            rent_type=self.rent_type,
+            construct_company=self.construct_company,
+            supply_household=self.supply_household,
+            offer_date=self.offer_date,
+            subscription_date=self.subscription_date,
+            special_supply_date=self.special_supply_date,
+            special_supply_etc_date=self.special_supply_etc_date,
+            special_etc_gyeonggi_date=self.special_etc_gyeonggi_date,
+            first_supply_date=self.first_supply_date,
+            first_supply_etc_date=self.first_supply_etc_date,
+            first_etc_gyeonggi_date=self.first_etc_gyeonggi_date,
+            second_supply_date=self.second_supply_date,
+            second_supply_etc_date=self.second_supply_etc_date,
+            second_etc_gyeonggi_date=self.second_etc_gyeonggi_date,
+            notice_winner_date=self.notice_winner_date,
+            contract_date=self.contract_date,
+            move_in_date=self.move_in_date,
+            # supply_price=self.supply_price,
+            cyber_model_house_link=self.cyber_model_house_link,
+            offer_notice_url=self.offer_notice_url,
+            heat_type=self.heat_type,
+            vl_rat=self.vl_rat,
+            bc_rat=self.bc_rat,
+            hhld_total_cnt=self.hhld_total_cnt,
+            park_total_cnt=self.park_total_cnt,
+            highest_floor=self.highest_floor,
+            dong_cnt=self.dong_cnt,
+            deposit=self.deposit,
+            middle_payment=self.middle_payment,
+            balance=self.balance,
+            restriction_sale=self.restriction_sale,
+            compulsory_residence=self.compulsory_residence,
+            hallway_type=self.hallway_type
+        )
