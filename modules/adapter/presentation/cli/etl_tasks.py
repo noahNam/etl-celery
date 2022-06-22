@@ -25,6 +25,7 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository 
 from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repository import (
     SyncSubscriptionRepository,
 )
+from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
@@ -41,6 +42,8 @@ from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUs
 from modules.application.use_case.etl.warehouse.v1.subscription_use_case import (
     SubscriptionUseCase,
 )
+
+logger = logger_.getLogger(__name__)
 
 
 def get_task(topic: str):
@@ -92,7 +95,12 @@ def get_task(topic: str):
 
 @etl_celery.task
 def start_worker(topic):
-    uc = get_task(topic=topic)
-    uc.execute()
-
-    session.remove()
+    try:
+        uc = get_task(topic=topic)
+        uc.execute()
+    except Exception as e:
+        logger.error(
+            f"{topic } error : {e}"
+        )
+    finally:
+        session.remove()

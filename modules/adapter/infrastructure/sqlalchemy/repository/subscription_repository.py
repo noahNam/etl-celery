@@ -20,15 +20,7 @@ logger = logger_.getLogger(__name__)
 
 class SyncSubscriptionRepository(SubscriptionRepository):
     def save(self, value: SubscriptionModel | SubscriptionDetailModel) -> None:
-        try:
-            session.add(value)
-            session.commit()
-        except exc.IntegrityError as e:
-            logger.error(
-                f"[SyncSubscriptionRepository][save] target_model : {value} error : {e}"
-            )
-            session.rollback()
-            raise NotUniqueErrorException
+        session.add(value)
 
     def update(self, value: SubscriptionModel | SubscriptionDetailModel) -> None:
         if isinstance(value, SubscriptionModel):
@@ -64,6 +56,7 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                     subscription_date=value.subscription_date,
                     special_supply_status=value.special_supply_status,
                     cmptt_rank=value.cmptt_rank,
+                    update_needed=value.update_needed,
                 )
             )
 
@@ -120,10 +113,9 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                     avg_win_point=value.avg_win_point,
                     avg_win_point_gyeonggi=value.avg_win_point_gyeonggi,
                     avg_win_point_etc=value.avg_win_point_etc,
+                    update_needed=value.update_needed,
                 )
             )
-
-        session.commit()
 
     def exists_by_key(self, value: SubscriptionModel | SubscriptionDetailModel) -> bool:
         query = None
@@ -159,7 +151,6 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                 for (key, value) in items.items():
                     if hasattr(target_model, key):
                         setattr(col_info, key, value)
-                        session.commit()
 
         elif target_model == SubscriptionDetailModel:
             key = value.get("key")
@@ -171,4 +162,3 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                 for (key, value) in items.items():
                     if hasattr(target_model, key):
                         setattr(col_info, key, value)
-                        session.commit()
