@@ -71,7 +71,14 @@ class GovtBldSpider(Spider):
                         "bun:": param.bun if param.bun else "0000",
                         "ji:": param.ji if param.ji else "0000",
                         "url": urls[0]
-                        + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
+                        + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
+                        f"&sigunguCd={param.sigungu_code}"
+                        f"&bjdongCd={param.bjdong_code}"
+                        f"&platGbCd=0"
+                        f"&bun={param.bun if param.bun else '0000'}"
+                        f"&ji={param.ji if param.ji else '0000'}"
+                        f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
+                        f"&pageNo=1",
                     },
                 )
                 yield Request(
@@ -94,8 +101,15 @@ class GovtBldSpider(Spider):
                         "bjd_code": param.origin_bjd_code,
                         "bun:": param.bun if param.bun else "0000",
                         "ji:": param.ji if param.ji else "0000",
-                        "url": urls[0]
-                        + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
+                        "url": urls[1]
+                        + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
+                        f"&sigunguCd={param.sigungu_code}"
+                        f"&bjdongCd={param.bjdong_code}"
+                        f"&platGbCd=0"
+                        f"&bun={param.bun if param.bun else '0000'}"
+                        f"&ji={param.ji if param.ji else '0000'}"
+                        f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
+                        f"&pageNo=1",
                     },
                 )
                 yield Request(
@@ -118,8 +132,15 @@ class GovtBldSpider(Spider):
                         "bjd_code": param.origin_bjd_code,
                         "bun:": param.bun if param.bun else "0000",
                         "ji:": param.ji if param.ji else "0000",
-                        "url": urls[0]
-                        + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
+                        "url": urls[2]
+                        + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
+                        f"&sigunguCd={param.sigungu_code}"
+                        f"&bjdongCd={param.bjdong_code}"
+                        f"&platGbCd=0"
+                        f"&bun={param.bun if param.bun else '0000'}"
+                        f"&ji={param.ji if param.ji else '0000'}"
+                        f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
+                        f"&pageNo=1",
                     },
                 )
 

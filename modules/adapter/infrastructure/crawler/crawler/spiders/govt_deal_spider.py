@@ -1,9 +1,18 @@
 from scrapy import Spider, Request
+from scrapy.http import TextResponse, Response
+from xmltodict import parse
 
 from modules.adapter.infrastructure.crawler.crawler.enum.govt_deal_enum import (
     GovtHouseDealEnum,
 )
-from modules.adapter.infrastructure.crawler.crawler.items import GovtHouseDealInputInfo
+from modules.adapter.infrastructure.crawler.crawler.items import (
+    GovtHouseDealInputInfo,
+    GovtAptDealInfoItem,
+    GovtAptRentInfoItem,
+    GovtOfctlDealInfoItem,
+    GovtOfctlRentInfoItem,
+    GovtRightLotOutInfoItem,
+)
 from modules.adapter.infrastructure.pypubsub.enum.call_failure_history_enum import (
     CallFailureTopicEnum,
 )
@@ -68,6 +77,8 @@ class GovtDateCounter:
 
 
 class GovtHouseDealSpider(Spider):
+    """현재 일일 request 횟수가 1000건 제한이기 때문에, 한번에 모든 년도 크롤링 불가능"""
+
     name = "govt_house_deal_infos"
     custom_settings = {
         "ITEM_PIPELINES": {
@@ -96,7 +107,7 @@ class GovtHouseDealSpider(Spider):
         if input_params:
             # param: 추출된 법정동 코드 앞 5자리(277개)
             for param in input_params:
-                # current_ym: 200601 ~ 202206 (기간 조정시 GovtHouseDealEnum 값 조정)
+                # current_ym: 200601 ~ 202206 (기간 조정시 GovtHouseDealEnum - MIN, MAX 값 조정)
                 while (
                     GovtHouseDealSpider.date_counter.current_ym()
                     <= GovtHouseDealSpider.date_counter.get_max_ym()
@@ -111,7 +122,96 @@ class GovtHouseDealSpider(Spider):
                         callback=self.parse_apt_deal_info,
                         errback=self.error_callback_apt_deal_info,
                         meta={
-                            "url": urls[0],
+                            "url": urls[0]
+                            + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
+                            f"&LAWD_CD={param.bjd_front_code}"
+                            f"&pageNo=1"
+                            f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
+                            f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
+                            "bjd_front_code": param,
+                            "year_month": GovtHouseDealSpider.date_counter.current_ym(),
+                        },
+                    )
+
+                    yield Request(
+                        url=urls[1]
+                        + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
+                        f"&LAWD_CD={param.bjd_front_code}"
+                        f"&pageNo=1"
+                        f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
+                        f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
+                        callback=self.parse_apt_rent_info,
+                        errback=self.error_callback_apt_rent_info,
+                        meta={
+                            "url": urls[1]
+                            + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
+                            f"&LAWD_CD={param.bjd_front_code}"
+                            f"&pageNo=1"
+                            f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
+                            f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
+                            "bjd_front_code": param,
+                            "year_month": GovtHouseDealSpider.date_counter.current_ym(),
+                        },
+                    )
+
+                    yield Request(
+                        url=urls[2]
+                        + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
+                        f"&LAWD_CD={param.bjd_front_code}"
+                        f"&pageNo=1"
+                        f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
+                        f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
+                        callback=self.parse_opctl_deal_info,
+                        errback=self.error_callback_opctl_deal_info,
+                        meta={
+                            "url": urls[2]
+                            + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
+                            f"&LAWD_CD={param.bjd_front_code}"
+                            f"&pageNo=1"
+                            f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
+                            f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
+                            "bjd_front_code": param,
+                            "year_month": GovtHouseDealSpider.date_counter.current_ym(),
+                        },
+                    )
+
+                    yield Request(
+                        url=urls[3]
+                        + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
+                        f"&LAWD_CD={param.bjd_front_code}"
+                        f"&pageNo=1"
+                        f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
+                        f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
+                        callback=self.parse_opctl_rent_info,
+                        errback=self.error_callback_opctl_rent_info,
+                        meta={
+                            "url": urls[3]
+                            + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
+                            f"&LAWD_CD={param.bjd_front_code}"
+                            f"&pageNo=1"
+                            f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
+                            f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
+                            "bjd_front_code": param,
+                            "year_month": GovtHouseDealSpider.date_counter.current_ym(),
+                        },
+                    )
+
+                    yield Request(
+                        url=urls[4]
+                        + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
+                        f"&LAWD_CD={param.bjd_front_code}"
+                        f"&pageNo=1"
+                        f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
+                        f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
+                        callback=self.parse_apt_right_lot_out_info,
+                        errback=self.error_callback_apt_right_lot_out_info,
+                        meta={
+                            "url": urls[4]
+                            + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
+                            f"&LAWD_CD={param.bjd_front_code}"
+                            f"&pageNo=1"
+                            f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
+                            f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
                             "bjd_front_code": param,
                             "year_month": GovtHouseDealSpider.date_counter.current_ym(),
                         },
@@ -120,35 +220,270 @@ class GovtHouseDealSpider(Spider):
                     GovtHouseDealSpider.date_counter.plus_month()
                 GovtHouseDealSpider.date_counter.reset_counter()
 
-    def parse_apt_deal_info(self):
-        pass
+    def parse_apt_deal_info(self, response):
+        xml_to_dict: dict = parse(response.text)
+        item: GovtAptDealInfoItem | None = None
 
-    def parse_apt_rent_info(self):
-        pass
+        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
+        elif not xml_to_dict["response"]["body"]["items"]:
+            item = None
+        else:
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
 
-    def parse_opctl_deal_info(self):
-        pass
+        try:
+            item = GovtAptDealInfoItem(
+                deal_amount=xml_to_dict.get("거래금액"),
+                build_year=xml_to_dict.get("건축년도"),
+                deal_year=xml_to_dict.get("년"),
+                road_name=xml_to_dict.get("도로명"),
+                road_name_bonbun=xml_to_dict.get("도로명건물본번호코드"),
+                road_name_bubun=xml_to_dict.get("도로명건물부번호코드"),
+                road_name_sigungu_cd=xml_to_dict.get("도로명시군구코드"),
+                road_name_seq=xml_to_dict.get("도로명일련번호코드"),
+                road_name_basement_cd=xml_to_dict.get("도로명지상지하코드"),
+                road_name_cd=xml_to_dict.get("도로명코드"),
+                dong=xml_to_dict.get("법정동"),
+                bonbun_cd=xml_to_dict.get("법정동본번코드"),
+                bubun_cd=xml_to_dict.get("법정동부번코드"),
+                sigungu_cd=xml_to_dict.get("법정동시군구코드"),
+                eubmyundong_cd=xml_to_dict.get("법정동읍면동코드"),
+                land_cd=xml_to_dict.get("법정동지번코드"),
+                apt_name=xml_to_dict.get("아파트"),
+                deal_month=xml_to_dict.get("월"),
+                deal_day=xml_to_dict.get("일"),
+                serial_no=xml_to_dict.get("일련번호"),
+                exclusive_area=xml_to_dict.get("전용면적"),
+                jibun=xml_to_dict.get("지번"),
+                regional_cd=xml_to_dict.get("지역코드"),
+                floor=xml_to_dict.get("층"),
+                cancel_deal_type=xml_to_dict.get("해제여부"),
+                cancel_deal_day=xml_to_dict.get("해제사유발생일"),
+                req_gbn=xml_to_dict.get("거래유형"),
+                rdealer_lawdnm=xml_to_dict.get("중개사소재지"),
+            )
+        except KeyError:
+            pass
 
-    def parse_opctl_rent_info(self):
-        pass
+        if item:
+            yield item
+        else:
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_apt_deals",
+                response_or_failure=response,
+            )
 
-    def parse_apt_right_lot_out_info(self):
-        pass
+    def parse_apt_rent_info(self, response):
+        xml_to_dict: dict = parse(response.text)
+        item: GovtAptRentInfoItem | None = None
 
-    def error_callback_apt_deal_info(self):
-        pass
+        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
+        elif not xml_to_dict["response"]["body"]["items"]:
+            item = None
+        else:
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
 
-    def error_callback_apt_rent_info(self):
-        pass
+        try:
+            item = GovtAptRentInfoItem(
+                build_year=xml_to_dict.get("건축년도"),
+                deal_year=xml_to_dict.get("년"),
+                dong=xml_to_dict.get("법정동"),
+                deposit=xml_to_dict.get("보증금액"),
+                apt_name=xml_to_dict.get("아파트"),
+                deal_month=xml_to_dict.get("월"),
+                deal_day=xml_to_dict.get("일"),
+                monthly_amount=xml_to_dict.get("월세금액"),
+                exclusive_area=xml_to_dict.get("전용면적"),
+                jibun=xml_to_dict.get("지번"),
+                regional_cd=xml_to_dict.get("지역코드"),
+                floor=xml_to_dict.get("층"),
+            )
+        except KeyError:
+            pass
 
-    def error_callback_opctl_deal_info(self):
-        pass
+        if item:
+            yield item
+        else:
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_apt_rents",
+                response_or_failure=response,
+            )
 
-    def error_callback_opctl_rent_info(self):
-        pass
+    def parse_opctl_deal_info(self, response):
+        xml_to_dict: dict = parse(response.text)
+        item: GovtOfctlDealInfoItem | None = None
 
-    def error_callback_apt_right_lot_out_info(self):
-        pass
+        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
+        elif not xml_to_dict["response"]["body"]["items"]:
+            item = None
+        else:
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+
+        try:
+            item = GovtOfctlDealInfoItem(
+                deal_amount=xml_to_dict.get("거래금액"),
+                build_year=xml_to_dict.get("건축년도"),
+                deal_year=xml_to_dict.get("년"),
+                opctl_name=xml_to_dict.get("단지"),
+                dong=xml_to_dict.get("법정동"),
+                sigungu=xml_to_dict.get("시군구"),
+                deal_month=xml_to_dict.get("월"),
+                deal_day=xml_to_dict.get("일"),
+                exclusive_area=xml_to_dict.get("전용면적"),
+                jibun=xml_to_dict.get("지번"),
+                regional_cd=xml_to_dict.get("지역코드"),
+                floor=xml_to_dict.get("층"),
+                cancel_deal_type=xml_to_dict.get("해제여부"),
+                cancel_deal_day=xml_to_dict.get("해제사유발생일"),
+                req_gbn=xml_to_dict.get("거래유형"),
+                rdealer_lawdnm=xml_to_dict.get("중개사소재지"),
+            )
+        except KeyError:
+            pass
+
+        if item:
+            yield item
+        else:
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_opctl_deals",
+                response_or_failure=response,
+            )
+
+    def parse_opctl_rent_info(self, response):
+        xml_to_dict: dict = parse(response.text)
+        item: GovtOfctlRentInfoItem | None = None
+
+        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
+        elif not xml_to_dict["response"]["body"]["items"]:
+            item = None
+        else:
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+
+        try:
+            item = GovtOfctlRentInfoItem(
+                deal_year=xml_to_dict.get("년"),
+                opctl_name=xml_to_dict.get("단지"),
+                dong=xml_to_dict.get("법정동"),
+                deposit=xml_to_dict.get("보증금액"),
+                sigungu=xml_to_dict.get("시군구"),
+                deal_month=xml_to_dict.get("월"),
+                deal_day=xml_to_dict.get("일"),
+                monthly_amount=xml_to_dict.get("월세금액"),
+                exclusive_area=xml_to_dict.get("전용면적"),
+                jibun=xml_to_dict.get("지번"),
+                regional_cd=xml_to_dict.get("지역코드"),
+                floor=xml_to_dict.get("층"),
+            )
+        except KeyError:
+            pass
+
+        if item:
+            yield item
+        else:
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_opctl_rents",
+                response_or_failure=response,
+            )
+
+    def parse_apt_right_lot_out_info(self, response):
+        xml_to_dict: dict = parse(response.text)
+        item: GovtRightLotOutInfoItem | None = None
+
+        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
+        elif not xml_to_dict["response"]["body"]["items"]:
+            item = None
+        else:
+            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+
+        try:
+            item = GovtRightLotOutInfoItem(
+                deal_amount=xml_to_dict.get("거래금액"),
+                classification_owner_ship=xml_to_dict.get("구분"),
+                deal_year=xml_to_dict.get("년"),
+                opctl_name=xml_to_dict.get("단지"),
+                dong=xml_to_dict.get("법정동"),
+                sigungu=xml_to_dict.get("시군구"),
+                deal_month=xml_to_dict.get("월"),
+                deal_day=xml_to_dict.get("일"),
+                exclusive_area=xml_to_dict.get("전용면적"),
+                jibun=xml_to_dict.get("지번"),
+                regional_cd=xml_to_dict.get("지역코드"),
+                floor=xml_to_dict.get("층"),
+            )
+        except KeyError:
+            pass
+
+        if item:
+            yield item
+        else:
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_opctl_deals",
+                response_or_failure=response,
+            )
+
+    def error_callback_apt_deal_info(self, failure: Response) -> None:
+        self.save_failure_info(
+            current_url=failure.request.meta.get("url"),
+            bjd_front_code=failure.request.meta.get("bjd_front_code"),
+            year_month=failure.request.meta.get("year_month"),
+            ref_table="govt_apt_deals",
+            response_or_failure=failure,
+        )
+
+    def error_callback_apt_rent_info(self, failure) -> None:
+        self.save_failure_info(
+            current_url=failure.request.meta.get("url"),
+            bjd_front_code=failure.request.meta.get("bjd_front_code"),
+            year_month=failure.request.meta.get("year_month"),
+            ref_table="govt_apt_rents",
+            response_or_failure=failure,
+        )
+
+    def error_callback_opctl_deal_info(self, failure) -> None:
+        self.save_failure_info(
+            current_url=failure.request.meta.get("url"),
+            bjd_front_code=failure.request.meta.get("bjd_front_code"),
+            year_month=failure.request.meta.get("year_month"),
+            ref_table="govt_opctl_deals",
+            response_or_failure=failure,
+        )
+
+    def error_callback_opctl_rent_info(self, failure) -> None:
+        self.save_failure_info(
+            current_url=failure.request.meta.get("url"),
+            bjd_front_code=failure.request.meta.get("bjd_front_code"),
+            year_month=failure.request.meta.get("year_month"),
+            ref_table="govt_opctl_rents",
+            response_or_failure=failure,
+        )
+
+    def error_callback_apt_right_lot_out_info(self, failure) -> None:
+        self.save_failure_info(
+            current_url=failure.request.meta.get("url"),
+            bjd_front_code=failure.request.meta.get("bjd_front_code"),
+            year_month=failure.request.meta.get("year_month"),
+            ref_table="govt_right_lot_outs",
+            response_or_failure=failure,
+        )
 
     def get_input_infos(
         self, deal_info_list: list[LegalDongCodeEntity]
@@ -167,7 +502,7 @@ class GovtHouseDealSpider(Spider):
 
         return result
 
-    def change_service_key(self):
+    def change_service_key(self) -> None:
         if (
             GovtHouseDealSpider.open_api_service_key
             == GovtHouseDealEnum.SERVICE_KEY_2.value
@@ -180,7 +515,7 @@ class GovtHouseDealSpider(Spider):
                 GovtHouseDealEnum.SERVICE_KEY_2.value
             )
 
-    def count_requests(self):
+    def count_requests(self) -> None:
         if (
             GovtHouseDealSpider.request_count
             >= GovtHouseDealEnum.DAILY_REQUEST_COUNT.value
@@ -190,8 +525,33 @@ class GovtHouseDealSpider(Spider):
         else:
             GovtHouseDealSpider.request_count += 1
 
-    def save_failure_info(self):
-        pass
+    def save_failure_info(
+        self,
+        current_url: str,
+        bjd_front_code: str,
+        year_month: str,
+        ref_table: str,
+        response_or_failure: TextResponse | Response,
+    ) -> None:
+        if isinstance(response_or_failure, TextResponse):
+            fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
+                ref_table=ref_table,
+                param=f"url: {current_url}, "
+                f"current_bjd_front_code: {bjd_front_code}, "
+                f"year_month: {year_month}, ",
+                reason=f"response:{response_or_failure.text}",
+            )
+        else:
+            fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
+                ref_table=ref_table,
+                param=f"url: {current_url}, "
+                f"current_bjd_front_code: {bjd_front_code}, "
+                f"year_month: {year_month}, ",
+                reason=f"response:{response_or_failure}",
+            )
+
+        if not self.__is_exists_failure(fail_orm=fail_orm):
+            self.__save_crawling_failure(fail_orm=fail_orm)
 
     def __save_crawling_failure(self, fail_orm: CallFailureHistoryModel) -> None:
         send_message(
