@@ -13,9 +13,6 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncBldMappingResultsRepository:
-    def __init__(self, session_factory: Callable[..., ContextManager[Session]]):
-        super().__init__(session_factory=session_factory)
-
     def save_all(self, models: list[BldMappingResultModel] | None) -> None:
         if not models:
             return None
