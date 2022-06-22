@@ -224,16 +224,66 @@ class GovtHouseDealSpider(Spider):
         xml_to_dict: dict = parse(response.text)
         item: GovtAptDealInfoItem | None = None
 
-        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
-        elif not xml_to_dict["response"]["body"]["items"]:
-            item = None
-        else:
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        try:
+            if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+                # 결과가 다수인 경우
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+                for elm in xml_to_dict:
+                    item = GovtAptDealInfoItem(
+                        deal_amount=int(elm.get("거래금액").replace(",", ""))
+                        if elm.get("거래금액")
+                        else None,
+                        build_year=elm.get("건축년도"),
+                        deal_year=elm.get("년"),
+                        road_name=elm.get("도로명"),
+                        road_name_bonbun=elm.get("도로명건물본번호코드"),
+                        road_name_bubun=elm.get("도로명건물부번호코드"),
+                        road_name_sigungu_cd=elm.get("도로명시군구코드"),
+                        road_name_seq=elm.get("도로명일련번호코드"),
+                        road_name_basement_cd=elm.get("도로명지상지하코드"),
+                        road_name_cd=elm.get("도로명코드"),
+                        dong=elm.get("법정동"),
+                        bonbun_cd=elm.get("법정동본번코드"),
+                        bubun_cd=elm.get("법정동부번코드"),
+                        sigungu_cd=elm.get("법정동시군구코드"),
+                        eubmyundong_cd=elm.get("법정동읍면동코드"),
+                        land_cd=elm.get("법정동지번코드"),
+                        apt_name=elm.get("아파트"),
+                        deal_month=elm.get("월"),
+                        deal_day=elm.get("일"),
+                        serial_no=elm.get("일련번호"),
+                        exclusive_area=elm.get("전용면적"),
+                        jibun=elm.get("지번"),
+                        regional_cd=elm.get("지역코드"),
+                        floor=elm.get("층"),
+                        cancel_deal_type=elm.get("해제여부"),
+                        cancel_deal_day=elm.get("해제사유발생일"),
+                        req_gbn=elm.get("거래유형"),
+                        rdealer_lawdnm=elm.get("중개사소재지"),
+                    )
+
+                    yield item
+                return None
+            elif not xml_to_dict["response"]["body"].get("items"):
+                item = None
+            else:
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        except Exception:
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_apt_deals",
+                response_or_failure=response,
+            )
+            return None
 
         try:
+            # 단일 결과인 경우
             item = GovtAptDealInfoItem(
-                deal_amount=xml_to_dict.get("거래금액"),
+                deal_amount=int(xml_to_dict.get("거래금액").replace(",", ""))
+                if xml_to_dict.get("거래금액")
+                else None,
                 build_year=xml_to_dict.get("건축년도"),
                 deal_year=xml_to_dict.get("년"),
                 road_name=xml_to_dict.get("도로명"),
@@ -280,23 +330,61 @@ class GovtHouseDealSpider(Spider):
         xml_to_dict: dict = parse(response.text)
         item: GovtAptRentInfoItem | None = None
 
-        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
-        elif not xml_to_dict["response"]["body"]["items"]:
-            item = None
-        else:
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        try:
+            if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+                # 결과가 다수인 경우
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+                for elm in xml_to_dict:
+                    item = GovtAptRentInfoItem(
+                        build_year=elm.get("건축년도"),
+                        deal_year=elm.get("년"),
+                        dong=elm.get("법정동"),
+                        deposit=int(elm.get("보증금액").replace(",", ""))
+                        if elm.get("보증금액")
+                        else None,
+                        apt_name=elm.get("아파트"),
+                        deal_month=elm.get("월"),
+                        deal_day=elm.get("일"),
+                        monthly_amount=int(elm.get("월세금액").replace(",", ""))
+                        if elm.get("월세금액")
+                        else None,
+                        exclusive_area=elm.get("전용면적"),
+                        jibun=elm.get("지번"),
+                        regional_cd=elm.get("지역코드"),
+                        floor=elm.get("층"),
+                    )
+
+                    yield item
+                return None
+            elif not xml_to_dict["response"]["body"].get("items"):
+                item = None
+            else:
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        except Exception:
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_apt_rents",
+                response_or_failure=response,
+            )
+            return None
 
         try:
+            # 단일 결과인 경우
             item = GovtAptRentInfoItem(
                 build_year=xml_to_dict.get("건축년도"),
                 deal_year=xml_to_dict.get("년"),
                 dong=xml_to_dict.get("법정동"),
-                deposit=xml_to_dict.get("보증금액"),
+                deposit=int(xml_to_dict.get("보증금액").replace(",", ""))
+                if xml_to_dict.get("보증금액")
+                else None,
                 apt_name=xml_to_dict.get("아파트"),
                 deal_month=xml_to_dict.get("월"),
                 deal_day=xml_to_dict.get("일"),
-                monthly_amount=xml_to_dict.get("월세금액"),
+                monthly_amount=int(xml_to_dict.get("월세금액").replace(",", ""))
+                if xml_to_dict.get("월세금액")
+                else None,
                 exclusive_area=xml_to_dict.get("전용면적"),
                 jibun=xml_to_dict.get("지번"),
                 regional_cd=xml_to_dict.get("지역코드"),
@@ -320,16 +408,54 @@ class GovtHouseDealSpider(Spider):
         xml_to_dict: dict = parse(response.text)
         item: GovtOfctlDealInfoItem | None = None
 
-        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
-        elif not xml_to_dict["response"]["body"]["items"]:
-            item = None
-        else:
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        try:
+            if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+                # 결과가 다수인 경우
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+                for elm in xml_to_dict:
+                    item = GovtOfctlDealInfoItem(
+                        deal_amount=int(elm.get("거래금액").replace(",", ""))
+                        if elm.get("거래금액")
+                        else None,
+                        build_year=elm.get("건축년도"),
+                        deal_year=elm.get("년"),
+                        opctl_name=elm.get("단지"),
+                        dong=elm.get("법정동"),
+                        sigungu=elm.get("시군구"),
+                        deal_month=elm.get("월"),
+                        deal_day=elm.get("일"),
+                        exclusive_area=elm.get("전용면적"),
+                        jibun=elm.get("지번"),
+                        regional_cd=elm.get("지역코드"),
+                        floor=elm.get("층"),
+                        cancel_deal_type=elm.get("해제여부"),
+                        cancel_deal_day=elm.get("해제사유발생일"),
+                        req_gbn=elm.get("거래유형"),
+                        rdealer_lawdnm=elm.get("중개사소재지"),
+                    )
+
+                    yield item
+                return None
+
+            elif not xml_to_dict["response"]["body"].get("items"):
+                item = None
+            else:
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        except Exception:
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_opctl_deals",
+                response_or_failure=response,
+            )
 
         try:
+            # 결과가 단일인 경우
             item = GovtOfctlDealInfoItem(
-                deal_amount=xml_to_dict.get("거래금액"),
+                deal_amount=int(xml_to_dict.get("거래금액").replace(",", ""))
+                if xml_to_dict.get("거래금액")
+                else None,
                 build_year=xml_to_dict.get("건축년도"),
                 deal_year=xml_to_dict.get("년"),
                 opctl_name=xml_to_dict.get("단지"),
@@ -364,23 +490,61 @@ class GovtHouseDealSpider(Spider):
         xml_to_dict: dict = parse(response.text)
         item: GovtOfctlRentInfoItem | None = None
 
-        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
-        elif not xml_to_dict["response"]["body"]["items"]:
-            item = None
-        else:
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        try:
+            if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+                # 결과가 다수인 경우
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+                for elm in xml_to_dict:
+                    item = GovtOfctlRentInfoItem(
+                        deal_year=elm.get("년"),
+                        opctl_name=elm.get("단지"),
+                        dong=elm.get("법정동"),
+                        deposit=int(elm.get("보증금액").replace(",", ""))
+                        if elm.get("보증금액")
+                        else None,
+                        sigungu=elm.get("시군구"),
+                        deal_month=elm.get("월"),
+                        deal_day=elm.get("일"),
+                        monthly_amount=int(elm.get("월세금액").replace(",", ""))
+                        if elm.get("월세금액")
+                        else None,
+                        exclusive_area=elm.get("전용면적"),
+                        jibun=elm.get("지번"),
+                        regional_cd=elm.get("지역코드"),
+                        floor=elm.get("층"),
+                    )
+
+                    yield item
+                return None
+            elif not xml_to_dict["response"]["body"].get("items"):
+                item = None
+            else:
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        except Exception:
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_opctl_rents",
+                response_or_failure=response,
+            )
+            return None
 
         try:
+            # 결과가 단일인 경우
             item = GovtOfctlRentInfoItem(
                 deal_year=xml_to_dict.get("년"),
                 opctl_name=xml_to_dict.get("단지"),
                 dong=xml_to_dict.get("법정동"),
-                deposit=xml_to_dict.get("보증금액"),
+                deposit=int(xml_to_dict.get("보증금액").replace(",", ""))
+                if xml_to_dict.get("보증금액")
+                else None,
                 sigungu=xml_to_dict.get("시군구"),
                 deal_month=xml_to_dict.get("월"),
                 deal_day=xml_to_dict.get("일"),
-                monthly_amount=xml_to_dict.get("월세금액"),
+                monthly_amount=int(xml_to_dict.get("월세금액").replace(",", ""))
+                if xml_to_dict.get("월세금액")
+                else None,
                 exclusive_area=xml_to_dict.get("전용면적"),
                 jibun=xml_to_dict.get("지번"),
                 regional_cd=xml_to_dict.get("지역코드"),
@@ -403,17 +567,50 @@ class GovtHouseDealSpider(Spider):
     def parse_apt_right_lot_out_info(self, response):
         xml_to_dict: dict = parse(response.text)
         item: GovtRightLotOutInfoItem | None = None
+        try:
+            if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+                # 결과가 다수인 경우
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+                for elm in xml_to_dict:
+                    item = GovtRightLotOutInfoItem(
+                        deal_amount=int(elm.get("거래금액").replace(",", ""))
+                        if elm.get("거래금액")
+                        else None,
+                        classification_owner_ship=elm.get("구분"),
+                        deal_year=elm.get("년"),
+                        opctl_name=elm.get("단지"),
+                        dong=elm.get("법정동"),
+                        sigungu=elm.get("시군구"),
+                        deal_month=elm.get("월"),
+                        deal_day=elm.get("일"),
+                        exclusive_area=elm.get("전용면적"),
+                        jibun=elm.get("지번"),
+                        regional_cd=elm.get("지역코드"),
+                        floor=elm.get("층"),
+                    )
 
-        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
-        elif not xml_to_dict["response"]["body"]["items"]:
-            item = None
-        else:
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+                    yield item
+                return None
+            elif not xml_to_dict["response"]["body"].get("items"):
+                item = None
+            else:
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        except Exception:
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_opctl_deals",
+                response_or_failure=response,
+            )
+            return None
 
         try:
+            # 결과가 단일인 경우
             item = GovtRightLotOutInfoItem(
-                deal_amount=xml_to_dict.get("거래금액"),
+                deal_amount=int(xml_to_dict.get("거래금액").replace(",", ""))
+                if xml_to_dict.get("거래금액")
+                else None,
                 classification_owner_ship=xml_to_dict.get("구분"),
                 deal_year=xml_to_dict.get("년"),
                 opctl_name=xml_to_dict.get("단지"),
