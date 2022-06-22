@@ -32,3 +32,15 @@ class GovtHouseDealRepository(ABC):
         | BldMappingResultModel,
     ) -> None:
         pass
+
+    @abstractmethod
+    def is_exists(
+        self,
+        model: GovtAptDealModel
+        | GovtAptRentModel
+        | GovtOfctlDealModel
+        | GovtOfctlRentModel
+        | GovtRightLotOutModel
+        | BldMappingResultModel,
+    ) -> bool:
+        pass
