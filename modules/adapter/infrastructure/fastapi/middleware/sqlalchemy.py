@@ -6,7 +6,7 @@ from http import HTTPStatus
 from uuid import uuid4
 
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
-from modules.adapter.infrastructure.sqlalchemy.database import session_factory
+from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
@@ -17,9 +17,9 @@ class SQLAlchemyMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        if not session_factory:
+        if not session:
             logger.error(
-                f"[SqlAlchemyMiddleware][dispatch] error : session_factory is {session_factory}"
+                f"[SqlAlchemyMiddleware][dispatch] error : session is {session}"
             )
             return JSONResponse(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -33,7 +33,7 @@ class SQLAlchemyMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
 
         except Exception as e:
-            await session_factory.rollback()
+            session.rollback()
             logger.error(f"[SqlAlchemyMiddleware][dispatch] error : {e}")
             return JSONResponse(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -41,5 +41,5 @@ class SQLAlchemyMiddleware(BaseHTTPMiddleware):
             )
         finally:
             # Sync_DB 사용시 await 제거 후 사용
-            await session_factory.remove()
+            session.remove()
         return response

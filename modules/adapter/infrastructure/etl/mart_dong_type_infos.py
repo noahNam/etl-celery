@@ -1,15 +1,20 @@
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
-    DongInfoEntity, TypeInfoEntity,
+    DongInfoEntity,
+    TypeInfoEntity,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import DongInfoModel
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import TypeInfoModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import (
+    DongInfoModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import (
+    TypeInfoModel,
+)
 
 
 class TransformDongTypeInfos:
     def start_etl(
         self,
         from_model: str,
-        target_list: list[DongInfoEntity| TypeInfoEntity],
+        target_list: list[DongInfoEntity | TypeInfoEntity],
     ) -> list[DongInfoModel | TypeInfoModel] | None:
         if not target_list:
             return None

@@ -255,3 +255,97 @@ class GovtBldAreaInfoItem(BaseModel):
     plat_gb_cd: str | None
     bun: str | None
     ji: str | None
+
+
+class GovtAptDealInfoItem(BaseModel):
+    deal_amount: int | None
+    build_year: str | None
+    deal_year: str | None
+    road_name: str | None
+    road_name_bonbun: str | None
+    road_name_bubun: str | None
+    road_name_sigungu_cd: str | None
+    road_name_seq: str | None
+    road_name_basement_cd: str | None
+    road_name_cd: str | None
+    dong: str | None
+    bonbun_cd: str | None
+    bubun_cd: str | None
+    sigungu_cd: str | None
+    eubmyundong_cd: str | None
+    land_cd: str | None
+    apt_name: str | None
+    deal_month: str | None
+    deal_day: str | None
+    serial_no: str | None
+    exclusive_area: str | None
+    jibun: str | None
+    regional_cd: str | None
+    floor: str | None
+    cancel_deal_type: str | None
+    cancel_deal_day: str | None
+    req_gbn: str | None
+    rdealer_lawdnm: str | None
+
+
+class GovtAptRentInfoItem(BaseModel):
+    build_year: str | None
+    deal_year: str | None
+    dong: str | None
+    deposit: int | None
+    apt_name: str | None
+    deal_month: str | None
+    deal_day: str | None
+    monthly_amount: int | None
+    exclusive_area: str | None
+    jibun: str | None
+    regional_cd: str | None
+    floor: str | None
+
+
+class GovtOfctlDealInfoItem(BaseModel):
+    deal_amount: int | None
+    deal_year: str | None
+    ofctl_name: str | None
+    dong: str | None
+    sigungu: str | None
+    deal_month: str | None
+    deal_day: str | None
+    exclusive_area: str | None
+    jibun: str | None
+    regional_cd: str | None
+    floor: str | None
+    cancel_deal_type: str | None
+    cancel_deal_day: str | None
+    req_gbn: str | None
+    rdealer_lawdnm: str | None
+
+
+class GovtOfctlRentInfoItem(BaseModel):
+    deal_year: str | None
+    ofctl_name: str | None
+    dong: str | None
+    deposit: int | None
+    sigungu: str | None
+    deal_month: str | None
+    deal_day: str | None
+    monthly_amount: int | None
+    exclusive_area: str | None
+    jibun: str | None
+    regional_cd: str | None
+    floor: str | None
+
+
+class GovtRightLotOutInfoItem(BaseModel):
+    deal_amount: int | None
+    classification_owner_ship: str | None
+    deal_year: str | None
+    name: str | None
+    dong: str | None
+    sigungu: str | None
+    deal_month: str | None
+    deal_day: str | None
+    exclusive_area: str | None
+    jibun: str | None
+    regional_cd: str | None
+    floor: str | None

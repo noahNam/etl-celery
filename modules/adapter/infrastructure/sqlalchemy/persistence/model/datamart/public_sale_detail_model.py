@@ -1,4 +1,13 @@
-from sqlalchemy import Column, String, BigInteger, Integer, Numeric, ForeignKey, Text, Boolean
+from sqlalchemy import (
+    Column,
+    String,
+    BigInteger,
+    Integer,
+    Numeric,
+    ForeignKey,
+    Text,
+    Boolean,
+)
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datamart_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_model import (
