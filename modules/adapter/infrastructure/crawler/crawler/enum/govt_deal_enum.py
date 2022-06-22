@@ -5,12 +5,10 @@ class GovtHouseDealEnum(Enum):
     """특정 년도, 월 범위로 범위 조정시, MIN_YEAR_MONTH, MAX_YEAR_MONTH 값 수정 후 크롤러 실행"""
 
     MIN_YEAR_MONTH = "2006-01"
-    MAX_YEAR_MONTH = "2022-06"
+    MAX_YEAR_MONTH = "2022-12"
     APT_DEAL_END_POINT = "http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev"
     APT_RENT_END_POINT = "http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptRent"
-    APT_RIGHT_LOT_OUT_END_POINT = (
-        "http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc"
-    )
+    APT_RIGHT_LOT_OUT_END_POINT = "http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcSilvTrade"
     OPCTL_DEAL_END_POINT = "http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcOffiTrade"
     OPCTL_RENT_END_POINT = "http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcOffiRent"
     SERVICE_KEY_1 = "toLAcbnBlhSZDGMeOK8gyApaeLsaa0qrLC3urCU0k%2BtyV9%2BNA9%2FwfIYqsfF9Hi2FBcxMuJBobhGNlCAyRam%2FjQ%3D%3D"
