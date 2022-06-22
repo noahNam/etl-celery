@@ -15,3 +15,5 @@ class TopicEnum(Enum):
     ETL_MART_PRIVATE_SALES = "antgirl.etl_mart_private_sales.v1"
     CRAWL_GOVT_DEAL_INFOS = "antgirl.crawl_govt_deal_infos.v1"
     ETL_MART_DONG_TYPE_INFOS = "antgirl.etl_mart_dong_type_infos.v1"
+
+    ETL_MART_PUBLIC_SALES = "antgirl.etl_mart_public_sales"

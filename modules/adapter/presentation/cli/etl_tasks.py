@@ -24,6 +24,9 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository 
 from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repository import (
     SyncSubscriptionRepository,
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.public_sale_repository import (
+    PublicSaleRepository
+)
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
@@ -40,6 +43,9 @@ from modules.application.use_case.etl.datamart.v1.real_estate_use_case import (
 from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
 from modules.application.use_case.etl.warehouse.v1.subscription_use_case import (
     SubscriptionUseCase,
+)
+from modules.application.use_case.etl.datamart.v1.public_sales_use_case import (
+    PublicSalesUseCase
 )
 
 
@@ -82,6 +88,12 @@ def get_task(topic: str):
             private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
         )
 
+    elif topic == TopicEnum.ETL_MART_PUBLIC_SALES.value:
+        return PublicSalesUseCase(
+            topic=topic,
+            subscription_repo=SyncSubscriptionRepository(),
+            public_repo=PublicSaleRepository()
+        )
 
 @etl_celery.task
 def start_worker(topic):

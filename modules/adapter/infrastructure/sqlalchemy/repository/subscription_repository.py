@@ -14,6 +14,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subsc
     SubscriptionModel,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
+    SubsToPublicEntity
+)
 
 logger = logger_.getLogger(__name__)
 
@@ -172,3 +175,13 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                     if hasattr(target_model, key):
                         setattr(col_info, key, value)
                         session.commit()
+
+    def find_by_update_needed(self) -> list[SubsToPublicEntity] | None:
+        query = select(SubscriptionModel).where(
+            SubscriptionModel.update_needed == True,
+        )
+        results = session.execute(query).scalars().all()
+        if results:
+            return [result.to_type_info_entity() for result in results]
+        else:
+            return None
