@@ -4,7 +4,6 @@ from sqlalchemy.orm import sessionmaker, scoped_session, Session
 from exceptions.base import InvalidConfigErrorException
 from modules.adapter.infrastructure.fastapi.config import fastapi_config
 from modules.adapter.infrastructure.sqlalchemy.connection import SyncDatabase
-from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
 from modules.adapter.infrastructure.sqlalchemy.mapper import (
     datalake_base,
     warehouse_base,
@@ -84,11 +83,12 @@ session_factory: scoped_session = scoped_session(
         },
         class_=Session,
         future=True,
-    ),
-    scopefunc=SessionContextManager.get_context,
+    )
 )
 db: SyncDatabase = SyncDatabase(
     engine_list=[datalake_engine, warehouse_engine, datamart_engine],
     session_factory=session_factory,
     mapper_list=[datalake_base, warehouse_base, datamart_base],
 )
+
+session: scoped_session = db.session_factory

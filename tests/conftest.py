@@ -1,13 +1,11 @@
 import os
 from typing import Generator, AsyncGenerator
-from uuid import uuid4
 
 import pytest
 import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from httpx import AsyncClient
-from sqlalchemy.engine import Transaction
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_scoped_session,
@@ -25,13 +23,13 @@ from starlette.testclient import TestClient
 from uvloop import new_event_loop
 
 from modules.adapter.infrastructure.fastapi.app import create_app
-from modules.adapter.infrastructure.fastapi.config import TestConfig
+from modules.adapter.infrastructure.fastapi.config import TestConfig, get_config
 from modules.adapter.infrastructure.sqlalchemy.connection import (
     AsyncDatabase,
     SyncDatabase,
 )
 from modules.adapter.infrastructure.sqlalchemy.context import SessionContextManager
-from modules.adapter.infrastructure.sqlalchemy.database import get_db_config, db
+from modules.adapter.infrastructure.sqlalchemy.database import get_db_config, db as _db
 from modules.adapter.infrastructure.sqlalchemy.mapper import (
     datalake_base,
     warehouse_base,
@@ -51,7 +49,7 @@ async def running_app(app, async_config):
 
 
 @pytest.fixture(scope="session")
-def sync_client(app: FastAPI) -> Generator:
+def sync_client(app: FastAPI, sync_db) -> Generator:
     with TestClient(app) as client:
         yield client
 
@@ -81,6 +79,7 @@ def sync_config() -> dict:
     config: TestConfig = TestConfig()
     config.DATA_LAKE_URL = "sqlite:///:memory:"
     config.DATA_WAREHOUSE_URL = "sqlite:///:memory:"
+    config.DATA_MART_URL = "sqlite:///:memory:"
     return config.dict()
 
 
@@ -117,7 +116,7 @@ async def async_db(async_config):
             ),
             scopefunc=SessionContextManager.get_context,
         )
-        _db: AsyncDatabase = AsyncDatabase(
+        db: AsyncDatabase = AsyncDatabase(
             engine_list=[
                 test_datalake_engine,
                 test_warehouse_engine,
@@ -128,12 +127,12 @@ async def async_db(async_config):
         )
     else:
         # local async db, not memory db
-        _db: AsyncDatabase = db
+        db: AsyncDatabase = _db
 
-    yield _db
+    yield db
 
     # tear_down
-    await _db.disconnect()
+    await db.disconnect()
 
 
 @pytest_asyncio.fixture
@@ -180,7 +179,7 @@ def _is_local_db_used(database_url: str):
             os.unlink(database_url.split("sqlite:///")[-1])
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def sync_db(sync_config):
     _is_local_db_used(database_url=sync_config.get("DATA_LAKE_URL"))
     _is_local_db_used(database_url=sync_config.get("DATA_WAREHOUSE_URL"))
@@ -214,9 +213,8 @@ def sync_db(sync_config):
                 class_=Session,
                 future=True,
             ),
-            scopefunc=SessionContextManager.get_context,
         )
-        _db: SyncDatabase = SyncDatabase(
+        db: SyncDatabase = SyncDatabase(
             engine_list=[
                 test_datalake_engine,
                 test_warehouse_engine,
@@ -227,12 +225,12 @@ def sync_db(sync_config):
         )
     else:
         # local sync db, not memory db
-        _db: SyncDatabase = db
+        db: SyncDatabase = _db
 
-    yield _db
+    yield db
 
     # tear_down
-    _db.disconnect()
+    db.disconnect()
 
 
 @pytest.fixture
@@ -246,19 +244,22 @@ def sync_session(sync_db, sync_config):
         for connection, engine, mapper in zip(
             connections, sync_db.engines, sync_db.mappers
         ):
-            mapper.metadata.drop_all(connection)
             mapper.metadata.create_all(connection)
 
-    sync_session_factory = sync_db.session_factory
+    session = sync_db.session_factory
 
-    # middleware session 처리
-    session_id = str(uuid4())
-    SessionContextManager.set_context_value(session_id)
+    yield session
 
-    yield sync_session_factory
+    if is_sqlite_used(sync_config.get("DATA_LAKE_URL")) or is_sqlite_used(
+        sync_config.get("DATA_WAREHOUSE_URL")
+    ):
+        for connection, engine, mapper in zip(
+            connections, sync_db.engines, sync_db.mappers
+        ):
+            mapper.metadata.drop_all(connection)
 
     for connection in connections:
         connection.rollback()
         connection.close()
 
-    sync_session_factory.remove()
+    session.remove()

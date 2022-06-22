@@ -177,5 +177,5 @@ class SubscriptionInfoModel(datalake_base, TimestampMixin):
             avg_win_point=self.avg_win_point,
             avg_win_point_gyeonggi=self.avg_win_point_gyeonggi,
             avg_win_point_etc=self.avg_win_point_etc,
-            update_needed=self.update_needed
+            update_needed=self.update_needed,
         )
