@@ -188,5 +188,5 @@ class BasicInfoModel(warehouse_base, TimestampMixin):
             public_ref_id=self.public_ref_id,
             rebuild_ref_id=self.rebuild_ref_id,
             is_available=self.is_available,
-            update_needed=self.update_needed
+            update_needed=self.update_needed,
         )
