@@ -38,6 +38,9 @@ class RightLotOutUseCase(BaseETLUseCase):
         govt_right_lot_outs: list[GovtRightLotOutJoinKeyEntity] = self._govt_deal_repo.find_by_update_needed(
             find_type=GovtFindTypeEnum.RIGHT_LOT_OUT_INPUT.value
         )
+        if not govt_right_lot_outs:
+            print('govt_right_lot_outs 업데이트 필요한 데이터 없음')
+            return
 
         house_ids = list()
         for govt_apt_rent in govt_right_lot_outs:
