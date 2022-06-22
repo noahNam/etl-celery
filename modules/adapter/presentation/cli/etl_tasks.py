@@ -97,63 +97,63 @@ def get_task(topic: str):
         return PrivateSaleUseCase(
             topic=topic,
             basic_repo=SyncBasicRepository(),
-            private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
+            private_sale_repo=SyncPrivateSaleRepository(),
         )
     elif topic == TopicEnum.ETL_MART_DONG_TYPE_INFOS.value:
         return DongTypeUseCase(
             topic=topic,
             basic_repo=SyncBasicRepository(),
-            private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
+            private_sale_repo=SyncPrivateSaleRepository(),
         )
     elif topic == TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value:
         return BldMappingResultsUseCase(
             topic=topic,
-            kapt_repo=SyncKaptRepository(session_factory=db.session),
-            govt_repo=SyncGovtDealsRepository(session_factory=db.session),
-            dong_code_repo=SyncLegalDongCodeRepository(session_factory=db.session),
-            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
+            kapt_repo=SyncKaptRepository(),
+            govt_repo=SyncGovtDealsRepository(),
+            dong_code_repo=SyncLegalDongCodeRepository(),
+            bld_mapping_repo=SyncBldMappingResultsRepository(),
         )
     elif topic == TopicEnum.ETL_WH_APT_DEALS.value:
         return AptDealUseCase(
             topic=topic,
-            govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
-            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
-            bld_deal_repo=SyncBldDealRepository(session_factory=db.session),
-            basic_repo=SyncBasicRepository(session_factory=db.session),
+            govt_deal_repo=SyncGovtDealsRepository(),
+            bld_mapping_repo=SyncBldMappingResultsRepository(),
+            bld_deal_repo=SyncBldDealRepository(),
+            basic_repo=SyncBasicRepository(),
         )
     elif topic == TopicEnum.ETL_WH_APT_RENTS.value:
         return AptRentUseCase(
             topic=topic,
-            govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
-            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
-            bld_deal_repo=SyncBldDealRepository(session_factory=db.session),
-            basic_repo=SyncBasicRepository(session_factory=db.session),
+            govt_deal_repo=SyncGovtDealsRepository(),
+            bld_mapping_repo=SyncBldMappingResultsRepository(),
+            bld_deal_repo=SyncBldDealRepository(),
+            basic_repo=SyncBasicRepository(),
         )
     elif topic == TopicEnum.ETL_WH_OFCTL_DEALS:
         return OfctlDealUseCase(
-            govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
-            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
-            bld_deal_repo=SyncBldDealRepository(session_factory=db.session),
-            basic_repo=SyncBasicRepository(session_factory=db.session),
+            govt_deal_repo=SyncGovtDealsRepository(),
+            bld_mapping_repo=SyncBldMappingResultsRepository(),
+            bld_deal_repo=SyncBldDealRepository(),
+            basic_repo=SyncBasicRepository(),
         )
     elif topic == TopicEnum.ETL_WH_OFCTL_RENTS.value:
         return OfctlRentsUseCase(
-            govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
-            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
-            bld_deal_repo=SyncBldDealRepository(session_factory=db.session),
-            basic_repo=SyncBasicRepository(session_factory=db.session),
+            govt_deal_repo=SyncGovtDealsRepository(),
+            bld_mapping_repo=SyncBldMappingResultsRepository(),
+            bld_deal_repo=SyncBldDealRepository(),
+            basic_repo=SyncBasicRepository(),
         )
     elif topic == TopicEnum.ETL_WH_RIGHT_LOG_OUTS.value:
         return RightLotOutUseCase(
-            govt_deal_repo=SyncGovtDealsRepository(session_factory=db.session),
-            bld_mapping_repo=SyncBldMappingResultsRepository(session_factory=db.session),
-            bld_deal_repo=SyncBldDealRepository(session_factory=db.session),
-            basic_repo=SyncBasicRepository(session_factory=db.session),
+            govt_deal_repo=SyncGovtDealsRepository(),
+            bld_mapping_repo=SyncBldMappingResultsRepository(),
+            bld_deal_repo=SyncBldDealRepository(),
+            basic_repo=SyncBasicRepository(),
         )
     elif topic == TopicEnum.ETL_WH_UPDATE_SUPPLY_AREA.value:
         return DealSupplyAreaUseCase(
-            basic_repo=SyncBasicRepository(session_factory=db.session),
-            bld_deal_repo=SyncBldDealRepository(session_factory=db.session),
+            basic_repo=SyncBasicRepository(),
+            bld_deal_repo=SyncBldDealRepository(),
         )
 
 

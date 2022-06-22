@@ -44,9 +44,6 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncGovtDealsRepository(GovtDealsRepository):
-    def __init__(self, session_factory: Callable[..., ContextManager[Session]]):
-        super().__init__(session_factory=session_factory)
-
     def find_by_update_needed(self,
                               find_type: int = 0) -> list[GovtAptDealsEntity] \
                                             | list[GovtAptRentsEntity] \
