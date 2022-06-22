@@ -1,5 +1,9 @@
 import xmltodict
 
+from modules.adapter.infrastructure.crawler.crawler.spiders.govt_deal_spider import (
+    GovtDateCounter,
+)
+
 
 def test_xml_response_to_item():
     xml_text = (

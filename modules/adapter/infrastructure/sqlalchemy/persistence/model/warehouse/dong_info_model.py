@@ -1,7 +1,16 @@
-from sqlalchemy import Column, BigInteger, Integer, String, Numeric, ForeignKey, Boolean, SmallInteger
+from sqlalchemy import (
+    Column,
+    BigInteger,
+    Integer,
+    String,
+    ForeignKey,
+    Boolean,
+    SmallInteger,
+)
 
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
-    DongInfoEntity, SupplyAreaEntity
+    DongInfoEntity,
+    SupplyAreaEntity
 )
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (

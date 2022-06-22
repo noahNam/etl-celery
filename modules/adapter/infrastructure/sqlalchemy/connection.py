@@ -142,14 +142,3 @@ class SyncDatabase:
     def disconnect(self) -> None:
         for engine in self._engines:
             engine.dispose()
-
-    @contextmanager
-    def session(self) -> Callable[..., ContextManager[Session]]:
-        session: Session = self._session_factory()
-        try:
-            yield session
-        except Exception:
-            session.rollback()
-            raise
-        finally:
-            session.close()
