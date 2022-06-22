@@ -325,6 +325,7 @@ class GovtHouseDealSpider(Spider):
                 ref_table="govt_apt_deals",
                 response_or_failure=response,
             )
+        self.count_requests()
 
     def parse_apt_rent_info(self, response):
         xml_to_dict: dict = parse(response.text)
@@ -403,6 +404,7 @@ class GovtHouseDealSpider(Spider):
                 ref_table="govt_apt_rents",
                 response_or_failure=response,
             )
+        self.count_requests()
 
     def parse_opctl_deal_info(self, response):
         xml_to_dict: dict = parse(response.text)
@@ -485,6 +487,7 @@ class GovtHouseDealSpider(Spider):
                 ref_table="govt_opctl_deals",
                 response_or_failure=response,
             )
+        self.count_requests()
 
     def parse_opctl_rent_info(self, response):
         xml_to_dict: dict = parse(response.text)
@@ -563,6 +566,7 @@ class GovtHouseDealSpider(Spider):
                 ref_table="govt_opctl_rents",
                 response_or_failure=response,
             )
+        self.count_requests()
 
     def parse_apt_right_lot_out_info(self, response):
         xml_to_dict: dict = parse(response.text)
@@ -636,6 +640,7 @@ class GovtHouseDealSpider(Spider):
                 ref_table="govt_opctl_deals",
                 response_or_failure=response,
             )
+        self.count_requests()
 
     def error_callback_apt_deal_info(self, failure: Response) -> None:
         self.save_failure_info(
