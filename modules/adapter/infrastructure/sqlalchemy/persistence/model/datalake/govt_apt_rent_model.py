@@ -55,7 +55,7 @@ class GovtAptRentModel(datalake_base, TimestampMixin):
     def to_entity_for_apt_rents(self) -> GovtAptRentsJoinKeyEntity:
         return GovtAptRentsJoinKeyEntity(
             id=self.id,
-            house_id=self.bld_mapping.house_id,# if self.bld_mapping.house_id else None,  # fixme: 정상적으로 나오는지 확인 필요
+            house_id=self.bld_mapping.house_id,
             dong=self.dong,
             apt_name=self.apt_name,
             monthly_amount=self.monthly_amount,

@@ -53,6 +53,9 @@ from modules.application.use_case.etl.datamart.v1.private_sale_use_case import (
 from modules.application.use_case.etl.datamart.v1.real_estate_use_case import (
     RealEstateUseCase,
 )
+from modules.application.use_case.etl.warehouse.v1.supply_area_use_case import(
+    DealSupplyAreaUseCase
+)
 from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
 from modules.application.use_case.etl.warehouse.v1.apt_deal_use_case import AptDealUseCase
 from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import BldMappingResultsUseCase
@@ -149,7 +152,10 @@ def get_task(topic: str):
             basic_repo=SyncBasicRepository(session_factory=db.session),
         )
     elif topic == TopicEnum.ETL_WH_UPDATE_SUPPLY_AREA.value:
-        return
+        return DealSupplyAreaUseCase(
+            basic_repo=SyncBasicRepository(session_factory=db.session),
+            bld_deal_repo=SyncBldDealRepository(session_factory=db.session),
+        )
 
 
 @etl_celery.task

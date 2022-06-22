@@ -32,5 +32,3 @@ class SyncBldMappingResultsRepository(BaseSyncRepository):
                 session.rollback()
                 raise NotUniqueErrorException
             return None
-
-# fixme: update 만들어두기

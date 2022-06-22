@@ -27,7 +27,7 @@ from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
 
 
 class AptRentUseCase(BaseETLUseCase):
-    def __init__(self, govt_deal_repo, bld_mapping_repo, bld_deal_repo, basic_repo, *args, **kwargs):  # fixme: 명칭 통일 및 수정
+    def __init__(self, govt_deal_repo, bld_mapping_repo, bld_deal_repo, basic_repo, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._bld_mapping_repo: SyncBldMappingResultsRepository = bld_mapping_repo  # input_table
         self._govt_deal_repo: SyncGovtDealsRepository = govt_deal_repo   # input_table
