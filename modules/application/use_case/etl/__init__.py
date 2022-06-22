@@ -4,7 +4,7 @@ from modules.adapter.infrastructure.utils.log_helper import logger_
 logger = logger_.getLogger(__name__)
 
 
-class BaseETLUseCase: #fixme: ETL 대문자로 (수정함)
+class BaseETLUseCase:
     def __init__(
         self,
         topic: str,

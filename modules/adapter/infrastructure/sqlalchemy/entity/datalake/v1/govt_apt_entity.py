@@ -112,7 +112,7 @@ class GovtRightLotOutsEntity(BaseModel):
     updated_at: str | None
 
 
-class GovtTransferEntity(BaseModel):  # fixme: 명칭 변경 (수정함)
+class GovtTransferEntity(BaseModel):
     """
     매핑테이블 전처리를 위한 임시 Entity
     TransferBldMappingResults 에서 사용.
