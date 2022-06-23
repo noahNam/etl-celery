@@ -5,7 +5,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_en
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import (
     DongInfoModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import (
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.type_info_model import (
     TypeInfoModel,
 )
 

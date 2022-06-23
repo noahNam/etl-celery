@@ -19,9 +19,6 @@ class BasicRepository(ABC):
     @abstractmethod
     def save(
         self,
-        target_model: Type[
-            BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel
-        ],
         values: list[BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel],
     ) -> None:
         pass

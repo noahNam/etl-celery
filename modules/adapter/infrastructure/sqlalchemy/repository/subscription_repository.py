@@ -7,6 +7,16 @@ from core.domain.warehouse.subscription.interface.subscription_info_repository i
 )
 from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.database import session
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
+    SubscriptionInfoEntity,
+    SubscriptionManualInfoEntity,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_info_model import (
+    SubscriptionInfoModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_manual_info_model import (
+    SubscriptionManualInfoModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_detail_model import (
     SubscriptionDetailModel,
 )
@@ -20,15 +30,7 @@ logger = logger_.getLogger(__name__)
 
 class SyncSubscriptionRepository(SubscriptionRepository):
     def save(self, value: SubscriptionModel | SubscriptionDetailModel) -> None:
-        try:
-            session.add(value)
-            session.commit()
-        except exc.IntegrityError as e:
-            logger.error(
-                f"[SyncSubscriptionRepository][save] target_model : {value} error : {e}"
-            )
-            session.rollback()
-            raise NotUniqueErrorException
+        session.add(value)
 
     def update(self, value: SubscriptionModel | SubscriptionDetailModel) -> None:
         if isinstance(value, SubscriptionModel):
@@ -64,6 +66,7 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                     subscription_date=value.subscription_date,
                     special_supply_status=value.special_supply_status,
                     cmptt_rank=value.cmptt_rank,
+                    update_needed=value.update_needed,
                 )
             )
 
@@ -120,10 +123,9 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                     avg_win_point=value.avg_win_point,
                     avg_win_point_gyeonggi=value.avg_win_point_gyeonggi,
                     avg_win_point_etc=value.avg_win_point_etc,
+                    update_needed=value.update_needed,
                 )
             )
-
-        session.commit()
 
     def exists_by_key(self, value: SubscriptionModel | SubscriptionDetailModel) -> bool:
         query = None
@@ -159,7 +161,6 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                 for (key, value) in items.items():
                     if hasattr(target_model, key):
                         setattr(col_info, key, value)
-                        session.commit()
 
         elif target_model == SubscriptionDetailModel:
             key = value.get("key")
@@ -171,4 +172,34 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                 for (key, value) in items.items():
                     if hasattr(target_model, key):
                         setattr(col_info, key, value)
-                        session.commit()
+
+    def change_update_needed_status(
+        self,
+        target_list: list[SubscriptionInfoEntity | SubscriptionManualInfoEntity],
+    ):
+        try:
+            keys = [entity.id for entity in target_list]
+            if isinstance(target_list[0], SubscriptionInfoEntity):
+                session.execute(
+                    update(SubscriptionInfoModel)
+                    .where(SubscriptionInfoModel.id.in_([keys]))
+                    .values(
+                        update_needed=False,
+                    )
+                )
+            elif isinstance(target_list[0], SubscriptionManualInfoEntity):
+                session.execute(
+                    update(SubscriptionManualInfoModel)
+                    .where(SubscriptionManualInfoModel.id.in_([keys]))
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            session.commit()
+
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncKaptRepository] change_update_needed_status -> {type(target_list[0])} error : {e}"
+            )
+            session.rollback()

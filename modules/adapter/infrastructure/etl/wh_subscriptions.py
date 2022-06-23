@@ -88,6 +88,7 @@ class TransformSubscription:
                     avg_win_point=target_entity.avg_win_point,
                     avg_win_point_gyeonggi=target_entity.avg_win_point_gyeonggi,
                     avg_win_point_etc=target_entity.avg_win_point_etc,
+                    update_needed=target_entity.update_needed,
                 )
             )
 
@@ -126,6 +127,7 @@ class TransformSubscription:
                     subscription_date=target_entity.subscription_date,
                     special_supply_status=target_entity.special_supply_status,
                     cmptt_rank=target_entity.cmptt_rank,
+                    update_needed=target_entity.update_needed,
                 )
             )
             subs_id = target_entity.subs_id
@@ -152,6 +154,7 @@ class TransformSubscription:
                         kitchen_window=target_entity.kitchen_window,
                         direct_window=target_entity.direct_window,
                         alpha_room=target_entity.alpha_room,
+                        update_needed=target_entity.update_needed,
                     ),
                 )
             )
@@ -180,6 +183,7 @@ class TransformSubscription:
                         cyber_model_house_link=target_entity.cyber_model_house_link,
                         supply_rate=target_entity.supply_rate,
                         supply_rate_etc=target_entity.supply_rate_etc,
+                        update_needed=target_entity.update_needed,
                     ),
                 )
             )
