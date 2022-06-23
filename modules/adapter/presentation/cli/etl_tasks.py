@@ -1,7 +1,10 @@
 from modules.adapter.infrastructure.celery.etl_queue import etl_celery
-from modules.adapter.infrastructure.sqlalchemy.database import db, session
+from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
+    SyncBldDealRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_bld_repository import (
     SyncGovtBldRepository,
@@ -24,12 +27,16 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository 
 from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repository import (
     SyncSubscriptionRepository,
 )
+from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
 )
 from modules.application.use_case.etl.datamart.v1.dong_type_use_case import (
     DongTypeUseCase,
+)
+from modules.application.use_case.etl.datamart.v1.private_sale_detail_use_case import (
+    PrivateSaleDetailUseCase,
 )
 from modules.application.use_case.etl.datamart.v1.private_sale_use_case import (
     PrivateSaleUseCase,
@@ -42,9 +49,13 @@ from modules.application.use_case.etl.warehouse.v1.subscription_use_case import 
     SubscriptionUseCase,
 )
 
+logger = logger_.getLogger(__name__)
+
 
 def get_task(topic: str):
-    if topic == TopicEnum.ETL_WH_BASIC_INFOS.value:
+    if (
+        topic == TopicEnum.ETL_WH_BASIC_INFOS.value
+    ):  # update_needed -> False - DL.KaptBasicInfoModel, DL.KaptMgmtCostModel, DL.KaptLocationInfoModel, DL.KaptAreaInfoModel, DL.GovtBldTopInfoModel, DL.GovtBldMiddleInfoModel, DL.GovtBldAreaInfoModel
         return BasicUseCase(
             topic=topic,
             basic_repo=SyncBasicRepository(),
@@ -52,40 +63,58 @@ def get_task(topic: str):
             kakao_repo=SyncKakaoApiRepository(),
             govt_bld_repo=SyncGovtBldRepository(),
         )
-    elif topic == TopicEnum.ETL_DL_SUBS_INFOS.value:
+    elif topic == TopicEnum.ETL_DL_SUBS_INFOS.value:  # update_needed -> X
         return SubscriptionInfoUseCase(
             topic=topic,
             subs_info_repo=SyncSubscriptionInfoRepository(),
         )
-    elif topic == TopicEnum.ETL_WH_SUBS_INFOS.value:
+    elif (
+        topic == TopicEnum.ETL_WH_SUBS_INFOS.value
+    ):  # update_needed -> False - DL.SubscriptionInfoModel, DL.SubscriptionManualInfoModel
         return SubscriptionUseCase(
             topic=topic,
             subscription_repo=SyncSubscriptionRepository(),
             subs_info_repo=SyncSubscriptionInfoRepository(),
         )
-    elif topic == TopicEnum.ETL_MART_REAL_ESTATES.value:
+    elif topic == TopicEnum.ETL_MART_REAL_ESTATES.value:  # update_needed -> X
         return RealEstateUseCase(
             topic=topic,
             basic_repo=SyncBasicRepository(),
             real_estate_repo=SyncRealEstateRepository(),
         )
-    elif topic == TopicEnum.ETL_MART_PRIVATE_SALES.value:
+    elif (
+        topic == TopicEnum.ETL_MART_PRIVATE_SALES.value
+    ):  # update_needed -> False - WH.BasicInfoModel
         return PrivateSaleUseCase(
             topic=topic,
             basic_repo=SyncBasicRepository(),
-            private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
+            private_sale_repo=SyncPrivateSaleRepository(),
         )
-    elif topic == TopicEnum.ETL_MART_DONG_TYPE_INFOS.value:
+    elif (
+        topic == TopicEnum.ETL_MART_DONG_TYPE_INFOS.value
+    ):  # update_needed -> False - WH.MartDongInfoModel, WH.MartTypeInfoModel
         return DongTypeUseCase(
             topic=topic,
             basic_repo=SyncBasicRepository(),
-            private_sale_repo=SyncPrivateSaleRepository(session_factory=db.session),
+            private_sale_repo=SyncPrivateSaleRepository(),
+        )
+    elif (
+        topic == TopicEnum.ETL_MART_PRIVATE_SALE_DETAILS.value
+    ):  # update_needed -> False - WH.AptDealModel, WH.AptRentModel, WH.OfctlDealModel, WH.OfctlRentModel, WH.RightLotOutModel
+        return PrivateSaleDetailUseCase(
+            topic=topic,
+            bld_deal_repo=SyncBldDealRepository(),
+            private_sale_repo=SyncPrivateSaleRepository(),
+            kapt_repo=SyncKaptRepository(),
         )
 
 
 @etl_celery.task
 def start_worker(topic):
-    uc = get_task(topic=topic)
-    uc.execute()
-
-    session.remove()
+    try:
+        uc = get_task(topic=topic)
+        uc.execute()
+    except Exception as e:
+        logger.error(f"{topic } error : {e}")
+    finally:
+        session.remove()
