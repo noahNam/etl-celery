@@ -135,7 +135,7 @@ class GovtAptDealsJoinKeyEntity(BaseModel):
     deal_amount: str | None
     deal_year: str
     deal_month: str
-    deal_day: str | None
+    deal_day: str
     serial_no: str | None
     exclusive_area: str | None
     regional_cd: str
@@ -154,7 +154,7 @@ class GovtAptRentsJoinKeyEntity(BaseModel):
     monthly_amount: int | None
     deal_year: str
     deal_month: str
-    deal_day: str | None
+    deal_day: str
     deposit: int | None
     exclusive_area: str | None
     regional_cd: str
@@ -166,10 +166,10 @@ class GovtOfctlDealJoinKeyEntity(BaseModel):
     house_id: int
     dong: str | None
     ofctl_name: str
-    deal_amount: int | None
+    deal_amount: int
     deal_year: str
     deal_month: str
-    deal_day: str | None
+    deal_day: str
     exclusive_area: str | None
     regional_cd: str
     floor: str | None
@@ -186,7 +186,7 @@ class GovtOfctlRentJoinKeyEntity(BaseModel):
     ofctl_name: str
     deal_year: str
     deal_month: str
-    deal_day: str | None
+    deal_day: str
     deposit: int | None
     monthly_amount: int | None
     exclusive_area: str | None
@@ -198,11 +198,11 @@ class GovtRightLotOutJoinKeyEntity(BaseModel):
     house_id: int
     dong: str | None
     name: str
-    deal_amount: int | None
-    classification_owner_ship: str | None
+    deal_amount: int
+    classification_owner_ship: str
     deal_year: str
     deal_month: str
-    deal_day: str | None
+    deal_day: str
     exclusive_area: str | None
     regional_cd: str
     floor: str | None

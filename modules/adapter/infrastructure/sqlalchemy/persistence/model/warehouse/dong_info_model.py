@@ -57,5 +57,6 @@ class DongInfoModel(warehouse_base, TimestampMixin):
     def to_supply_area_entity(self) -> SupplyAreaEntity:
         return SupplyAreaEntity(
             house_id=self.house_id,
+            private_area=self.type_infos.private_area,
             supply_area=self.type_infos.supply_area
         )
