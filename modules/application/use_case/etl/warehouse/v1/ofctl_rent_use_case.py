@@ -60,6 +60,5 @@ class OfctlRentsUseCase(BaseETLUseCase):
         govt_ofctl_rent_ids: list[int] = results[1]
 
         # Load
-        self._govt_deal_repo.alter_update_needed_by_id(govt_ofctl_rent_ids, GovtOfctlRentModel)
-        self._bld_deal_reop.save_all(insert_models=ofctl_rents, ids=govt_ofctl_rent_ids,
+        self._bld_deal_reop.save_all(insert_models=ofctl_rents, _ids=govt_ofctl_rent_ids,
                                      update_model=GovtOfctlRentModel)

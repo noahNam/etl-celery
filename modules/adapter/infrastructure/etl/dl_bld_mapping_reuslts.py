@@ -196,10 +196,6 @@ class TransferBldMappingResults(Transfer):
                 return_idx = idx
                 break
 
-        # if return_idx is None:
-            # pass
-            # 아파트이름 비슷한 것 찾기
-
         return return_idx
 
     def _filter_basices_by_jibun(self,

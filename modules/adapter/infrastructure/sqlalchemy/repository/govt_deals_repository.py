@@ -67,8 +67,7 @@ class SyncGovtDealsRepository(GovtDealsRepository):
             if not govt_apt_deals:
                 return None
             else:
-                return_ls = [govt_apt_deal.to_entity_for_bld_mapping_results() for govt_apt_deal in govt_apt_deals]
-                return return_ls
+                return [govt_apt_deal.to_entity_for_bld_mapping_results() for govt_apt_deal in govt_apt_deals]
 
         elif find_type == GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value:
             query = select(
@@ -81,8 +80,7 @@ class SyncGovtDealsRepository(GovtDealsRepository):
             if not govt_apt_rents:
                 return None
             else:
-                return_ls = [govt_apt_rent.to_entity_for_bld_mapping_results() for govt_apt_rent in govt_apt_rents]
-                return return_ls
+                return [govt_apt_rent.to_entity_for_bld_mapping_results() for govt_apt_rent in govt_apt_rents]
 
         elif find_type == GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value:
             query = select(
@@ -94,9 +92,8 @@ class SyncGovtDealsRepository(GovtDealsRepository):
             if not govt_ofctl_deals:
                 return None
             else:
-                return_ls = [govt_ofctl_deal.to_entity_for_bld_mapping_results() for govt_ofctl_deal in
+                return [govt_ofctl_deal.to_entity_for_bld_mapping_results() for govt_ofctl_deal in
                              govt_ofctl_deals]
-                return return_ls
 
         elif find_type == GovtFindTypeEnum.GOV_OFCTL_RENT_MAPPING.value:
             query = select(
@@ -108,9 +105,8 @@ class SyncGovtDealsRepository(GovtDealsRepository):
             if not govt_ofctl_rents:
                 return None
             else:
-                return_ls = [govt_ofctl_rent.to_entity_for_bld_mapping_results() for govt_ofctl_rent in
+                return [govt_ofctl_rent.to_entity_for_bld_mapping_results() for govt_ofctl_rent in
                              govt_ofctl_rents]
-                return return_ls
 
         elif find_type == GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value:
             query = select(
@@ -122,9 +118,8 @@ class SyncGovtDealsRepository(GovtDealsRepository):
             if not govt_right_lot_outs:
                 return None
             else:
-                return_ls = [govt_right_lot_out.to_entity_for_bld_mapping_results() for govt_right_lot_out in
+                return [govt_right_lot_out.to_entity_for_bld_mapping_results() for govt_right_lot_out in
                              govt_right_lot_outs]
-                return return_ls
 
         elif find_type == GovtFindTypeEnum.APT_DEALS_INPUT.value:
             query = select(
@@ -144,8 +139,7 @@ class SyncGovtDealsRepository(GovtDealsRepository):
             if not govt_apt_deals:
                 return None
             else:
-                return_ls = [govt_apt_deal.to_entity_for_apt_deals() for govt_apt_deal in govt_apt_deals]
-                return return_ls
+                return [govt_apt_deal.to_entity_for_apt_deals() for govt_apt_deal in govt_apt_deals]
 
         elif find_type == GovtFindTypeEnum.APT_RENTS_INPUT.value:
             query = select(
@@ -165,8 +159,7 @@ class SyncGovtDealsRepository(GovtDealsRepository):
             if not govt_apt_rents:
                 return None
             else:
-                return_ls = [govt_apt_rent.to_entity_for_apt_rents() for govt_apt_rent in govt_apt_rents]
-                return return_ls
+                return [govt_apt_rent.to_entity_for_apt_rents() for govt_apt_rent in govt_apt_rents]
 
         elif find_type == GovtFindTypeEnum.OFCTL_DEAL_INPUT.value:
             query = select(
@@ -187,8 +180,7 @@ class SyncGovtDealsRepository(GovtDealsRepository):
             if not govt_ofctl_deals:
                 return None
             else:
-                return_ls = [ovt_ofctl_deal.to_entity_for_ofctl_deals() for ovt_ofctl_deal in govt_ofctl_deals]
-                return return_ls
+                return [ovt_ofctl_deal.to_entity_for_ofctl_deals() for ovt_ofctl_deal in govt_ofctl_deals]
 
         elif find_type == GovtFindTypeEnum.OFCTL_RENT_INPUT.value:
             query = select(
@@ -208,8 +200,7 @@ class SyncGovtDealsRepository(GovtDealsRepository):
             if not govt_ofctl_rents:
                 return None
             else:
-                return_ls = [govt_ofctl_rent.to_entity_for_ofctl_rents() for govt_ofctl_rent in govt_ofctl_rents]
-                return return_ls
+                return [govt_ofctl_rent.to_entity_for_ofctl_rents() for govt_ofctl_rent in govt_ofctl_rents]
 
         elif find_type == GovtFindTypeEnum.RIGHT_LOT_OUT_INPUT.value:
             query = select(
@@ -230,27 +221,6 @@ class SyncGovtDealsRepository(GovtDealsRepository):
             if not govt_right_lot_outs:
                 return None
             else:
-                return_ls = [govt_right_lot_out.to_entity_for_right_lot_outs() for govt_right_lot_out in govt_right_lot_outs]
-                return return_ls
+                return [govt_right_lot_out.to_entity_for_right_lot_outs() for govt_right_lot_out in govt_right_lot_outs]
         else:
             return None
-
-    def alter_update_needed_by_id(self,
-                                  ids: list[int],
-                                  model: type[GovtAptDealModel
-                                              | GovtAptRentModel
-                                              | GovtOfctlDealModel
-                                              | GovtOfctlRentModel
-                                              | GovtRightLotOutModel],
-                                  ) -> None:
-        try:
-            session.execute(
-                update(model)
-                    .where(model.id.in_(ids))
-                    .values(
-                        update_needed=False
-                    )
-            )
-            session.commit()
-        except:
-            session.rollback()
