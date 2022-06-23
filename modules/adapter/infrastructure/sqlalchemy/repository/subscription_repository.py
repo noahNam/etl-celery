@@ -7,6 +7,16 @@ from core.domain.warehouse.subscription.interface.subscription_info_repository i
 )
 from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.database import session
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
+    SubscriptionInfoEntity,
+    SubscriptionManualInfoEntity,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_info_model import (
+    SubscriptionInfoModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_manual_info_model import (
+    SubscriptionManualInfoModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_detail_model import (
     SubscriptionDetailModel,
 )
@@ -162,3 +172,34 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                 for (key, value) in items.items():
                     if hasattr(target_model, key):
                         setattr(col_info, key, value)
+
+    def change_update_needed_status(
+        self,
+        target_list: list[SubscriptionInfoEntity | SubscriptionManualInfoEntity],
+    ):
+        try:
+            keys = [entity.id for entity in target_list]
+            if isinstance(target_list[0], SubscriptionInfoEntity):
+                session.execute(
+                    update(SubscriptionInfoModel)
+                    .where(SubscriptionInfoModel.id.in_([keys]))
+                    .values(
+                        update_needed=False,
+                    )
+                )
+            elif isinstance(target_list[0], SubscriptionManualInfoEntity):
+                session.execute(
+                    update(SubscriptionManualInfoModel)
+                    .where(SubscriptionManualInfoModel.id.in_([keys]))
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            session.commit()
+
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncKaptRepository] change_update_needed_status -> {type(target_list[0])} error : {e}"
+            )
+            session.rollback()

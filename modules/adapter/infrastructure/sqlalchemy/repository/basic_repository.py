@@ -11,7 +11,9 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_en
     DongInfoEntity,
     TypeInfoEntity,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_model import PrivateSaleModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_model import (
+    PrivateSaleModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
 )
@@ -25,7 +27,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_
     TypeInfoModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import (
-    DongInfoModel as MartDongInfoModel
+    DongInfoModel as MartDongInfoModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.type_info_model import (
     TypeInfoModel as MartTypeInfoModel,
@@ -281,13 +283,15 @@ class SyncBasicRepository(BasicRepository):
                 query.to_calc_mgmt_cost_entity(priv_area=options) for query in queryset
             ]
 
-    def change_update_needed_status(self, value: PrivateSaleModel | MartDongInfoModel | MartTypeInfoModel):
+    def change_update_needed_status(
+        self, value: PrivateSaleModel | MartDongInfoModel | MartTypeInfoModel
+    ):
         try:
             if isinstance(value, PrivateSaleModel):
                 session.execute(
                     update(BasicInfoModel)
-                        .where(BasicInfoModel.house_id == value.id)
-                        .values(
+                    .where(BasicInfoModel.house_id == value.id)
+                    .values(
                         update_needed=False,
                     )
                 )
@@ -295,8 +299,8 @@ class SyncBasicRepository(BasicRepository):
             elif isinstance(value, MartDongInfoModel):
                 session.execute(
                     update(DongInfoModel)
-                        .where(DongInfoModel.id == value.id)
-                        .values(
+                    .where(DongInfoModel.id == value.id)
+                    .values(
                         update_needed=False,
                     )
                 )
@@ -304,8 +308,8 @@ class SyncBasicRepository(BasicRepository):
             elif isinstance(value, MartTypeInfoModel):
                 session.execute(
                     update(TypeInfoModel)
-                        .where(TypeInfoModel.id == value.id)
-                        .values(
+                    .where(TypeInfoModel.id == value.id)
+                    .values(
                         update_needed=False,
                     )
                 )

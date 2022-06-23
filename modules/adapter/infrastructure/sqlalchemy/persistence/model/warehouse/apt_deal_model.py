@@ -1,6 +1,8 @@
 from sqlalchemy import Column, String, BigInteger, Integer, Float, Boolean, Numeric
 
-from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.bld_deal_entity import AptDealEntity
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.bld_deal_entity import (
+    AptDealEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
@@ -57,5 +59,5 @@ class AptDealModel(warehouse_base, TimestampMixin):
             req_gbn=self.req_gbn,
             rdealer_lawdnm=self.rdealer_lawdnm,
             is_available=self.is_available,
-            update_needed=self.update_needed
+            update_needed=self.update_needed,
         )

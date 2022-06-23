@@ -100,7 +100,9 @@ class SyncGovtBldRepository(GovtBldRepository):
             )
             results = session.execute(query).scalars().all()
             if results:
-                result_list = [result.to_govt_bld_top_info_entity() for result in results]
+                result_list = [
+                    result.to_govt_bld_top_info_entity() for result in results
+                ]
 
         elif target_model == GovtBldMiddleInfoModel:
             # 총괄부 표제 동 정보
