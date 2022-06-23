@@ -305,7 +305,7 @@ class SyncBasicRepository(BasicRepository):
             return None
 
         return [
-            supply_area.to_supply_area_entity for supply_area in supply_areas
+            supply_area.to_supply_area_entity() for supply_area in supply_areas
         ]
 
     def find_supply_areas_by_update_needed(self) -> list[SupplyAreaEntity] | None:
@@ -324,6 +324,6 @@ class SyncBasicRepository(BasicRepository):
             return None
 
         return [
-            supply_area.to_supply_area_entity for supply_area in supply_areas
+            supply_area.to_supply_area_entity() for supply_area in supply_areas
         ]
 

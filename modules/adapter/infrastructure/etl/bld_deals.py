@@ -39,7 +39,7 @@ class TransferAptDeals(Transfer):
             apt_daels = list()
             apt_dael_ids = list()
             for govt_apt_deal in entities:
-                supply_area = self._get_supply_area(supply_areas=supply_areas, house_id=govt_apt_deal.house_id)
+                supply_area = self._get_supply_area(supply_areas=supply_areas, govt_deal=govt_apt_deal)
 
                 apt_dael = AptDealModel(
                     house_id=govt_apt_deal.house_id,
@@ -68,7 +68,7 @@ class TransferAptDeals(Transfer):
             apt_rents = list()
             apt_rent_ids = list()
             for govt_apt_rent in entities:
-                supply_area = self._get_supply_area(supply_areas=supply_areas, house_id=govt_apt_rent.house_id)
+                supply_area = self._get_supply_area(supply_areas=supply_areas, govt_deal=govt_apt_rent)
 
                 apt_rent = AptRentModel(
                     house_id=govt_apt_rent.house_id,
@@ -93,7 +93,7 @@ class TransferAptDeals(Transfer):
             ofctl_deals = list()
             ofctl_deal_ids = list()
             for govt_ofctl_deal in entities:
-                supply_area = self._get_supply_area(supply_areas=supply_areas, house_id=govt_ofctl_deal.house_id)
+                supply_area = self._get_supply_area(supply_areas=supply_areas, govt_deal=govt_ofctl_deal)
 
                 ofctl_deal = OfctlDealModel(
                     house_id=govt_ofctl_deal.house_id,
@@ -120,7 +120,7 @@ class TransferAptDeals(Transfer):
             ofctl_rents = list()
             ofctl_rent_ids = list()
             for govt_ofctl_rent in entities:
-                supply_area = self._get_supply_area(supply_areas=supply_areas, house_id=govt_ofctl_rent.house_id)
+                supply_area = self._get_supply_area(supply_areas=supply_areas, govt_deal=govt_ofctl_rent)
 
                 ofctl_rent = OfctlRentModel(
                     house_id=govt_ofctl_rent.house_id,
@@ -146,7 +146,7 @@ class TransferAptDeals(Transfer):
             right_lot_out_ids = list()
 
             for govt_right_lot_out in entities:
-                supply_area = self._get_supply_area(supply_areas=supply_areas, house_id=govt_right_lot_out.house_id)
+                supply_area = self._get_supply_area(supply_areas=supply_areas, govt_deal=govt_right_lot_out)
 
                 right_lot_out = RightLotOutModel(
                     house_id=govt_right_lot_out.house_id,
@@ -170,12 +170,20 @@ class TransferAptDeals(Transfer):
         else:
             return None
 
-    def _get_supply_area(self, supply_areas: list[SupplyAreaEntity], house_id: int) -> float | None:
+    def _get_supply_area(self,
+                         supply_areas: list[SupplyAreaEntity],
+                         govt_deal: GovtAptDealsJoinKeyEntity
+                                      | GovtOfctlDealJoinKeyEntity
+                                      | GovtAptRentsJoinKeyEntity
+                                      | GovtOfctlRentJoinKeyEntity
+                                      | GovtRightLotOutJoinKeyEntity
+                         ) -> float | None:
         if not supply_areas:
             return None
 
         supply_area = None
         for supply_entity in supply_areas:
-            if house_id == supply_entity.house_id:
+            if govt_deal.house_id == supply_entity.house_id \
+                    and govt_deal.exclusive_area == supply_entity.private_area:
                 supply_area = supply_entity.supply_area
         return supply_area

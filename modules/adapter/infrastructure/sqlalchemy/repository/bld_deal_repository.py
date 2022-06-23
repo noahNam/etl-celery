@@ -1,17 +1,13 @@
-from typing import Callable, ContextManager
-from sqlalchemy.orm import Session
+from typing import Type
+
 from sqlalchemy import exc, update
-from exceptions.base import NotUniqueErrorException
 
-from modules.adapter.infrastructure.utils.log_helper import logger_
-from modules.adapter.infrastructure.sqlalchemy.database import session
 from core.domain.warehouse.bld_deal.interface.bld_deal_repository import BldDealsRepository
-
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_deal_model import AptDealModel
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_rent_model import AptRentModel
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl_deal_model import OfctlDealModel
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl_rent_model import OfctlRentModel
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.right_lot_out_model import RightLotOutModel
+from exceptions.base import NotUniqueErrorException
+from modules.adapter.infrastructure.sqlalchemy.database import session
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
+    SupplyAreaEntity
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_deal_model import (
     GovtAptDealModel,
 )
@@ -24,13 +20,15 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_o
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_ofctl_rent_model import (
     GovtOfctlRentModel
 )
-
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_right_lot_out_model import (
     GovtRightLotOutModel
 )
-from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
-    SupplyAreaEntity
-)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_deal_model import AptDealModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_rent_model import AptRentModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl_deal_model import OfctlDealModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl_rent_model import OfctlRentModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.right_lot_out_model import RightLotOutModel
+from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
 
@@ -39,7 +37,7 @@ class SyncBldDealRepository(BldDealsRepository):
     def save_all(self,
                  insert_models: list[AptDealModel | AptRentModel | OfctlDealModel | OfctlRentModel | RightLotOutModel],
                  _ids: list[int],
-                 update_model: type[GovtAptDealModel
+                 update_model: Type[GovtAptDealModel
                                     | GovtAptRentModel
                                     | GovtOfctlDealModel
                                     | GovtOfctlRentModel
@@ -70,7 +68,8 @@ class SyncBldDealRepository(BldDealsRepository):
             for supply_area in supply_areas:
                 query = update(AptDealModel
                         ).where(
-                            AptDealModel.house_id == supply_area.house_id
+                            AptDealModel.house_id == supply_area.house_id,
+                            AptDealModel.private_area == supply_area.private_area
                         ).values(
                             supply_area=supply_area.supply_area,
                         )
@@ -78,7 +77,8 @@ class SyncBldDealRepository(BldDealsRepository):
 
                 query = update(AptRentModel
                         ).where(
-                            AptRentModel.house_id == supply_area.house_id
+                            AptRentModel.house_id == supply_area.house_id,
+                            AptRentModel.private_area == supply_area.private_area
                         ).values(
                             supply_area=supply_area.supply_area,
                         )
@@ -86,7 +86,8 @@ class SyncBldDealRepository(BldDealsRepository):
 
                 query = update(OfctlDealModel
                         ).where(
-                            OfctlDealModel.house_id == supply_area.house_id
+                            OfctlDealModel.house_id == supply_area.house_id,
+                            OfctlDealModel.private_area == supply_area.private_area,
                         ).values(
                             supply_area=supply_area.supply_area,
                         )
@@ -94,7 +95,8 @@ class SyncBldDealRepository(BldDealsRepository):
 
                 query = update(OfctlRentModel
                         ).where(
-                            OfctlRentModel.house_id == supply_area.house_id
+                            OfctlRentModel.house_id == supply_area.house_id,
+                            OfctlRentModel.private_area == supply_area.private_area,
                         ).values(
                             supply_area=supply_area.supply_area,
                         )
@@ -102,12 +104,20 @@ class SyncBldDealRepository(BldDealsRepository):
 
                 query = update(RightLotOutModel
                         ).where(
-                            RightLotOutModel.house_id == supply_area.house_id
+                            RightLotOutModel.house_id == supply_area.house_id,
+                            RightLotOutModel.private_area == supply_area.private_area,
                         ).values(
                             supply_area=supply_area.supply_area,
                         )
                 session.execute(query)
 
             session.commit()
-        except:
+
+        except Exception as e:
             session.rollback()
+            logger.error(
+                f"[SyncBldDealRepository][update_supply_area][{type(supply_areas[0])}] house_id : {supply_areas[0].house_id} error : {e}"
+            )
+            session.rollback()
+            raise Exception
+
