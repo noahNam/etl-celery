@@ -71,26 +71,21 @@ class BldMappingResultsUseCase(BaseETLUseCase):
         )
 
         govt_apt_deals: list[GovtAptDealsEntity] = self._govt_repo.find_by_update_needed(
-            target_date=today,
             find_type=GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value
         )
 
         govt_apt_rents: list[GovtAptRentsEntity] = self._govt_repo.find_by_update_needed(
-            target_date=today,
             find_type=GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value
         )
 
         govt_ofctl_deals: list[GovtOfctlDealsEntity] = self._govt_repo.find_by_update_needed(
-            target_date=today,
             find_type=GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value
         )
 
         govt_ofctl_rents: list[GovtOfctlRentsEntity] = self._govt_repo.find_by_update_needed(
-            target_date=today,
             find_type=GovtFindTypeEnum.GOV_OFCTL_RENT_MAPPING.value
         )
         govt_right_lot_outs: list[GovtRightLotOutsEntity] = self._govt_repo.find_by_update_needed(
-            target_date=today,
             find_type=GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value
         )
 

@@ -61,4 +61,4 @@ class AptRentUseCase(BaseETLUseCase):
         govt_apt_rent_ids: list[int] = results[1]
 
         # Load
-        self._bld_deal_reop.save_all(insert_models=apt_rents, ids=govt_apt_rent_ids, update_model=GovtAptRentModel)
+        self._bld_deal_reop.save_all(insert_models=apt_rents, _ids=govt_apt_rent_ids, update_model=GovtAptRentModel)

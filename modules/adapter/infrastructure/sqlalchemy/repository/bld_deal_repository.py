@@ -38,7 +38,7 @@ logger = logger_.getLogger(__name__)
 class SyncBldDealRepository(BldDealsRepository):
     def save_all(self,
                  insert_models: list[AptDealModel | AptRentModel | OfctlDealModel | OfctlRentModel | RightLotOutModel],
-                 ids: list[int],
+                 _ids: list[int],
                  update_model: type[GovtAptDealModel
                                     | GovtAptRentModel
                                     | GovtOfctlDealModel
@@ -52,7 +52,7 @@ class SyncBldDealRepository(BldDealsRepository):
             session.add_all(insert_models)
             session.execute(
                 update(update_model)
-                    .where(update_model.id.in_(ids))
+                    .where(update_model.id.in_(_ids))
                     .values(
                     update_needed=False
                 )

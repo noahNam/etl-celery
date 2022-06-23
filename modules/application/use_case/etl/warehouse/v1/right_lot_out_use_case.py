@@ -61,5 +61,5 @@ class RightLotOutUseCase(BaseETLUseCase):
         govt_right_lot_out_ids: list[int] = results[1]
 
         # Load
-        self._bld_deal_reop.save_all(insert_models=right_lot_outs, ids=govt_right_lot_out_ids,
+        self._bld_deal_reop.save_all(insert_models=right_lot_outs, _ids=govt_right_lot_out_ids,
                                      update_model=GovtRightLotOutModel)

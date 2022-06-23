@@ -171,7 +171,7 @@ class TransferAptDeals(Transfer):
             return None
 
     def _get_supply_area(self, supply_areas: list[SupplyAreaEntity], house_id: int) -> float | None:
-        if supply_areas is None:
+        if not supply_areas:
             return None
 
         supply_area = None

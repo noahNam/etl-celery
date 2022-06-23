@@ -10,5 +10,5 @@ class BldMappingResultsEntity(BaseModel):
     jibun: str | None
     dong: str | None
     bld_name: str | None
-    created_at: str | datetime
-    updated_at: str | datetime
+    created_at: datetime
+    updated_at: datetime

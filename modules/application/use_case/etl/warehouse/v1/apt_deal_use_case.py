@@ -62,4 +62,4 @@ class AptDealUseCase(BaseETLUseCase):
         govt_apt_deals: list[int] = results[1]
 
         # Load
-        self._bld_deal_reop.save_all(insert_models=apt_daels, ids=govt_apt_deals, update_model=GovtAptDealModel)
+        self._bld_deal_reop.save_all(insert_models=apt_daels, _ids=govt_apt_deals, update_model=GovtAptDealModel)
