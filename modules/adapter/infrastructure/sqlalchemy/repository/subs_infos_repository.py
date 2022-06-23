@@ -129,6 +129,7 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository):
                     avg_win_point=value.avg_win_point,
                     avg_win_point_gyeonggi=value.avg_win_point_gyeonggi,
                     avg_win_point_etc=value.avg_win_point_etc,
+                    update_needed=value.update_needed,
                 )
             )
 
@@ -159,6 +160,7 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository):
                     cyber_model_house_link=value.cyber_model_house_link,
                     supply_rate=value.supply_rate,
                     supply_rate_etc=value.supply_rate_etc,
+                    update_needed=value.update_needed,
                 )
             )
 
