@@ -155,7 +155,7 @@ class TransformSubsInfo:
                     cyber_model_house_link=target_entity.cyber_house_link,
                     supply_rate=target_entity.cyber_house_link,
                     supply_rate_etc=target_entity.cyber_house_link,
-                    update_needed=True
+                    update_needed=True,
                 )
             )
         return result

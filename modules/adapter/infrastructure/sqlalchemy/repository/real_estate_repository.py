@@ -43,7 +43,7 @@ class SyncRealEstateRepository:
                     front_legal_code=value.front_legal_code,
                     back_legal_code=value.back_legal_code,
                     is_available=value.is_available,
-                    update_needed=value.update_needed
+                    update_needed=value.update_needed,
                 )
             )
 

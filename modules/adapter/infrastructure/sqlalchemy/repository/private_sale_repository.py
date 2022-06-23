@@ -1,9 +1,12 @@
 from sqlalchemy import select, update
 
 from modules.adapter.infrastructure.sqlalchemy.database import session
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import DongInfoModel
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_detail_model import \
-    PrivateSaleDetailModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import (
+    DongInfoModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_detail_model import (
+    PrivateSaleDetailModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_model import (
     PrivateSaleModel,
 )
@@ -16,10 +19,20 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncPrivateSaleRepository:
-    def save(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel) -> None:
+    def save(
+        self,
+        value: [
+            PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel
+        ],
+    ) -> None:
         session.add(value)
 
-    def update(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel) -> None:
+    def update(
+        self,
+        value: [
+            PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel
+        ],
+    ) -> None:
         if isinstance(value, PrivateSaleModel):
             session.execute(
                 update(PrivateSaleModel)
@@ -97,7 +110,12 @@ class SyncPrivateSaleRepository:
                 )
             )
 
-    def exists_by_key(self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel) -> bool:
+    def exists_by_key(
+        self,
+        value: [
+            PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel
+        ],
+    ) -> bool:
         result = None
         if isinstance(value, PrivateSaleModel):
             query = select(PrivateSaleModel.id).where(PrivateSaleModel.id == value.id)
@@ -112,7 +130,9 @@ class SyncPrivateSaleRepository:
             result = session.execute(query).scalars().first()
 
         elif isinstance(value, PrivateSaleDetailModel):
-            query = select(PrivateSaleDetailModel.id).where(PrivateSaleDetailModel.id == value.id)
+            query = select(PrivateSaleDetailModel.id).where(
+                PrivateSaleDetailModel.id == value.id
+            )
             result = session.execute(query).scalars().first()
 
         if result:

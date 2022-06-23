@@ -141,7 +141,9 @@ class BasicUseCase(BaseBasicUseCase):
         )
 
         if location_infos:
-            self.__update_to_warehouse(target_model=BasicInfoModel, results=location_infos)
+            self.__update_to_warehouse(
+                target_model=BasicInfoModel, results=location_infos
+            )
 
         # 단지 면적 정보
         kapt_area_infos: list[
@@ -165,7 +167,9 @@ class BasicUseCase(BaseBasicUseCase):
             from_model="govt_bld_top_infos", target_list=govt_bld_top_infos
         )
         if bld_top_infos:
-            self.__update_to_warehouse(target_model=BasicInfoModel, results=bld_top_infos)
+            self.__update_to_warehouse(
+                target_model=BasicInfoModel, results=bld_top_infos
+            )
 
         # 총괄부 표제 동 정보
         govt_bld_middle_infos: list[
@@ -248,10 +252,21 @@ class BasicUseCase(BaseBasicUseCase):
             self._basic_repo.dynamic_update(target_model=target_model, value=result)
 
     def __change_update_needed_status(
-            self,
-            target_dict: dict[str, list[KaptBasicInfoEntity | KaptMgmtCostEntity | KaptLocationInfoEntity | KaptAreaInfoEntity | GovtBldTopInfoEntity | GovtBldMiddleInfoEntity | GovtBldAreaInfoEntity]]
-        ):
-            for key in target_dict.keys():
-                target_list = target_dict.get(key)
-                if target_list:
-                    self._kapt_repo.change_update_needed_status(target_list=target_list)
+        self,
+        target_dict: dict[
+            str,
+            list[
+                KaptBasicInfoEntity
+                | KaptMgmtCostEntity
+                | KaptLocationInfoEntity
+                | KaptAreaInfoEntity
+                | GovtBldTopInfoEntity
+                | GovtBldMiddleInfoEntity
+                | GovtBldAreaInfoEntity
+            ],
+        ],
+    ):
+        for key in target_dict.keys():
+            target_list = target_dict.get(key)
+            if target_list:
+                self._kapt_repo.change_update_needed_status(target_list=target_list)
