@@ -60,4 +60,4 @@ class OfctlDealUseCase(BaseETLUseCase):
         govt_ofctl_deal_ids: list[int] = results[1]
 
         # Load
-        self._bld_deal_reop.save_all(insert_models=ofctl_deals, _ids=govt_ofctl_deal_ids, update_model=GovtOfctlDealModel)
+        self._bld_deal_reop.save_all(insert_models=ofctl_deals, ids=govt_ofctl_deal_ids, update_model=GovtOfctlDealModel)

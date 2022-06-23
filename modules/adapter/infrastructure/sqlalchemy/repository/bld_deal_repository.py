@@ -13,7 +13,6 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.bld_deal_enti
     OfctlRentEntity,
     RightLotOutEntity,
 )
-from core.domain.warehouse.bld_deal.interface.bld_deal_repository import BldDealsRepository
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     SupplyAreaEntity
 )
@@ -42,10 +41,10 @@ from modules.adapter.infrastructure.utils.log_helper import logger_
 logger = logger_.getLogger(__name__)
 
 
-class SyncBldDealRepository(BldDealsRepository):
+class SyncBldDealRepository(BldDealRepository):
     def save_all(self,
                  insert_models: list[AptDealModel | AptRentModel | OfctlDealModel | OfctlRentModel | RightLotOutModel],
-                 _ids: list[int],
+                 ids: list[int],
                  update_model: Type[GovtAptDealModel
                                     | GovtAptRentModel
                                     | GovtOfctlDealModel
@@ -59,7 +58,7 @@ class SyncBldDealRepository(BldDealsRepository):
             session.add_all(insert_models)
             session.execute(
                 update(update_model)
-                    .where(update_model.id.in_(_ids))
+                    .where(update_model.id.in_(ids))
                     .values(
                     update_needed=False
                 )
