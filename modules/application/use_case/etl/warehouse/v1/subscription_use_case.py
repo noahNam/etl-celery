@@ -66,6 +66,9 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
         if results:
             self.__upsert_to_warehouse(results=results.get("subscriptions"))
             self.__upsert_to_warehouse(results=results.get("subscription_details"))
+            self.__change_update_needed_status(
+                update_needed_target_entities=subscription_infos
+            )
 
         # DL:subscription_manual_infos -> WH: subscriptions, subscription_details
         # Only update
@@ -87,14 +90,16 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
                 target_model=SubscriptionDetailModel,
                 results=results.get("subscription_details"),
             )
+            self.__change_update_needed_status(
+                update_needed_target_entities=subscription_manual_infos
+            )
 
     """
     insert, update
     """
 
     def __upsert_to_warehouse(
-        self,
-        results: list[SubscriptionModel | SubscriptionDetailModel],
+        self, results: list[SubscriptionModel | SubscriptionDetailModel]
     ):
         for result in results:
             exists_result: bool = self._subscription_repo.exists_by_key(value=result)
@@ -119,4 +124,19 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
             # update
             self._subscription_repo.dynamic_update(
                 target_model=target_model, value=result
+            )
+
+    """
+    all change update_needed -> False
+    """
+
+    def __change_update_needed_status(
+        self,
+        update_needed_target_entities: list[
+            SubscriptionInfoEntity | SubscriptionManualInfoEntity
+        ],
+    ) -> None:
+        if update_needed_target_entities:
+            self._subscription_repo.change_update_needed_status(
+                target_list=update_needed_target_entities
             )

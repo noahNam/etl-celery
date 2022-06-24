@@ -4,25 +4,34 @@ from sqlalchemy import update, exc, desc
 from sqlalchemy.future import select
 
 from core.domain.warehouse.basic.interface.basic_repository import BasicRepository
-from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     BasicInfoEntity,
     CalcMgmtCostEntity,
     DongInfoEntity,
     TypeInfoEntity,
+    SupplyAreaEntity
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_model import (
+    PrivateSaleModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import (
-    DongInfoModel,
-)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.mgmt_cost_model import (
     MgmtCostModel,
 )
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import (
+    DongInfoModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import (
     TypeInfoModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import (
+    DongInfoModel as MartDongInfoModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.type_info_model import (
+    TypeInfoModel as MartTypeInfoModel,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
@@ -32,20 +41,9 @@ logger = logger_.getLogger(__name__)
 class SyncBasicRepository(BasicRepository):
     def save(
         self,
-        target_model: Type[
-            BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel
-        ],
-        value: [BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel],
+        value: BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel,
     ) -> None:
-        try:
-            session.add(value)
-            session.commit()
-        except exc.IntegrityError as e:
-            logger.error(
-                f"[SyncBasicRepository][save] target_model : {target_model} error : {e}"
-            )
-            session.rollback()
-            raise NotUniqueErrorException
+        session.add(value)
 
     def update(
         self,
@@ -153,8 +151,6 @@ class SyncBasicRepository(BasicRepository):
                     supply_area=value.supply_area,
                 )
             )
-
-        session.commit()
 
     def dynamic_update(self, target_model: Type[BasicInfoModel], value: dict) -> None:
         key = value.get("key")
@@ -287,3 +283,80 @@ class SyncBasicRepository(BasicRepository):
             return [
                 query.to_calc_mgmt_cost_entity(priv_area=options) for query in queryset
             ]
+
+    def change_update_needed_status(
+        self, value: PrivateSaleModel | MartDongInfoModel | MartTypeInfoModel
+    ):
+        try:
+            if isinstance(value, PrivateSaleModel):
+                session.execute(
+                    update(BasicInfoModel)
+                    .where(BasicInfoModel.house_id == value.id)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            elif isinstance(value, MartDongInfoModel):
+                session.execute(
+                    update(DongInfoModel)
+                    .where(DongInfoModel.id == value.id)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            elif isinstance(value, MartTypeInfoModel):
+                session.execute(
+                    update(TypeInfoModel)
+                    .where(TypeInfoModel.id == value.id)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            session.commit()
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncBasicRepository] change_update_needed_status -> {type(value)} error : {e}"
+            )
+            session.rollback()
+
+    def find_supply_areas_by_house_ids(self, house_ids: list[int]) -> list[SupplyAreaEntity] | None:
+        query = select(
+            DongInfoModel
+        ).join(
+            TypeInfoModel,
+            TypeInfoModel.dong_id == DongInfoModel.id
+        ).where(
+            DongInfoModel.house_id.in_(house_ids)
+        )
+
+        supply_areas = session.execute(query).scalars().all()
+
+        if not supply_areas:
+            return None
+
+        return [
+            supply_area.to_supply_area_entity() for supply_area in supply_areas
+        ]
+
+    def find_supply_areas_by_update_needed(self) -> list[SupplyAreaEntity] | None:
+        query = select(
+            DongInfoModel
+        ).join(
+            TypeInfoModel,
+            TypeInfoModel.dong_id == DongInfoModel.id
+        ).where(
+            TypeInfoModel.update_needed == True
+        )
+
+        supply_areas = session.execute(query).scalars().all()
+
+        if not supply_areas:
+            return None
+
+        return [
+            supply_area.to_supply_area_entity() for supply_area in supply_areas
+        ]
+

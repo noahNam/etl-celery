@@ -109,7 +109,7 @@ class GovtBldMiddleInfoModel(datalake_base, TimestampMixin):
     rserthqk_ablty = Column(String(200), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
 
-    def to_govt_bld_top_info_entity(self) -> GovtBldMiddleInfoEntity:
+    def to_govt_bld_middle_info_entity(self) -> GovtBldMiddleInfoEntity:
         return GovtBldMiddleInfoEntity(
             house_id=self.house_id,
             dong_nm=self.dong_nm,

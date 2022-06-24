@@ -1,8 +1,14 @@
 from sqlalchemy import Column, String, BigInteger, Integer, Boolean
+from sqlalchemy.orm import relationship
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
+)
+
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
+    GovtOfctlRentsEntity,
+    GovtOfctlRentJoinKeyEntity
 )
 
 
@@ -28,3 +34,36 @@ class GovtOfctlRentModel(datalake_base, TimestampMixin):
     regional_cd = Column(String(5), nullable=True, index=True)
     floor = Column(String(4), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    bld_mapping = relationship("BldMappingResultModel",
+                               backref="govt_ofctl_rents", uselist=False, lazy='joined',
+                               primaryjoin="and_(foreign(GovtOfctlRentModel.regional_cd) == BldMappingResultModel.regional_cd,"
+                                           "foreign(GovtOfctlRentModel.jibun) == BldMappingResultModel.jibun,"
+                                           "foreign(GovtOfctlRentModel.dong) == BldMappingResultModel.dong,"
+                                           "foreign(GovtOfctlRentModel.ofctl_name) == BldMappingResultModel.bld_name)"
+                               )
+
+    def to_entity_for_bld_mapping_results(self) -> GovtOfctlRentsEntity:
+        return GovtOfctlRentsEntity(
+            id=self.id,
+            regional_cd=self.regional_cd,
+            dong=self.dong,
+            jibun=self.jibun,
+            ofctl_name=self.ofctl_name
+        )
+
+    def to_entity_for_ofctl_rents(self) -> GovtOfctlRentJoinKeyEntity:
+        return GovtOfctlRentJoinKeyEntity(
+            id=self.id,
+            house_id=self.bld_mapping.house_id,
+            dong=self.dong,
+            ofctl_name=self.ofctl_name,
+            deal_year=self.deal_year,
+            deal_month=self.deal_month,
+            deal_day=self.deal_day,
+            deposit=self.deposit,
+            monthly_amount=self.monthly_amount,
+            exclusive_area=self.exclusive_area,
+            regional_cd=self.regional_cd,
+            floor=self.floor,
+        )
