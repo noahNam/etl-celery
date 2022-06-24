@@ -20,6 +20,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
     KaptAreaInfoEntity,
     KaptLocationInfoEntity,
     KaptMgmtCostEntity,
+    KaptMappingEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.code_rule_model import (
@@ -120,7 +121,7 @@ class SyncKaptRepository(KaptRepository):
 
     def find_all(
         self, find_type: int = 0
-    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity]:
+    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | list[KaptMappingEntity]:
         queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
 
         if not queryset:
@@ -128,6 +129,8 @@ class SyncKaptRepository(KaptRepository):
 
         if find_type == KaptFindTypeEnum.KAKAO_API_INPUT.value:
             return [query.to_kakao_api_input_entity() for query in queryset]
+        elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
+            return [result.to_entity_for_bld_mapping_results() for result in queryset]
 
         return [query.to_open_api_input_entity() for query in queryset]
 

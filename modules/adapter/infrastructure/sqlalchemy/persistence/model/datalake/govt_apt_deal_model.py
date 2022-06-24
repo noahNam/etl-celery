@@ -1,8 +1,14 @@
 from sqlalchemy import Column, String, BigInteger, Integer, Boolean
+from sqlalchemy.orm import relationship
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
+)
+
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
+    GovtAptDealsEntity,
+    GovtAptDealsJoinKeyEntity
 )
 
 
@@ -44,3 +50,42 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
     req_gbn = Column(String(10), nullable=True)
     rdealer_lawdnm = Column(String(150), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    bld_mapping = relationship("BldMappingResultModel",
+                               backref="govt_apt_deals", uselist=False, lazy='joined',
+                               primaryjoin="and_(foreign(GovtAptDealModel.regional_cd) == BldMappingResultModel.regional_cd,"
+                                           "foreign(GovtAptDealModel.jibun) == BldMappingResultModel.jibun,"
+                                           "foreign(GovtAptDealModel.dong) == BldMappingResultModel.dong,"
+                                           "foreign(GovtAptDealModel.apt_name) == BldMappingResultModel.bld_name)",
+                               )
+
+    def to_entity_for_bld_mapping_reuslts(self) -> GovtAptDealsEntity:
+        return GovtAptDealsEntity(
+            id=self.id,
+            sigungu_cd=self.sigungu_cd,
+            eubmyundong_cd=self.eubmyundong_cd,
+            build_year=self.build_year,
+            jibun=self.jibun,
+            apt_name=self.apt_name,
+            dong=self.dong
+        )
+
+    def to_entity_for_apt_deals(self) -> GovtAptDealsJoinKeyEntity:
+        return GovtAptDealsJoinKeyEntity(
+            id=self.id,
+            house_id=self.bld_mapping.house_id,
+            dong=self.dong,
+            apt_name=self.apt_name,
+            deal_amount=self.deal_amount,
+            deal_year=self.deal_year,
+            deal_month=self.deal_month,
+            deal_day=self.deal_day,
+            serial_no=self.serial_no,
+            exclusive_area=self.exclusive_area,
+            regional_cd=self.regional_cd,
+            floor=self.floor,
+            cancel_deal_type=self.cancel_deal_type,
+            cancel_deal_day=self.cancel_deal_day,
+            req_gbn=self.req_gbn,
+            rdealer_lawdnm=self.rdealer_lawdnm
+        )

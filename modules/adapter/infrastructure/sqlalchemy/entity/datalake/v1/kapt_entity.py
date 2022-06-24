@@ -170,3 +170,17 @@ class KaptMgmtCostEntity(BaseModel):
     update_needed: bool
     created_at: datetime
     updated_at: datetime
+
+
+class KaptMappingEntity(BaseModel):
+    house_id: int
+    sido: str | None
+    sigungu: str | None
+    eubmyun: str | None
+    dongri: str | None
+    use_apr_day: str | None
+    origin_dong_address: str | None
+    name: str | None
+
+
+
