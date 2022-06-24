@@ -7,13 +7,10 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_en
     DongInfoEntity,
     TypeInfoEntity,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_model import (
-    PrivateSaleModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import (
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import (
     DongInfoModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import (
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.type_info_model import (
     TypeInfoModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
@@ -58,7 +55,7 @@ class DongTypeUseCase(BaseDongTypeUseCase):
         )
 
         if results:
-            self.__upsert_to_warehouse(results=results)
+            self.__upsert_to_datamart(results=results)
 
         # 타입 기본 정보
         type_infos: list[TypeInfoEntity] | None = self._basic_repo.find_to_update(
@@ -69,13 +66,13 @@ class DongTypeUseCase(BaseDongTypeUseCase):
         )
 
         if results:
-            self.__upsert_to_warehouse(results=results)
+            self.__upsert_to_datamart(results=results)
 
     """
     insert, update
     """
 
-    def __upsert_to_warehouse(
+    def __upsert_to_datamart(
         self,
         results: list[DongInfoModel | TypeInfoModel],
     ) -> None:
@@ -88,3 +85,5 @@ class DongTypeUseCase(BaseDongTypeUseCase):
             else:
                 # update
                 self._private_sale_repo.update(value=result)
+
+            self._basic_repo.change_update_needed_status(value=result)
