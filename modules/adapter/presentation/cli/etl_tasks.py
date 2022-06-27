@@ -5,10 +5,16 @@ from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository impor
     SyncBasicRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
-    SyncBldDealRepository,
+    SyncBldDealRepository
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
+    SyncBldMappingResultsRepository
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_bld_repository import (
     SyncGovtBldRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
+    SyncGovtDealsRepository
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repository import (
     SyncKakaoApiRepository,
@@ -16,21 +22,9 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repos
 from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import (
     SyncKaptRepository,
 )
-from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
-    SyncGovtDealsRepository
-)
-
 from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
     SyncLegalDongCodeRepository
 )
-from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
-    SyncBldMappingResultsRepository
-)
-from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
-    SyncBldDealRepository
-)
-
-
 from modules.adapter.infrastructure.sqlalchemy.repository.private_sale_repository import (
     SyncPrivateSaleRepository,
 )
@@ -45,6 +39,7 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repositor
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.adapter.presentation.cli.enum import TopicEnum
+from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import BldMappingResultsUseCase
 from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
 )
@@ -60,18 +55,17 @@ from modules.application.use_case.etl.datamart.v1.private_sale_use_case import (
 from modules.application.use_case.etl.datamart.v1.real_estate_use_case import (
     RealEstateUseCase,
 )
-from modules.application.use_case.etl.warehouse.v1.supply_area_use_case import(
-    DealSupplyAreaUseCase
-)
-from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
 from modules.application.use_case.etl.warehouse.v1.apt_deal_use_case import AptDealUseCase
-from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import BldMappingResultsUseCase
 from modules.application.use_case.etl.warehouse.v1.apt_rent_use_case import AptRentUseCase
+from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
 from modules.application.use_case.etl.warehouse.v1.ofctl_deal_use_case import OfctlDealUseCase
 from modules.application.use_case.etl.warehouse.v1.ofctl_rent_use_case import OfctlRentsUseCase
 from modules.application.use_case.etl.warehouse.v1.right_lot_out_use_case import RightLotOutUseCase
 from modules.application.use_case.etl.warehouse.v1.subscription_use_case import (
     SubscriptionUseCase,
+)
+from modules.application.use_case.etl.warehouse.v1.supply_area_use_case import (
+    DealSupplyAreaUseCase
 )
 
 logger = logger_.getLogger(__name__)
@@ -106,6 +100,7 @@ def get_task(topic: str):
             topic=topic,
             basic_repo=SyncBasicRepository(),
             real_estate_repo=SyncRealEstateRepository(),
+            redis=redis,
         )
     elif (
         topic == TopicEnum.ETL_MART_PRIVATE_SALES.value
@@ -123,6 +118,7 @@ def get_task(topic: str):
             topic=topic,
             basic_repo=SyncBasicRepository(),
             private_sale_repo=SyncPrivateSaleRepository(),
+            redis=redis,
         )
     elif (
         topic == TopicEnum.ETL_MART_PRIVATE_SALE_DETAILS.value
@@ -132,6 +128,7 @@ def get_task(topic: str):
             bld_deal_repo=SyncBldDealRepository(),
             private_sale_repo=SyncPrivateSaleRepository(),
             kapt_repo=SyncKaptRepository(),
+            redis=redis,
         )
     elif topic == TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value:
         return BldMappingResultsUseCase(

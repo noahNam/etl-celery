@@ -1,4 +1,4 @@
-import os
+import json
 
 from modules.adapter.infrastructure.etl.mart_real_estates import TransformRealEstate
 from modules.adapter.infrastructure.message.broker.redis import RedisClient
@@ -18,32 +18,25 @@ from modules.adapter.infrastructure.sqlalchemy.repository.real_estate_repository
     SyncRealEstateRepository,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
+from modules.application.use_case.etl import BaseETLUseCase
 
 logger = logger_.getLogger(__name__)
 
 
-class BaseRealEstateUseCase:
+class RealEstateUseCase(BaseETLUseCase):
     def __init__(
-        self,
-        topic: str,
-        basic_repo: SyncBasicRepository,
-        real_estate_repo: SyncRealEstateRepository,
-        redis: RedisClient,
+            self,
+            basic_repo: SyncBasicRepository,
+            real_estate_repo: SyncRealEstateRepository,
+            redis: RedisClient,
+            *args, **kwargs
     ):
-        self._topic: str = topic
+        super().__init__(*args, **kwargs)
         self._basic_repo: SyncBasicRepository = basic_repo
         self._real_estate_repo: SyncRealEstateRepository = real_estate_repo
         self._transfer: TransformRealEstate = TransformRealEstate()
         self._redis: RedisClient = redis
 
-    @property
-    def client_id(self) -> str:
-        return f"{self._topic}-{os.getpid()}"
-
-
-class RealEstateUseCase(BaseRealEstateUseCase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def execute(self):
         """
@@ -72,9 +65,30 @@ class RealEstateUseCase(BaseRealEstateUseCase):
         for result in results:
             exists_result: bool = self._real_estate_repo.exists_by_key(value=result)
 
-            if not exists_result:
-                # insert
-                self._real_estate_repo.save(value=result)
-            else:
-                # update
-                self._real_estate_repo.update(value=result)
+            try:
+                if not exists_result:
+                    # insert
+                    self._real_estate_repo.save(value=result)
+                    key_div = "I"
+                else:
+                    # update
+                    self._real_estate_repo.update(value=result)
+                    key_div = "U"
+
+                # message publish to redis
+                self._redis.set(
+                    key=f"sync:{key_div}:real_estates:{result.id}",
+                    value=json.dumps(result.to_dict(), ensure_ascii=False).encode(
+                        "utf-8"
+                    ),
+                )
+                self._real_estate_repo.change_update_needed_status(value=result)
+
+            except Exception as e:
+                logger.error(f"☠️\tRealEstateUseCase - Failure! {result.id}:{e}")
+                self._save_crawling_failure(
+                    failure_value=result,
+                    ref_table="real_estates",
+                    param=result,
+                    reason=e,
+                )

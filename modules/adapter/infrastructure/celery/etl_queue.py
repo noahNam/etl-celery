@@ -50,8 +50,8 @@ def setup_periodic_tasks(sender, **kwargs):
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_BASIC_INFOS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_DL_SUBS_INFOS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_SUBS_INFOS.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_REAL_ESTATES.value)
-    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PRIVATE_SALES.value)
+    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_REAL_ESTATES.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PRIVATE_SALES.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_DONG_TYPE_INFOS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PRIVATE_SALE_DETAILS.value)
 
@@ -69,7 +69,7 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # DW 아파트 실거래가
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_APT_DEALS.value)  # 매핑테이블 이후, 건축물대장 업데이트 이후
-    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_APT_RENTS.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_APT_RENTS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_OFCTL_DEALS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_OFCTL_RENTS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_RIGHT_LOG_OUTS.value)

@@ -1,5 +1,3 @@
-import json
-
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     BasicInfoEntity,
     CalcMgmtCostEntity,
@@ -147,7 +145,7 @@ class TransformPrivateSale:
                     avg_mgmt_cost=manage_cost_result[2] if manage_cost_result else None,
                     public_ref_id=basic_info.public_ref_id,
                     rebuild_ref_id=basic_info.rebuild_ref_id,
-                    is_available="AAAAA",
+                    is_available=basic_info.is_available,
                     update_needed=basic_info.update_needed,
                 )
             )
