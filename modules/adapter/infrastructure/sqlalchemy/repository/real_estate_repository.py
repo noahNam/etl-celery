@@ -48,9 +48,7 @@ class SyncRealEstateRepository:
 
         return False
 
-    def change_update_needed_status(
-        self, value: RealEstateModel
-    ) -> None:
+    def change_update_needed_status(self, value: RealEstateModel) -> None:
         try:
             if isinstance(value, RealEstateModel):
                 session.execute(

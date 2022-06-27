@@ -68,12 +68,13 @@ logger = logger_.getLogger(__name__)
 
 class BasicUseCase(BaseETLUseCase):
     def __init__(
-            self,
-            basic_repo: SyncBasicRepository,
-            kapt_repo: SyncKaptRepository,
-            kakao_repo: SyncKakaoApiRepository,
-            govt_bld_repo: SyncGovtBldRepository,
-            *args, **kwargs
+        self,
+        basic_repo: SyncBasicRepository,
+        kapt_repo: SyncKaptRepository,
+        kakao_repo: SyncKakaoApiRepository,
+        govt_bld_repo: SyncGovtBldRepository,
+        *args,
+        **kwargs
     ):
         super().__init__(*args, **kwargs)
         self._basic_repo: SyncBasicRepository = basic_repo

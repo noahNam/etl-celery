@@ -28,17 +28,18 @@ logger = logger_.getLogger(__name__)
 
 class DongTypeUseCase(BaseETLUseCase):
     def __init__(
-            self,
-            basic_repo: SyncBasicRepository,
-            private_sale_repo: SyncPrivateSaleRepository,
-            redis: RedisClient,
-            *args, **kwargs):
+        self,
+        basic_repo: SyncBasicRepository,
+        private_sale_repo: SyncPrivateSaleRepository,
+        redis: RedisClient,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self._basic_repo: SyncBasicRepository = basic_repo
         self._private_sale_repo: SyncPrivateSaleRepository = private_sale_repo
         self._transfer: TransformDongTypeInfos = TransformDongTypeInfos()
         self._redis: RedisClient = redis
-
 
     def execute(self):
         # 동 기본 정보
@@ -87,7 +88,9 @@ class DongTypeUseCase(BaseETLUseCase):
                 self._basic_repo.change_update_needed_status(value=result)
 
                 # message publish to redis
-                ref_table = "dong_infos" if isinstance(result, DongInfoModel) else "type_infos"
+                ref_table = (
+                    "dong_infos" if isinstance(result, DongInfoModel) else "type_infos"
+                )
                 self._redis.set(
                     key=f"sync:{key_div}:{ref_table}:{result.id}",
                     value=json.dumps(result.to_dict(), ensure_ascii=False).encode(
@@ -100,7 +103,9 @@ class DongTypeUseCase(BaseETLUseCase):
                 logger.error(f"☠️\tDongTypeUseCase - Failure! {result.id}:{e}")
                 self._save_crawling_failure(
                     failure_value=result,
-                    ref_table="dong_infos" if isinstance(result, DongInfoModel) else "type_infos",
+                    ref_table="dong_infos"
+                    if isinstance(result, DongInfoModel)
+                    else "type_infos",
                     param=result,
                     reason=e,
                 )

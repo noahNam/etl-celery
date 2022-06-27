@@ -25,18 +25,18 @@ logger = logger_.getLogger(__name__)
 
 class RealEstateUseCase(BaseETLUseCase):
     def __init__(
-            self,
-            basic_repo: SyncBasicRepository,
-            real_estate_repo: SyncRealEstateRepository,
-            redis: RedisClient,
-            *args, **kwargs
+        self,
+        basic_repo: SyncBasicRepository,
+        real_estate_repo: SyncRealEstateRepository,
+        redis: RedisClient,
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self._basic_repo: SyncBasicRepository = basic_repo
         self._real_estate_repo: SyncRealEstateRepository = real_estate_repo
         self._transfer: TransformRealEstate = TransformRealEstate()
         self._redis: RedisClient = redis
-
 
     def execute(self):
         """
