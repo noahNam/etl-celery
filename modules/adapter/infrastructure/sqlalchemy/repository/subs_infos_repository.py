@@ -1,7 +1,6 @@
-from typing import Callable, ContextManager, Type
+from typing import Type
 
 from sqlalchemy import exc, select, desc, update
-from sqlalchemy.orm import Session
 
 from core.domain.datalake.subscription_info.interface.subscription_info_repository import (
     SubscriptionInfoRepository,

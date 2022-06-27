@@ -11,6 +11,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_en
     CalcMgmtCostEntity,
     DongInfoEntity,
     TypeInfoEntity,
+    SupplyAreaEntity
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_model import (
     PrivateSaleModel,
@@ -323,3 +324,42 @@ class SyncBasicRepository(BasicRepository):
             )
             session.rollback()
             raise
+
+    def find_supply_areas_by_house_ids(self, house_ids: list[int]) -> list[SupplyAreaEntity] | None:
+        query = select(
+            DongInfoModel
+        ).join(
+            TypeInfoModel,
+            TypeInfoModel.dong_id == DongInfoModel.id
+        ).where(
+            DongInfoModel.house_id.in_(house_ids)
+        )
+
+        supply_areas = session.execute(query).scalars().all()
+
+        if not supply_areas:
+            return None
+
+        return [
+            supply_area.to_supply_area_entity() for supply_area in supply_areas
+        ]
+
+    def find_supply_areas_by_update_needed(self) -> list[SupplyAreaEntity] | None:
+        query = select(
+            DongInfoModel
+        ).join(
+            TypeInfoModel,
+            TypeInfoModel.dong_id == DongInfoModel.id
+        ).where(
+            TypeInfoModel.update_needed == True
+        )
+
+        supply_areas = session.execute(query).scalars().all()
+
+        if not supply_areas:
+            return None
+
+        return [
+            supply_area.to_supply_area_entity() for supply_area in supply_areas
+        ]
+
