@@ -284,7 +284,7 @@ class SyncKaptRepository(KaptRepository):
         return result_list
 
     def find_id_by_code_rules(self, key_div: str) -> int:
-        query = select(func.max(CodeRuleModel.last_seq)).where(
+        query = select(CodeRuleModel.last_seq).where(
             CodeRuleModel.key_div == key_div
         )
         return session.execute(query).scalars().first()

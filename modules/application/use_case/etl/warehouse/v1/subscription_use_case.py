@@ -25,30 +25,21 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repositor
     SyncSubscriptionRepository,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
+from modules.application.use_case.etl import BaseETLUseCase
 
 logger = logger_.getLogger(__name__)
 
 
-class BaseSubscriptionUseCase:
+class SubscriptionUseCase(BaseETLUseCase):
     def __init__(
-        self,
-        topic: str,
-        subscription_repo: SyncSubscriptionRepository,
-        subs_info_repo: SyncSubscriptionInfoRepository,
-    ):
-        self._topic: str = topic
+            self,
+            subscription_repo: SyncSubscriptionRepository,
+            subs_info_repo: SyncSubscriptionInfoRepository,
+            *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._subscription_repo: SyncSubscriptionRepository = subscription_repo
         self._subs_info_repo: SyncSubscriptionInfoRepository = subs_info_repo
         self._transfer: TransformSubscription = TransformSubscription()
-
-    @property
-    def client_id(self) -> str:
-        return f"{self._topic}-{os.getpid()}"
-
-
-class SubscriptionUseCase(BaseSubscriptionUseCase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def execute(self):
         # DL:subscription_infos -> WH: subscriptions, subscription_details

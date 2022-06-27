@@ -142,7 +142,7 @@ class SyncPrivateSaleRepository:
         return False
 
     def change_update_needed_status(
-        self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel
+        self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel
     ) -> None:
         try:
             if isinstance(value, PrivateSaleModel):
@@ -167,6 +167,15 @@ class SyncPrivateSaleRepository:
                 session.execute(
                     update(TypeInfoModel)
                     .where(TypeInfoModel.id == value.id)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            elif isinstance(value, PrivateSaleDetailModel):
+                session.execute(
+                    update(PrivateSaleDetailModel)
+                    .where(PrivateSaleDetailModel.id == value.id)
                     .values(
                         update_needed=False,
                     )

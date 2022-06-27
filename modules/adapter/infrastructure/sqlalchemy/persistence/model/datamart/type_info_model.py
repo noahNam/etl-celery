@@ -24,3 +24,11 @@ class TypeInfoModel(datamart_base, TimestampMixin):
     private_area = Column(Numeric(6, 2), nullable=True)
     supply_area = Column(Numeric(6, 2), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            dong_id=self.dong_id,
+            private_area=self.private_area,
+            supply_area=self.supply_area,
+        )

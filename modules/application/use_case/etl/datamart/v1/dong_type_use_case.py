@@ -1,8 +1,9 @@
-import os
+import json
 
 from modules.adapter.infrastructure.etl.mart_dong_type_infos import (
     TransformDongTypeInfos,
 )
+from modules.adapter.infrastructure.message.broker.redis import RedisClient
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     DongInfoEntity,
     TypeInfoEntity,
@@ -20,30 +21,24 @@ from modules.adapter.infrastructure.sqlalchemy.repository.private_sale_repositor
     SyncPrivateSaleRepository,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
+from modules.application.use_case.etl import BaseETLUseCase
 
 logger = logger_.getLogger(__name__)
 
 
-class BaseDongTypeUseCase:
+class DongTypeUseCase(BaseETLUseCase):
     def __init__(
-        self,
-        topic: str,
-        basic_repo: SyncBasicRepository,
-        private_sale_repo: SyncPrivateSaleRepository,
-    ):
-        self._topic: str = topic
+            self,
+            basic_repo: SyncBasicRepository,
+            private_sale_repo: SyncPrivateSaleRepository,
+            redis: RedisClient,
+            *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._basic_repo: SyncBasicRepository = basic_repo
         self._private_sale_repo: SyncPrivateSaleRepository = private_sale_repo
         self._transfer: TransformDongTypeInfos = TransformDongTypeInfos()
+        self._redis: RedisClient = redis
 
-    @property
-    def client_id(self) -> str:
-        return f"{self._topic}-{os.getpid()}"
-
-
-class DongTypeUseCase(BaseDongTypeUseCase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def execute(self):
         # 동 기본 정보
@@ -79,11 +74,33 @@ class DongTypeUseCase(BaseDongTypeUseCase):
         for result in results:
             exists_result: bool = self._private_sale_repo.exists_by_key(value=result)
 
-            if not exists_result:
-                # insert
-                self._private_sale_repo.save(value=result)
-            else:
-                # update
-                self._private_sale_repo.update(value=result)
+            try:
+                if not exists_result:
+                    # insert
+                    self._private_sale_repo.save(value=result)
+                    key_div = "I"
+                else:
+                    # update
+                    self._private_sale_repo.update(value=result)
+                    key_div = "U"
 
-            self._basic_repo.change_update_needed_status(value=result)
+                self._basic_repo.change_update_needed_status(value=result)
+
+                # message publish to redis
+                ref_table = "dong_infos" if isinstance(result, DongInfoModel) else "type_infos"
+                self._redis.set(
+                    key=f"sync:{key_div}:{ref_table}:{result.id}",
+                    value=json.dumps(result.to_dict(), ensure_ascii=False).encode(
+                        "utf-8"
+                    ),
+                )
+                self._private_sale_repo.change_update_needed_status(value=result)
+
+            except Exception as e:
+                logger.error(f"☠️\tDongTypeUseCase - Failure! {result.id}:{e}")
+                self._save_crawling_failure(
+                    failure_value=result,
+                    ref_table="dong_infos" if isinstance(result, DongInfoModel) else "type_infos",
+                    param=result,
+                    reason=e,
+                )
