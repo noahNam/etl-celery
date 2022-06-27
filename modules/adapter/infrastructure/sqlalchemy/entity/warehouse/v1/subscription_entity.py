@@ -3,32 +3,33 @@ from pydantic import BaseModel
 
 class SubsToPublicEntity(BaseModel):
     subs_id: int
+    place_id: int
     name: str
     region: str
     housing_category: str
     rent_type: str
-    # trade_type ??
+    # trade_type 데이터가 없음
     construct_company: str | None
-    supply_household: str  #fixme: 자료형이 int가 아닐까
+    supply_household: str
     offer_date: str | None
-    subscription_date: str | None  # 청약기간
-    special_supply_date: str | None  # 특별공급 공급이 없을 수 있음
+    subscription_date: str | None
+    special_supply_date: str | None
     special_supply_etc_date: str | None
     special_etc_gyeonggi_date: str | None
     first_supply_date: str | None
     first_supply_etc_date: str | None
     first_etc_gyeonggi_date: str | None
-    second_supply_date: str | None  # 2순위 공급이 없을 수 있음
+    second_supply_date: str | None
     second_supply_etc_date: str | None
     second_etc_gyeonggi_date: str | None
     notice_winner_date: str | None
-    contract_date: str  # 계약 시작일, 종료일
-    move_in_date: str  # 입주 년, 월
+    contract_date: str
+    move_in_date: str
     min_down_payment: int | None
     max_down_payment: int | None
-    # deposit: float  # 계약금 퍼센트
-    supply_price: str | None  # subscription_details 에 있음 ???
-    cyber_model_house_link: str | None  # fixme: 이게 맞는지??
+    supply_price: str | None
+    cyber_model_house_link: str | None
+    hompage_url: str | None
     offer_notice_url: str | None
     heat_type: str | None
     vl_rat: str | None
@@ -37,19 +38,29 @@ class SubsToPublicEntity(BaseModel):
     park_total_cnt: str | None
     highest_floor: str | None
     dong_cnt: str | None
-    deposit: float | None  # 계약금 퍼센트
-    middle_payment: float | None  # 중도금
-    balance: float | None  # 잔금
-    restriction_sale: str | None  # 전매제한
-    compulsory_residence: str | None  # 의무거주
-    hallway_type: str | None  # 복도유형
+    deposit: float | None
+    middle_payment: float | None
+    balance: float | None
+    restriction_sale: str | None
+    compulsory_residence: str | None
+    hallway_type: str | None
 
 
-
-
-
-
-
-
-
-
+class SubDtToPublicDtEntity(BaseModel):
+    id: int
+    subs_id: int
+    area_type: str | None
+    supply_area: float | None
+    supply_price: str
+    special_household: str
+    multi_children_household: str
+    newlywed_household: str
+    old_parent_household: str
+    first_life_household: str
+    general_household: str
+    bay: str | None
+    pansang_tower: str | None
+    kitchen_window: str | None
+    direct_window: str | None
+    alpha_room: str | None
+    cyber_model_house_link: str | None

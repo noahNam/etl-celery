@@ -24,6 +24,7 @@ class SubscriptionModel(warehouse_base, TimestampMixin):
     subs_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, primary_key=True
     )
+    place_id = Column(BigInteger, nullable=False)
     offer_date = Column(String(10), nullable=True)
     notice_winner_date = Column(String(10), nullable=True)
     name = Column(String(100), nullable=True)
@@ -77,12 +78,13 @@ class SubscriptionModel(warehouse_base, TimestampMixin):
                                )
 
     def to_entity_for_public_sales(self) -> SubsToPublicEntity:
-        supply_prices = [int(sub.supply_price) for sub in self.sub_details]
+        supply_prices = [int(sub_detail.supply_price) for sub_detail in self.sub_details]
         min_down_payment = None if not supply_prices else min(supply_prices)
         max_down_payment = None if not supply_prices else max(supply_prices)
 
         return SubsToPublicEntity(
             subs_id=self.subs_id,
+            place_id=self.place_id,
             name=self.name,
             region=self.region,
             housing_category=self.housing_category,
@@ -106,6 +108,7 @@ class SubscriptionModel(warehouse_base, TimestampMixin):
             min_down_payment=min_down_payment,
             max_down_payment=max_down_payment,
             cyber_model_house_link=self.cyber_model_house_link,
+            hompage_url=self.hompage_url,
             offer_notice_url=self.offer_notice_url,
             heat_type=self.heat_type,
             vl_rat=self.vl_rat,
@@ -120,5 +123,4 @@ class SubscriptionModel(warehouse_base, TimestampMixin):
             restriction_sale=self.restriction_sale,
             compulsory_residence=self.compulsory_residence,
             hallway_type=self.hallway_type,
-
         )

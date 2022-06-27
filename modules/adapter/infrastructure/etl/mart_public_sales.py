@@ -1,12 +1,20 @@
+import re
+
+from modules.adapter.infrastructure.utils.math_helper import MathHelper
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
-    SubsToPublicEntity
+    SubsToPublicEntity,
+    SubDtToPublicDtEntity
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_model import (
     PublicSaleModel
 )
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_detail_model import (
+    PublicSaleDetailModel
+)
+
 
 class TransformPublicSales:
-    def start_transfer(self, subscriptions: list[SubsToPublicEntity]) -> list[PublicSaleModel]:
+    def start_transfer_public_sales(self, subscriptions: list[SubsToPublicEntity]) -> list[PublicSaleModel]:
         return_models = list()
         for subscription in subscriptions:
             subscription_start_date: str = self._get_start_date(date=subscription.subscription_date)
@@ -16,14 +24,14 @@ class TransformPublicSales:
             move_in_year, move_in_month = self._get_move_year_month(move_in_year=subscription.move_in_date)
 
             public_sale = PublicSaleModel(
-                real_estate_id=None,  # todo, place_id 아직 없음
+                real_estate_id=subscription.place_id,
                 name=subscription.name,
                 region=subscription.region,
                 housing_category=subscription.housing_category,
                 rent_type=subscription.rent_type,
                 trade_type=None,  # todo, 아직 데이터 없음
                 construct_company=subscription.construct_company,
-                supply_household=subscription.supply_household,
+                supply_household=float(subscription.supply_household),
                 offer_date=subscription.offer_date,
                 subscription_start_date=subscription_start_date,
                 subscription_end_date=subscription_end_date,
@@ -44,7 +52,7 @@ class TransformPublicSales:
                 min_down_payment=subscription.min_down_payment,
                 max_down_payment=subscription.max_down_payment,
                 down_payment_ratio=subscription.deposit,
-                reference_url=subscription.cyber_model_house_link,
+                reference_url=subscription.hompage_url,
                 offer_notice_url=subscription.offer_notice_url,
                 heating_type=subscription.heat_type,
                 vl_rat=subscription.vl_rat,
@@ -66,17 +74,51 @@ class TransformPublicSales:
             return_models.append(public_sale)
         return return_models
 
+    def start_transfer_public_sale_details(self, sub_details: list[SubDtToPublicDtEntity]) -> list[PublicSaleDetailModel]:
+        return_models = list()
+        for sub_detail in sub_details:
+            area_type: str = self._get_area_type(raw_type=sub_detail.area_type)
+            private_area: float = self._get_private_area(raw_type=sub_detail.area_type)
+            acquisition_tax: int = self._calculate_house_acquisition_xax(
+                private_area=private_area, supply_price=int(sub_detail.supply_price)
+            )
+
+            public_sale_detail = PublicSaleDetailModel(
+                public_sale_id=sub_detail.subs_id,
+                area_type=area_type,
+                private_area=private_area,
+                supply_area=MathHelper.round(float(sub_detail.supply_area), 2),
+                supply_price=int(sub_detail.supply_price),
+                acquisition_tax=acquisition_tax,
+                special_household=float(sub_detail.special_household),
+                multi_children_household=float(sub_detail.multi_children_household),
+                newlywed_household=float(sub_detail.newlywed_household),
+                old_parent_household=float(sub_detail.old_parent_household),
+                first_life_household=float(sub_detail.first_life_household),
+                general_household=float(sub_detail.general_household),
+                bay=sub_detail.bay,
+                pansang_tower=sub_detail.pansang_tower,
+                kitchen_window=sub_detail.kitchen_window,
+                direct_window=sub_detail.direct_window,
+                alpha_room=sub_detail.alpha_room,
+                cyber_model_house_link=sub_detail.cyber_model_house_link,
+                update_needed=True
+            )
+            return_models.append(public_sale_detail)
+
+        return return_models
+
     def _get_start_date(self, date: str) -> str | None:
         if date and len(date) == 23:
             return date[:10]
         else:
-            return
+            return None
 
     def _get_end_date(self, date: str) -> str | None:
         if date and len(date) == 23:
             return date[13:]
         else:
-            return
+            return None
 
     def _get_move_year_month(self, move_in_year: str) -> list[str] | None:
         if move_in_year and len(move_in_year) == 7:
@@ -84,5 +126,68 @@ class TransformPublicSales:
         else:
             return None
 
+    def _get_area_type(self, raw_type: str) -> str | None:
+        val = re.search("([a-zA-Z]+)", raw_type)
+        return val[0] if val else None
 
+    def _get_private_area(self, raw_type: str) -> float:
+        val = re.search("([0-9]+[.][0-9]+)", raw_type)
+        return MathHelper().round(float(val[0]), 2)
 
+    def _calculate_house_acquisition_xax(
+        self, private_area: float, supply_price: int
+    ) -> int:
+        """
+            부동산 정책이 매년 변경되므로 정기적으로 세율 변경 시 업데이트 필요합니다.
+            <취득세 계산 2022년도 기준>
+            - 전용면적을 사용 (공급면적 X)
+            - 부동산 종류가 주택일 경우로 한정 (상가, 오피스텔, 토지, 건물 제외)
+            - 1주택자 기준
+
+            [parameters]
+            - private_area: 전용면적(제곱미터)
+            - supply_price: 공급금액 (DB 저장 단위: 만원)
+
+            [계산법]
+            6억 이하, 85제곱미터 이하 : 1.1%
+            6억 이하, 85제곱미터 초과 : 1.3%
+            6억 초과 9억 이하, 85제곱미터 이하 : (집값 x 2 / 3억 - 3) * 0.01 * 1.1
+            6억 초과 9억 이하, 85제곱미터 초과 : (집값 x 2 / 3억 - 3) * 0.01 * 1.1 + 0.002
+            9억 초과, 85제곱미터 이하 : 3.3%
+            9억 초과, 85제곱미터 초과 : 3.5%
+
+            [return]
+            - total_acquisition_tax : 최종 취득세
+
+            출처1 : https://hwanggum.tistory.com/335
+            출처2 : http://xn--989a00af8jnslv3dba.com/%EC%B7%A8%EB%93%9D%EC%84%B8
+        """
+        if (
+            not private_area
+            or private_area == 0
+            or not supply_price
+            or supply_price == 0
+        ):
+            return 0
+
+        if supply_price <= 60000:
+            if private_area <= 85:
+                tax_rate = 0.011
+            else:
+                tax_rate = 0.013
+        elif 60000 < supply_price <= 90000:
+            if private_area <= 85:
+                tax_rate = (supply_price * 2 / 30000 - 3) * 0.01 * 1.1
+            else:
+                tax_rate = (supply_price * 2 / 30000 - 3) * 0.01 * 1.1 + 0.002
+        else:
+            if private_area <= 85:
+                tax_rate = 0.033
+            else:
+                tax_rate = 0.035
+
+        total_acquisition_tax = MathHelper.round(
+            num=supply_price * tax_rate
+        )
+
+        return total_acquisition_tax
