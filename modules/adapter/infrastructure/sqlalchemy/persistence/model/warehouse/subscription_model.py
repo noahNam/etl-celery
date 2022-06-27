@@ -8,7 +8,7 @@ from sqlalchemy import (
     Numeric,
     Boolean,
 )
-
+from sqlalchemy.orm import relationship
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
@@ -70,8 +70,19 @@ class SubscriptionModel(warehouse_base, TimestampMixin):
     cmptt_rank = Column(String(6), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
 
+    sub_details = relationship("SubscriptionDetailModel",
+                               backref="subscriptions",
+                               uselist=True,
+                               primaryjoin="foreign(SubscriptionModel.subs_id) == SubscriptionDetailModel.subs_id"
+                               )
+
     def to_entity_for_public_sales(self) -> SubsToPublicEntity:
+        supply_prices = [int(sub.supply_price) for sub in self.sub_details]
+        min_down_payment = None if not supply_prices else min(supply_prices)
+        max_down_payment = None if not supply_prices else max(supply_prices)
+
         return SubsToPublicEntity(
+            subs_id=self.subs_id,
             name=self.name,
             region=self.region,
             housing_category=self.housing_category,
@@ -92,7 +103,8 @@ class SubscriptionModel(warehouse_base, TimestampMixin):
             notice_winner_date=self.notice_winner_date,
             contract_date=self.contract_date,
             move_in_date=self.move_in_date,
-            # supply_price=self.supply_price,
+            min_down_payment=min_down_payment,
+            max_down_payment=max_down_payment,
             cyber_model_house_link=self.cyber_model_house_link,
             offer_notice_url=self.offer_notice_url,
             heat_type=self.heat_type,
@@ -107,5 +119,6 @@ class SubscriptionModel(warehouse_base, TimestampMixin):
             balance=self.balance,
             restriction_sale=self.restriction_sale,
             compulsory_residence=self.compulsory_residence,
-            hallway_type=self.hallway_type
+            hallway_type=self.hallway_type,
+
         )
