@@ -1,5 +1,3 @@
-import os
-
 from modules.adapter.infrastructure.etl.dl_subs_infos import TransformSubsInfo
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
     ApplyHomeEntity,
@@ -21,28 +19,19 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository 
     SyncSubscriptionInfoRepository,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
+from modules.application.use_case.etl import BaseETLUseCase
 
 logger = logger_.getLogger(__name__)
 
 
-class BaseSubscriptionInfoUseCase:
+class SubscriptionInfoUseCase(BaseETLUseCase):
     def __init__(
-        self,
-        topic: str,
-        subs_info_repo: SyncSubscriptionInfoRepository,
-    ):
-        self._topic: str = topic
+            self,
+            subs_info_repo: SyncSubscriptionInfoRepository,
+            *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._subs_info_repo: SyncSubscriptionInfoRepository = subs_info_repo
         self._transfer: TransformSubsInfo = TransformSubsInfo()
-
-    @property
-    def client_id(self) -> str:
-        return f"{self._topic}-{os.getpid()}"
-
-
-class SubscriptionInfoUseCase(BaseSubscriptionInfoUseCase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def execute(self):
         # ApplyHomeModel -> SubscriptionInfoModel

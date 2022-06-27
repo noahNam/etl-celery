@@ -1,4 +1,3 @@
-import os
 from typing import Type, Any
 
 from modules.adapter.infrastructure.etl.wh_basic_infos import TransformBasic
@@ -62,34 +61,26 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import
     SyncKaptRepository,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
+from modules.application.use_case.etl import BaseETLUseCase
 
 logger = logger_.getLogger(__name__)
 
 
-class BaseBasicUseCase:
+class BasicUseCase(BaseETLUseCase):
     def __init__(
-        self,
-        topic: str,
-        basic_repo: SyncBasicRepository,
-        kapt_repo: SyncKaptRepository,
-        kakao_repo: SyncKakaoApiRepository,
-        govt_bld_repo: SyncGovtBldRepository,
+            self,
+            basic_repo: SyncBasicRepository,
+            kapt_repo: SyncKaptRepository,
+            kakao_repo: SyncKakaoApiRepository,
+            govt_bld_repo: SyncGovtBldRepository,
+            *args, **kwargs
     ):
-        self._topic: str = topic
+        super().__init__(*args, **kwargs)
         self._basic_repo: SyncBasicRepository = basic_repo
         self._kapt_repo: SyncKaptRepository = kapt_repo
         self._kakao_repo: SyncKakaoApiRepository = kakao_repo
         self._govt_bld_repo: SyncGovtBldRepository = govt_bld_repo
         self._transfer: TransformBasic = TransformBasic()
-
-    @property
-    def client_id(self) -> str:
-        return f"{self._topic}-{os.getpid()}"
-
-
-class BasicUseCase(BaseBasicUseCase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def execute(self):
         # 단지 기본 정보
