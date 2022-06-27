@@ -1,4 +1,5 @@
-from sqlalchemy import select, update
+from sqlalchemy import select, update, exc
+from sqlalchemy.exc import StatementError
 
 from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import (
@@ -139,3 +140,43 @@ class SyncPrivateSaleRepository:
             return True
 
         return False
+
+    def change_update_needed_status(
+        self, value: PrivateSaleModel | DongInfoModel | TypeInfoModel
+    ) -> None:
+        try:
+            if isinstance(value, PrivateSaleModel):
+                session.execute(
+                    update(PrivateSaleModel)
+                    .where(PrivateSaleModel.id == value.id)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            elif isinstance(value, DongInfoModel):
+                session.execute(
+                    update(DongInfoModel)
+                    .where(DongInfoModel.id == value.id)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            elif isinstance(value, TypeInfoModel):
+                session.execute(
+                    update(TypeInfoModel)
+                    .where(TypeInfoModel.id == value.id)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            session.commit()
+
+        except exc.IntegrityError | StatementError as e:
+            logger.error(
+                f"[SyncPrivateSaleRepository] change_update_needed_status -> {type(value)} error : {e}"
+            )
+            session.rollback()
+            raise

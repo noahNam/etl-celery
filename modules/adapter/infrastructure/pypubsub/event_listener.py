@@ -31,30 +31,28 @@ event_listener_dict = {
 
 
 def save_crawling_failure(fail_orm) -> None:
-    SyncFailureRepository(db.session).save(fail_orm=fail_orm)
+    SyncFailureRepository().save(fail_orm=fail_orm)
     event_listener_dict.update(
         {f"{CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value}": None}
     )
 
 
 def save_kakao_crawling_result(kakao_orm: KakaoApiResultModel) -> None:
-    pk = SyncKakaoApiRepository(db.session).save(kakao_orm=kakao_orm)
+    pk = SyncKakaoApiRepository().save(kakao_orm=kakao_orm)
     event_listener_dict.update(
         {f"{KakaoApiTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value}": pk}
     )
 
 
 def is_exists_by_origin_address(kakao_orm: KakaoApiResultModel) -> None:
-    result = SyncKakaoApiRepository(db.session).is_exists_by_origin_address(
-        kakao_orm=kakao_orm
-    )
+    result = SyncKakaoApiRepository().is_exists_by_origin_address(kakao_orm=kakao_orm)
     event_listener_dict.update(
         {f"{KakaoApiTopicEnum.IS_EXISTS_BY_ORIGIN_ADDRESS.value}": result}
     )
 
 
 def is_exists_failure(fail_orm: CallFailureHistoryModel) -> None:
-    result = SyncFailureRepository(db.session).is_exists(fail_orm=fail_orm)
+    result = SyncFailureRepository().is_exists(fail_orm=fail_orm)
     event_listener_dict.update({f"{CallFailureTopicEnum.IS_EXISTS.value}": result})
 
 

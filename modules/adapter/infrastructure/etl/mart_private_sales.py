@@ -1,3 +1,5 @@
+import json
+
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     BasicInfoEntity,
     CalcMgmtCostEntity,
@@ -116,18 +118,13 @@ class TransformPrivateSale:
                 else None
             )
 
-            # test_code
-            is_available = True
-            if basic_info.house_id == 19000:
-                is_available = "AAAAA"
-
             result.append(
                 PrivateSaleModel(
                     id=basic_info.house_id,
                     real_estate_id=basic_info.place_id,
                     name=basic_info.name,
                     building_type=basic_info.code_apt_nm,
-                    build_year=basic_info.use_apr_day,
+                    build_year=basic_info.use_apr_day[:4],
                     move_in_date=basic_info.use_apr_day,
                     dong_cnt=basic_info.dong_cnt,
                     hhld_cnt=basic_info.hhld_cnt,
@@ -150,8 +147,7 @@ class TransformPrivateSale:
                     avg_mgmt_cost=manage_cost_result[2] if manage_cost_result else None,
                     public_ref_id=basic_info.public_ref_id,
                     rebuild_ref_id=basic_info.rebuild_ref_id,
-                    is_available=is_available,
-                    # is_available=basic_info.is_available,
+                    is_available="AAAAA",
                     update_needed=basic_info.update_needed,
                 )
             )
