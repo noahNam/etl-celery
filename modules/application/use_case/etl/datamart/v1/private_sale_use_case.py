@@ -1,20 +1,10 @@
 import json
-import os
-from typing import Any
 
-from modules.adapter.infrastructure.pypubsub.enum.call_failure_history_enum import (
-    CallFailureTopicEnum,
-)
-from modules.adapter.infrastructure.pypubsub.event_listener import event_listener_dict
-from modules.adapter.infrastructure.pypubsub.event_observer import send_message
 from modules.adapter.infrastructure.etl.mart_private_sales import TransformPrivateSale
 from modules.adapter.infrastructure.message.broker.redis import RedisClient
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     BasicInfoEntity,
     CalcMgmtCostEntity,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.call_failure_history_model import (
-    CallFailureHistoryModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.private_sale_model import (
     PrivateSaleModel,
@@ -32,32 +22,24 @@ from modules.adapter.infrastructure.sqlalchemy.repository.private_sale_repositor
     SyncPrivateSaleRepository,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
+from modules.application.use_case.etl import BaseETLUseCase
 
 logger = logger_.getLogger(__name__)
 
 
-class BasePrivateSaleUseCase:
+class PrivateSaleUseCase(BaseETLUseCase):
     def __init__(
-        self,
-        topic: str,
-        basic_repo: SyncBasicRepository,
-        private_sale_repo: SyncPrivateSaleRepository,
-        redis: RedisClient,
+            self,
+            basic_repo: SyncBasicRepository,
+            private_sale_repo: SyncPrivateSaleRepository,
+            redis: RedisClient,
+            *args, **kwargs
     ):
-        self._topic: str = topic
+        super().__init__(*args, **kwargs)
         self._basic_repo: SyncBasicRepository = basic_repo
         self._private_sale_repo: SyncPrivateSaleRepository = private_sale_repo
         self._transfer: TransformPrivateSale = TransformPrivateSale()
         self._redis: RedisClient = redis
-
-    @property
-    def client_id(self) -> str:
-        return f"{self._topic}-{os.getpid()}"
-
-
-class PrivateSaleUseCase(BasePrivateSaleUseCase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def execute(self):
         """
@@ -136,32 +118,9 @@ class PrivateSaleUseCase(BasePrivateSaleUseCase):
 
             except Exception as e:
                 logger.error(f"☠️\tPrivateSaleUseCase - Failure! {result.id}:{e}")
-                self.__save_crawling_failure(
+                self._save_crawling_failure(
                     failure_value=result,
                     ref_table="private_sales",
                     param=result,
                     reason=e,
                 )
-
-    def __save_crawling_failure(
-        self,
-        failure_value: PrivateSaleModel,
-        ref_table: str,
-        param: Any | None,
-        reason: Exception,
-    ) -> None:
-        fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
-            ref_id=failure_value.id,
-            ref_table=ref_table,
-            param=param,
-            reason=reason,
-            is_solved=False,
-        )
-
-        send_message(
-            topic_name=CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value,
-            fail_orm=fail_orm,
-        )
-        event_listener_dict.get(
-            f"{CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value}", None
-        )
