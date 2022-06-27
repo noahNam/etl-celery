@@ -10,6 +10,9 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity im
     SubscriptionInfoEntity,
     SubscriptionManualInfoEntity,
 )
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
+    SubsToPublicEntity
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_info_model import (
     SubscriptionInfoModel,
 )
@@ -23,9 +26,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subsc
     SubscriptionModel,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
-from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
-    SubsToPublicEntity
-)
 
 logger = logger_.getLogger(__name__)
 
@@ -207,11 +207,10 @@ class SyncSubscriptionRepository(SubscriptionRepository):
             session.rollback()
 
     def find_by_update_needed(self) -> list[SubsToPublicEntity] | None:
-        query = select(SubscriptionModel).where(
-            SubscriptionModel.update_needed == True,
-        )
+        query = select(SubscriptionModel)
         results = session.execute(query).scalars().all()
+
         if results:
-            return [result.to_type_info_entity() for result in results]
+            return [result.to_entity_for_public_sales() for result in results]
         else:
             return None
