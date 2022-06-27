@@ -1,4 +1,5 @@
 from modules.adapter.infrastructure.celery.etl_queue import etl_celery
+from modules.adapter.infrastructure.message.broker.redis import redis
 from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
@@ -89,6 +90,7 @@ def get_task(topic: str):
             topic=topic,
             basic_repo=SyncBasicRepository(),
             private_sale_repo=SyncPrivateSaleRepository(),
+            redis=redis,
         )
     elif (
         topic == TopicEnum.ETL_MART_DONG_TYPE_INFOS.value

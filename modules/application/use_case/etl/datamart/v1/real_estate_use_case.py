@@ -1,6 +1,7 @@
 import os
 
 from modules.adapter.infrastructure.etl.mart_real_estates import TransformRealEstate
+from modules.adapter.infrastructure.message.broker.redis import RedisClient
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     BasicInfoEntity,
 )
@@ -27,11 +28,13 @@ class BaseRealEstateUseCase:
         topic: str,
         basic_repo: SyncBasicRepository,
         real_estate_repo: SyncRealEstateRepository,
+        redis: RedisClient,
     ):
         self._topic: str = topic
         self._basic_repo: SyncBasicRepository = basic_repo
         self._real_estate_repo: SyncRealEstateRepository = real_estate_repo
         self._transfer: TransformRealEstate = TransformRealEstate()
+        self._redis: RedisClient = redis
 
     @property
     def client_id(self) -> str:

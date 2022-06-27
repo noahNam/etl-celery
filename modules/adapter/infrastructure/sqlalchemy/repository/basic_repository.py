@@ -1,6 +1,7 @@
 from typing import Type, Any
 
 from sqlalchemy import update, exc, desc
+from sqlalchemy.exc import StatementError
 from sqlalchemy.future import select
 
 from core.domain.warehouse.basic.interface.basic_repository import BasicRepository
@@ -285,7 +286,7 @@ class SyncBasicRepository(BasicRepository):
 
     def change_update_needed_status(
         self, value: PrivateSaleModel | MartDongInfoModel | MartTypeInfoModel
-    ):
+    ) -> None:
         try:
             if isinstance(value, PrivateSaleModel):
                 session.execute(
@@ -315,8 +316,10 @@ class SyncBasicRepository(BasicRepository):
                 )
 
             session.commit()
-        except exc.IntegrityError as e:
+
+        except exc.IntegrityError | StatementError as e:
             logger.error(
                 f"[SyncBasicRepository] change_update_needed_status -> {type(value)} error : {e}"
             )
             session.rollback()
+            raise
