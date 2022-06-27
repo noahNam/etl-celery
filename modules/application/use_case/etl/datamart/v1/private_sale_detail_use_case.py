@@ -47,19 +47,20 @@ logger = logger_.getLogger(__name__)
 
 class PrivateSaleDetailUseCase(BaseETLUseCase):
     def __init__(
-            self,
-            bld_deal_repo: SyncBldDealRepository,
-            private_sale_repo: SyncPrivateSaleRepository,
-            kapt_repo: SyncKaptRepository,
-            redis: RedisClient,
-            *args, **kwargs):
+        self,
+        bld_deal_repo: SyncBldDealRepository,
+        private_sale_repo: SyncPrivateSaleRepository,
+        kapt_repo: SyncKaptRepository,
+        redis: RedisClient,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self._bld_deal_repo: SyncBldDealRepository = bld_deal_repo
         self._private_sale_repo: SyncPrivateSaleRepository = private_sale_repo
         self._kapt_repo: SyncKaptRepository = kapt_repo
         self._transfer: TransformPrivateSaleDetail = TransformPrivateSaleDetail()
         self._redis: RedisClient = redis
-
 
     def execute(self):
         # 아파트 실거래가 정보

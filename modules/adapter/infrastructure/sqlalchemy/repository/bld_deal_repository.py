@@ -14,43 +14,62 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.bld_deal_enti
     RightLotOutEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
-    SupplyAreaEntity
+    SupplyAreaEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_deal_model import (
     GovtAptDealModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_rent_model import (
-    GovtAptRentModel
+    GovtAptRentModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_ofctl_deal_model import (
-    GovtOfctlDealModel
+    GovtOfctlDealModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_ofctl_rent_model import (
-    GovtOfctlRentModel
+    GovtOfctlRentModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_right_lot_out_model import (
-    GovtRightLotOutModel
+    GovtRightLotOutModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_deal_model import AptDealModel
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_rent_model import AptRentModel
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl_deal_model import OfctlDealModel
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl_rent_model import OfctlRentModel
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.right_lot_out_model import RightLotOutModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_deal_model import (
+    AptDealModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_rent_model import (
+    AptRentModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl_deal_model import (
+    OfctlDealModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl_rent_model import (
+    OfctlRentModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.right_lot_out_model import (
+    RightLotOutModel,
+)
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
 
 
 class SyncBldDealRepository(BldDealRepository):
-    def save_all(self,
-                 insert_models: list[AptDealModel | AptRentModel | OfctlDealModel | OfctlRentModel | RightLotOutModel],
-                 ids: list[int],
-                 update_model: Type[GovtAptDealModel
-                                    | GovtAptRentModel
-                                    | GovtOfctlDealModel
-                                    | GovtOfctlRentModel
-                                    | GovtRightLotOutModel]
-                 ) -> None:
+    def save_all(
+        self,
+        insert_models: list[
+            AptDealModel
+            | AptRentModel
+            | OfctlDealModel
+            | OfctlRentModel
+            | RightLotOutModel
+        ],
+        ids: list[int],
+        update_model: Type[
+            GovtAptDealModel
+            | GovtAptRentModel
+            | GovtOfctlDealModel
+            | GovtOfctlRentModel
+            | GovtRightLotOutModel
+        ],
+    ) -> None:
         if not insert_models:
             return None
 
@@ -58,10 +77,8 @@ class SyncBldDealRepository(BldDealRepository):
             session.add_all(insert_models)
             session.execute(
                 update(update_model)
-                    .where(update_model.id.in_(ids))
-                    .values(
-                    update_needed=False
-                )
+                .where(update_model.id.in_(ids))
+                .values(update_needed=False)
             )
             session.commit()
         except exc.IntegrityError as e:
@@ -74,49 +91,64 @@ class SyncBldDealRepository(BldDealRepository):
     def update_supply_area(self, supply_areas: list[SupplyAreaEntity]):
         try:
             for supply_area in supply_areas:
-                query = update(AptDealModel
-                        ).where(
-                            AptDealModel.house_id == supply_area.house_id,
-                            AptDealModel.private_area == supply_area.private_area
-                        ).values(
-                            supply_area=supply_area.supply_area,
-                        )
+                query = (
+                    update(AptDealModel)
+                    .where(
+                        AptDealModel.house_id == supply_area.house_id,
+                        AptDealModel.private_area == supply_area.private_area,
+                    )
+                    .values(
+                        supply_area=supply_area.supply_area,
+                    )
+                )
                 session.execute(query)
 
-                query = update(AptRentModel
-                        ).where(
-                            AptRentModel.house_id == supply_area.house_id,
-                            AptRentModel.private_area == supply_area.private_area
-                        ).values(
-                            supply_area=supply_area.supply_area,
-                        )
+                query = (
+                    update(AptRentModel)
+                    .where(
+                        AptRentModel.house_id == supply_area.house_id,
+                        AptRentModel.private_area == supply_area.private_area,
+                    )
+                    .values(
+                        supply_area=supply_area.supply_area,
+                    )
+                )
                 session.execute(query)
 
-                query = update(OfctlDealModel
-                        ).where(
-                            OfctlDealModel.house_id == supply_area.house_id,
-                            OfctlDealModel.private_area == supply_area.private_area,
-                        ).values(
-                            supply_area=supply_area.supply_area,
-                        )
+                query = (
+                    update(OfctlDealModel)
+                    .where(
+                        OfctlDealModel.house_id == supply_area.house_id,
+                        OfctlDealModel.private_area == supply_area.private_area,
+                    )
+                    .values(
+                        supply_area=supply_area.supply_area,
+                    )
+                )
                 session.execute(query)
 
-                query = update(OfctlRentModel
-                        ).where(
-                            OfctlRentModel.house_id == supply_area.house_id,
-                            OfctlRentModel.private_area == supply_area.private_area,
-                        ).values(
-                            supply_area=supply_area.supply_area,
-                        )
+                query = (
+                    update(OfctlRentModel)
+                    .where(
+                        OfctlRentModel.house_id == supply_area.house_id,
+                        OfctlRentModel.private_area == supply_area.private_area,
+                    )
+                    .values(
+                        supply_area=supply_area.supply_area,
+                    )
+                )
                 session.execute(query)
 
-                query = update(RightLotOutModel
-                        ).where(
-                            RightLotOutModel.house_id == supply_area.house_id,
-                            RightLotOutModel.private_area == supply_area.private_area,
-                        ).values(
-                            supply_area=supply_area.supply_area,
-                        )
+                query = (
+                    update(RightLotOutModel)
+                    .where(
+                        RightLotOutModel.house_id == supply_area.house_id,
+                        RightLotOutModel.private_area == supply_area.private_area,
+                    )
+                    .values(
+                        supply_area=supply_area.supply_area,
+                    )
+                )
                 session.execute(query)
 
             session.commit()

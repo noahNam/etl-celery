@@ -1,4 +1,3 @@
-import os
 from typing import Type
 
 from modules.adapter.infrastructure.etl.wh_subscriptions import TransformSubscription
@@ -32,10 +31,12 @@ logger = logger_.getLogger(__name__)
 
 class SubscriptionUseCase(BaseETLUseCase):
     def __init__(
-            self,
-            subscription_repo: SyncSubscriptionRepository,
-            subs_info_repo: SyncSubscriptionInfoRepository,
-            *args, **kwargs):
+        self,
+        subscription_repo: SyncSubscriptionRepository,
+        subs_info_repo: SyncSubscriptionInfoRepository,
+        *args,
+        **kwargs
+    ):
         super().__init__(*args, **kwargs)
         self._subscription_repo: SyncSubscriptionRepository = subscription_repo
         self._subs_info_repo: SyncSubscriptionInfoRepository = subs_info_repo

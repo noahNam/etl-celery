@@ -25,10 +25,7 @@ logger = logger_.getLogger(__name__)
 
 
 class SubscriptionInfoUseCase(BaseETLUseCase):
-    def __init__(
-            self,
-            subs_info_repo: SyncSubscriptionInfoRepository,
-            *args, **kwargs):
+    def __init__(self, subs_info_repo: SyncSubscriptionInfoRepository, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._subs_info_repo: SyncSubscriptionInfoRepository = subs_info_repo
         self._transfer: TransformSubsInfo = TransformSubsInfo()

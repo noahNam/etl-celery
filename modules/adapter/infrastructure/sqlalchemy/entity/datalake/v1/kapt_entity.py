@@ -181,6 +181,3 @@ class KaptMappingEntity(BaseModel):
     use_apr_day: str | None
     origin_dong_address: str | None
     name: str | None
-
-
-

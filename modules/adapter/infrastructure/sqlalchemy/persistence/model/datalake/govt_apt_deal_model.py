@@ -8,7 +8,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     GovtAptDealsEntity,
-    GovtAptDealsJoinKeyEntity
+    GovtAptDealsJoinKeyEntity,
 )
 
 
@@ -51,13 +51,16 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
     rdealer_lawdnm = Column(String(150), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
 
-    bld_mapping = relationship("BldMappingResultModel",
-                               backref="govt_apt_deals", uselist=False, lazy='joined',
-                               primaryjoin="and_(foreign(GovtAptDealModel.regional_cd) == BldMappingResultModel.regional_cd,"
-                                           "foreign(GovtAptDealModel.jibun) == BldMappingResultModel.jibun,"
-                                           "foreign(GovtAptDealModel.dong) == BldMappingResultModel.dong,"
-                                           "foreign(GovtAptDealModel.apt_name) == BldMappingResultModel.bld_name)",
-                               )
+    bld_mapping = relationship(
+        "BldMappingResultModel",
+        backref="govt_apt_deals",
+        uselist=False,
+        lazy="joined",
+        primaryjoin="and_(foreign(GovtAptDealModel.regional_cd) == BldMappingResultModel.regional_cd,"
+        "foreign(GovtAptDealModel.jibun) == BldMappingResultModel.jibun,"
+        "foreign(GovtAptDealModel.dong) == BldMappingResultModel.dong,"
+        "foreign(GovtAptDealModel.apt_name) == BldMappingResultModel.bld_name)",
+    )
 
     def to_entity_for_bld_mapping_reuslts(self) -> GovtAptDealsEntity:
         return GovtAptDealsEntity(
@@ -67,7 +70,7 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
             build_year=self.build_year,
             jibun=self.jibun,
             apt_name=self.apt_name,
-            dong=self.dong
+            dong=self.dong,
         )
 
     def to_entity_for_apt_deals(self) -> GovtAptDealsJoinKeyEntity:
@@ -87,5 +90,5 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
             cancel_deal_type=self.cancel_deal_type,
             cancel_deal_day=self.cancel_deal_day,
             req_gbn=self.req_gbn,
-            rdealer_lawdnm=self.rdealer_lawdnm
+            rdealer_lawdnm=self.rdealer_lawdnm,
         )

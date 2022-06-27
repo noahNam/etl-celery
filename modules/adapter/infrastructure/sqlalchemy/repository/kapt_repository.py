@@ -121,7 +121,9 @@ class SyncKaptRepository(KaptRepository):
 
     def find_all(
         self, find_type: int = 0
-    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | list[KaptMappingEntity]:
+    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | list[
+        KaptMappingEntity
+    ]:
         queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
 
         if not queryset:
@@ -284,9 +286,7 @@ class SyncKaptRepository(KaptRepository):
         return result_list
 
     def find_id_by_code_rules(self, key_div: str) -> int:
-        query = select(CodeRuleModel.last_seq).where(
-            CodeRuleModel.key_div == key_div
-        )
+        query = select(CodeRuleModel.last_seq).where(CodeRuleModel.key_div == key_div)
         return session.execute(query).scalars().first()
 
     def update_id_to_code_rules(self, key_div: str, last_id: int) -> None:

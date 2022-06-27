@@ -29,11 +29,12 @@ logger = logger_.getLogger(__name__)
 
 class PrivateSaleUseCase(BaseETLUseCase):
     def __init__(
-            self,
-            basic_repo: SyncBasicRepository,
-            private_sale_repo: SyncPrivateSaleRepository,
-            redis: RedisClient,
-            *args, **kwargs
+        self,
+        basic_repo: SyncBasicRepository,
+        private_sale_repo: SyncPrivateSaleRepository,
+        redis: RedisClient,
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self._basic_repo: SyncBasicRepository = basic_repo
