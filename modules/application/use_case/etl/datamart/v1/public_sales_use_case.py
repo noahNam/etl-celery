@@ -53,7 +53,7 @@ class PublicSaleUseCase:
             self.public_repo.save_all(models=public_sales)
 
         sub_details: list[SubDtToPublicDtEntity] = self._subscription_repo.find_by_update_needed(
-            model=PublicSaleDetailModel
+            model=SubscriptionDetailModel
         )
         if not subscriptions:
             logger.info(
