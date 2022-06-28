@@ -1,30 +1,10 @@
-from sqlalchemy import select, update
-from typing import Callable, ContextManager
-from sqlalchemy.orm import Session
 from sqlalchemy import and_
+from sqlalchemy import select
 
+from core.domain.datalake.govt_deal.interface.govt_deal_repository import (
+    GovtDealsRepository,
+)
 from modules.adapter.infrastructure.sqlalchemy.database import session
-from modules.adapter.infrastructure.utils.log_helper import logger_
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_deal_model import (
-    GovtAptDealModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_rent_model import (
-    GovtAptRentModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_ofctl_deal_model import (
-    GovtOfctlDealModel,
-)
-
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_ofctl_rent_model import (
-    GovtOfctlRentModel,
-)
-
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_right_lot_out_model import (
-    GovtRightLotOutModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_mapping_result_model import (
-    BldMappingResultModel,
-)
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     GovtAptDealsEntity,
     GovtAptRentsEntity,
@@ -37,15 +17,31 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entit
     GovtOfctlRentJoinKeyEntity,
     GovtRightLotOutJoinKeyEntity,
 )
-from core.domain.datalake.govt_deal.interface.govt_deal_repository import (
-    GovtDealsRepository,
-)
 from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTypeEnum
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_mapping_result_model import (
+    BldMappingResultModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_deal_model import (
+    GovtAptDealModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_rent_model import (
+    GovtAptRentModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_ofctl_deal_model import (
+    GovtOfctlDealModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_ofctl_rent_model import (
+    GovtOfctlRentModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_right_lot_out_model import (
+    GovtRightLotOutModel,
+)
+from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
 
 
-class SyncGovtDealsRepository(GovtDealsRepository):
+class SyncGovtDealRepository(GovtDealsRepository):
     def find_by_update_needed(
         self, find_type: int = 0
     ) -> list[GovtAptDealsEntity] | list[GovtAptRentsEntity] | list[

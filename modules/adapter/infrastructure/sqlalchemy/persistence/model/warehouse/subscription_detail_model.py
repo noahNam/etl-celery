@@ -7,6 +7,7 @@ from sqlalchemy import (
     ForeignKey,
     Boolean,
 )
+from sqlalchemy.orm import relationship
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -14,6 +15,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_model import (
     SubscriptionModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
+    SubDtToPublicDtEntity,
 )
 
 
@@ -82,3 +86,46 @@ class SubscriptionDetailModel(warehouse_base, TimestampMixin):
     avg_win_point_gyeonggi = Column(String(10), nullable=True)
     avg_win_point_etc = Column(String(10), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    subs = relationship(
+        "SubscriptionModel",
+        backref="subscription_details",
+        uselist=False,
+        primaryjoin="foreign(SubscriptionDetailModel.subs_id) == SubscriptionModel.subs_id",
+    )
+
+    def to_entity_for_public_sale_details(self) -> SubDtToPublicDtEntity:
+        return SubDtToPublicDtEntity(
+            id=self.id,
+            subs_id=self.subs_id,
+            area_type=self.area_type,
+            supply_area=self.supply_area,
+            special_household=self.special_household,
+            multi_children_household=self.multi_children_household,
+            newlywed_household=self.newlywed_household,
+            old_parent_household=self.old_parent_household,
+            first_life_household=self.first_life_household,
+            general_household=self.general_household,
+            bay=self.bay,
+            pansang_tower=self.pansang_tower,
+            kitchen_window=self.kitchen_window,
+            direct_window=self.direct_window,
+            alpha_room=self.alpha_room,
+            cyber_model_house_link=self.subs.cyber_model_house_link,
+            housing_category=self.subs.housing_category,
+            region=self.subs.region,
+            supply_rate=self.subs.supply_rate,
+            supply_rate_etc=self.subs.supply_rate_etc,
+            multi_children_vol=self.multi_children_vol,
+            multi_children_vol_etc_gyeonggi=self.multi_children_vol_etc_gyeonggi,
+            multi_children_vol_etc=self.multi_children_vol_etc,
+            newlywed_vol=self.newlywed_vol,
+            newlywed_vol_etc_gyeonggi=self.newlywed_vol_etc_gyeonggi,
+            newlywed_vol_etc=self.newlywed_vol_etc,
+            old_parent_vol=self.old_parent_vol,
+            old_parent_vol_etc_gyeonggi=self.old_parent_vol_etc_gyeonggi,
+            old_parent_vol_etc=self.old_parent_vol_etc,
+            first_life_vol=self.first_life_vol,
+            first_life_vol_etc_gyeonggi=self.first_life_vol_etc_gyeonggi,
+            first_life_vol_etc=self.first_life_vol_etc,
+        )

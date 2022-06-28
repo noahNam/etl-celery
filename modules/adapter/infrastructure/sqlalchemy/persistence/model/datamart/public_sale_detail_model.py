@@ -16,6 +16,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
 )
+from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
+    PublicDtUniqueEntity,
+)
 
 
 class PublicSaleDetailModel(datamart_base, TimestampMixin):
@@ -48,3 +51,11 @@ class PublicSaleDetailModel(datamart_base, TimestampMixin):
     alpha_room = Column(String(1), nullable=True)
     cyber_model_house_link = Column(Text, nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_unique_entity(self) -> PublicDtUniqueEntity:
+        return PublicDtUniqueEntity(
+            id=self.id,
+            public_sale_id=self.public_sale_id,
+            area_type=self.area_type,
+            private_area=self.private_area,
+        )
