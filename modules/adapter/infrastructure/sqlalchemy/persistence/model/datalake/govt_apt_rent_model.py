@@ -8,7 +8,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     GovtAptRentsEntity,
-    GovtAptRentsJoinKeyEntity
+    GovtAptRentsJoinKeyEntity,
 )
 
 
@@ -35,12 +35,16 @@ class GovtAptRentModel(datalake_base, TimestampMixin):
     floor = Column(String(4), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
 
-    bld_mapping = relationship("BldMappingResultModel",
-                               backref="govt_apt_rents", uselist=False, lazy='joined',
-                               primaryjoin="and_(foreign(GovtAptRentModel.regional_cd) == BldMappingResultModel.regional_cd,"
-                                           "foreign(GovtAptRentModel.jibun) == BldMappingResultModel.jibun,"
-                                           "foreign(GovtAptRentModel.dong) == BldMappingResultModel.dong,"
-                                           "foreign(GovtAptRentModel.apt_name) == BldMappingResultModel.bld_name)")
+    bld_mapping = relationship(
+        "BldMappingResultModel",
+        backref="govt_apt_rents",
+        uselist=False,
+        lazy="joined",
+        primaryjoin="and_(foreign(GovtAptRentModel.regional_cd) == BldMappingResultModel.regional_cd,"
+        "foreign(GovtAptRentModel.jibun) == BldMappingResultModel.jibun,"
+        "foreign(GovtAptRentModel.dong) == BldMappingResultModel.dong,"
+        "foreign(GovtAptRentModel.apt_name) == BldMappingResultModel.bld_name)",
+    )
 
     def to_entity_for_bld_mapping_results(self) -> GovtAptRentsEntity:
         return GovtAptRentsEntity(
@@ -49,7 +53,7 @@ class GovtAptRentModel(datalake_base, TimestampMixin):
             dong=self.dong,
             build_year=self.build_year,
             jibun=self.jibun,
-            apt_name=self.apt_name
+            apt_name=self.apt_name,
         )
 
     def to_entity_for_apt_rents(self) -> GovtAptRentsJoinKeyEntity:
@@ -65,5 +69,5 @@ class GovtAptRentModel(datalake_base, TimestampMixin):
             deposit=self.deposit,
             exclusive_area=self.exclusive_area,
             regional_cd=self.regional_cd,
-            floor=self.floor
+            floor=self.floor,
         )

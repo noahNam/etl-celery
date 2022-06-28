@@ -28,4 +28,3 @@ class SyncBldMappingResultRepository:
             )
             session.rollback()
             raise Exception
-

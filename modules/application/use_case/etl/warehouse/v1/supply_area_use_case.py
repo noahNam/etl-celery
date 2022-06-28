@@ -1,12 +1,12 @@
 from modules.application.use_case.etl import BaseETLUseCase
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
-    SyncBasicRepository
+    SyncBasicRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
-    SupplyAreaEntity
+    SupplyAreaEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
-    SyncBldDealRepository
+    SyncBldDealRepository,
 )
 
 
@@ -25,8 +25,9 @@ class DealSupplyAreaUseCase(BaseETLUseCase):
         house_id를 이용해 매핑함
         update 이후에 type_infos의 updqte_needed를 갱신하지는 않음
         """
-        supply_areas: list[SupplyAreaEntity] = self._basic_repo.find_supply_areas_by_update_needed()
+        supply_areas: list[
+            SupplyAreaEntity
+        ] = self._basic_repo.find_supply_areas_by_update_needed()
 
         if supply_areas:
             self._bld_deal_reop.update_supply_area(supply_areas=supply_areas)
-

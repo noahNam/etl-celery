@@ -7,6 +7,7 @@ class KaptFindTypeEnum(Enum):
     KAPT_OPEN_API_INPUT = 0
     KAKAO_API_INPUT = 1
     BLD_MAPPING_RESULTS_INPUT = 2
+    KAPT_BASIC_INFOS = 3
 
 
 class CodeRuleKeyEnum(Enum):

@@ -14,7 +14,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
     TimestampMixin,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
-    SubsToPublicEntity
+    SubsToPublicEntity,
 )
 
 
@@ -71,14 +71,17 @@ class SubscriptionModel(warehouse_base, TimestampMixin):
     cmptt_rank = Column(String(6), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
 
-    sub_details = relationship("SubscriptionDetailModel",
-                               backref="subscriptions",
-                               uselist=True,
-                               primaryjoin="foreign(SubscriptionModel.subs_id) == SubscriptionDetailModel.subs_id"
-                               )
+    sub_details = relationship(
+        "SubscriptionDetailModel",
+        backref="subscriptions",
+        uselist=True,
+        primaryjoin="foreign(SubscriptionModel.subs_id) == SubscriptionDetailModel.subs_id",
+    )
 
     def to_entity_for_public_sales(self) -> SubsToPublicEntity:
-        supply_prices = [int(sub_detail.supply_price) for sub_detail in self.sub_details]
+        supply_prices = [
+            int(sub_detail.supply_price) for sub_detail in self.sub_details
+        ]
         min_down_payment = None if not supply_prices else min(supply_prices)
         max_down_payment = None if not supply_prices else max(supply_prices)
 

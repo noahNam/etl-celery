@@ -5,7 +5,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
     KaptOpenApiInputEntity,
     KakaoApiInputEntity,
     KaptBasicInfoEntity,
-    KaptMappingEntity
+    KaptMappingEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -174,5 +174,5 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
             dongri=self.dongri,
             use_apr_day=self.use_apr_day,
             origin_dong_address=self.origin_dong_address,
-            name=self.name
+            name=self.name,
         )

@@ -23,7 +23,7 @@ from starlette.testclient import TestClient
 from uvloop import new_event_loop
 
 from modules.adapter.infrastructure.fastapi.app import create_app
-from modules.adapter.infrastructure.fastapi.config import TestConfig, get_config
+from modules.adapter.infrastructure.fastapi.config import TestConfig
 from modules.adapter.infrastructure.sqlalchemy.connection import (
     AsyncDatabase,
     SyncDatabase,

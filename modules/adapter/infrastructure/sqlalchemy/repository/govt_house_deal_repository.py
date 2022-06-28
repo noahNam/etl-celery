@@ -1,8 +1,5 @@
 from sqlalchemy import exc, select
 
-from core.domain.datalake.govt_house_deal.interface.govt_house_deal_repository import (
-    GovtHouseDealRepository,
-)
 from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_mapping_result_model import (
@@ -28,7 +25,7 @@ from modules.adapter.infrastructure.utils.log_helper import logger_
 logger = logger_.getLogger(__name__)
 
 
-class SyncGovtHouseDealRepository(GovtHouseDealRepository):
+class SyncGovtHouseDealRepository:
     def save(
         self,
         model: GovtAptDealModel

@@ -2,16 +2,16 @@ from sqlalchemy import select
 
 from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
-    PublicDtUniqueEntity
+    PublicDtUniqueEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_detail_model import (
-    PublicSaleDetailModel
+    PublicSaleDetailModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_model import (
-    PublicSaleModel
+    PublicSaleModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.special_supply_result_model import (
-    SpecialSupplyResultModel
+    SpecialSupplyResultModel,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
@@ -19,9 +19,9 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncPublicSaleRepository:
-    def save_all(self,
-                 models: list[PublicSaleModel] | list[PublicSaleDetailModel]
-                 ) -> None:
+    def save_all(
+        self, models: list[PublicSaleModel] | list[PublicSaleDetailModel]
+    ) -> None:
         if not models:
             return None
 
@@ -35,17 +35,18 @@ class SyncPublicSaleRepository:
             session.rollback()
             raise Exception
 
-    def find_to_detail_ids_by_sub_ids(self, sub_ids: list[int]) -> list[PublicDtUniqueEntity]:
+    def find_to_detail_ids_by_sub_ids(
+        self, sub_ids: list[int]
+    ) -> list[PublicDtUniqueEntity]:
         query = select(PublicSaleDetailModel).where(
             PublicSaleDetailModel.public_sale_id.in_(sub_ids)
         )
         results = session.execute(query).scalars().all()
         return [result.to_unique_entity() for result in results]
 
-    def save_all_update_needed(self,
-                               special_supply_results: list[SpecialSupplyResultModel],
-                               sub_ids: list[int]
-                               ) -> None:
+    def save_all_update_needed(
+        self, special_supply_results: list[SpecialSupplyResultModel], sub_ids: list[int]
+    ) -> None:
         if not special_supply_results:
             return None
 
