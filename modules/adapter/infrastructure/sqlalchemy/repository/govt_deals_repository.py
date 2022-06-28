@@ -43,7 +43,7 @@ from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTyp
 logger = logger_.getLogger(__name__)
 
 
-class SyncGovtDealsRepository(GovtDealsRepository):
+class SyncGovtDealRepository(GovtDealsRepository):
     def find_by_update_needed(self,
                               find_type: int = 0) -> list[GovtAptDealsEntity] \
                                             | list[GovtAptRentsEntity] \

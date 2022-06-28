@@ -8,7 +8,7 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import
 )
 
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
-    SyncGovtDealsRepository,
+    SyncGovtDealRepository,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
@@ -16,7 +16,7 @@ from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_reposi
 )
 
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
-    SyncBldMappingResultsRepository
+    SyncBldMappingResultRepository
 )
 
 from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTypeEnum
@@ -47,19 +47,19 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_ma
 logger = logger_.getLogger(__name__)
 
 
-class BldMappingResultsUseCase(BaseETLUseCase):
+class BldMappingResultUseCase(BaseETLUseCase):
     def __init__(self,
                  kapt_repo: SyncKaptRepository,
-                 govt_repo: SyncGovtDealsRepository,
+                 govt_repo: SyncGovtDealRepository,
                  dong_code_repo: SyncLegalDongCodeRepository,
-                 bld_mapping_repo: SyncBldMappingResultsRepository,
+                 bld_mapping_repo: SyncBldMappingResultRepository,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._kapt_repo: SyncKaptRepository = kapt_repo
-        self._govt_repo: SyncGovtDealsRepository = govt_repo
+        self._govt_repo: SyncGovtDealRepository = govt_repo
         self._transfer: TransferBldMappingResults = TransferBldMappingResults()
         self._dong_code: SyncLegalDongCodeRepository = dong_code_repo
-        self._bld_mapping_repo: SyncBldMappingResultsRepository = bld_mapping_repo
+        self._bld_mapping_repo: SyncBldMappingResultRepository = bld_mapping_repo
 
     def execute(self):
         # extract
