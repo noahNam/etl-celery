@@ -11,7 +11,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_detail_model import (
     PublicSaleDetailModel
 )
-
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.special_supply_result_model import (
+    SpecialSupplyResultModel
+)
+from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
+    PublicDtUniqueEntity
+)
 
 class TransformPublicSales:
     def start_transfer_public_sales(self, subscriptions: list[SubsToPublicEntity]) -> list[PublicSaleModel]:
@@ -108,6 +113,58 @@ class TransformPublicSales:
 
         return return_models
 
+    def start_transfer_special_supply_results(self,
+                                              sub_details: list[SubDtToPublicDtEntity],
+                                              public_sale_details: list[PublicDtUniqueEntity]
+                                              ) -> list[SpecialSupplyResultModel]:
+        return_models = list()
+        for sub_detail in sub_details:
+            public_sale_detail_id: int = self._get_public_sale_detail_id(
+                sub_detail=sub_detail,
+                public_sale_details=public_sale_details
+            )
+            if not public_sale_detail_id:
+                continue
+
+            # 해당지역, 기타경기, 기타지역
+            region_percents: list[int] = self._get_region_percent(sub_detail=sub_detail)
+
+            area = SpecialSupplyResultModel(
+                public_sale_detail_id=public_sale_detail_id,
+                region="해당지역",
+                region_percent=region_percents[0],
+                multi_children_vol=sub_detail.multi_children_vol,
+                newlywed_vol=sub_detail.newlywed_vol,
+                old_parent_vol=sub_detail.old_parent_vol,
+                first_life_vol=sub_detail.first_life_vol,
+                update_needed=False
+            )
+            gyeonggi_area = SpecialSupplyResultModel(
+                public_sale_detail_id=public_sale_detail_id,
+                region="기타경기",
+                region_percent=region_percents[1],
+                multi_children_vol=sub_detail.multi_children_vol_etc_gyeonggi,
+                newlywed_vol=sub_detail.newlywed_vol_etc_gyeonggi,
+                old_parent_vol=sub_detail.old_parent_vol_etc_gyeonggi,
+                first_life_vol=sub_detail.first_life_vol_etc_gyeonggi,
+                update_needed=False
+            )
+            etc_area = SpecialSupplyResultModel(
+                public_sale_detail_id=public_sale_detail_id,
+                region="기타지역",
+                region_percent=region_percents[2],
+                multi_children_vol=sub_detail.multi_children_vol_etc,
+                newlywed_vol=sub_detail.newlywed_vol_etc,
+                old_parent_vol=sub_detail.old_parent_vol_etc,
+                first_life_vol=sub_detail.first_life_vol_etc,
+                update_needed=False
+            )
+
+            return_models.append(area)
+            return_models.append(gyeonggi_area)
+            return_models.append(etc_area)
+        return return_models
+
     def _get_start_date(self, date: str) -> str | None:
         if date and len(date) == 23:
             return date[:10]
@@ -191,3 +248,30 @@ class TransformPublicSales:
         )
 
         return total_acquisition_tax
+
+    def get_sub_ids(self, sub_details: list[SubDtToPublicDtEntity]) -> list[int]:
+        sub_ids = list()
+        for sub_detail in sub_details:
+            sub_ids.append(sub_detail.subs_id)
+        return sub_ids
+
+    def _get_public_sale_detail_id(self,
+                                   sub_detail: SubDtToPublicDtEntity,
+                                   public_sale_details: list[PublicDtUniqueEntity]
+                                   ) -> int:
+        public_sale_detail_id = None
+        for public_sale_detail in public_sale_details:
+            area_type = self._get_area_type(sub_detail.area_type)
+            private_area = self._get_private_area(sub_detail.area_type)
+            if public_sale_detail.area_type == area_type and public_sale_detail.private_area == private_area:
+                public_sale_detail_id = public_sale_detail.id
+        return public_sale_detail_id
+
+    def _get_region_percent(self, sub_detail: SubDtToPublicDtEntity) -> list[int]:
+        if sub_detail.housing_category == "민영":
+            return [100, 0, 0]
+        else:
+            if sub_detail.region == "경기":
+                return [30, 20, 50]
+            else:
+                return [50, 0, 50]

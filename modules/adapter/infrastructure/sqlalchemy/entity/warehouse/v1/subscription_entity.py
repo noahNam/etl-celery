@@ -64,3 +64,18 @@ class SubDtToPublicDtEntity(BaseModel):
     direct_window: str | None
     alpha_room: str | None
     cyber_model_house_link: str | None
+    housing_category: str
+    region: str
+    multi_children_vol: str | None
+    multi_children_vol_etc_gyeonggi: str | None
+    multi_children_vol_etc: str | None
+    newlywed_vol: str | None
+    newlywed_vol_etc_gyeonggi: str | None
+    newlywed_vol_etc: str | None
+    old_parent_vol: str | None
+    old_parent_vol_etc_gyeonggi: str | None
+    old_parent_vol_etc: str | None
+    first_life_vol: str | None
+    first_life_vol_etc_gyeonggi: str | None
+    first_life_vol_etc: str | None
+
