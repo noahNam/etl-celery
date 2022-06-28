@@ -1,8 +1,8 @@
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
-    SyncBldMappingResultsRepository
+    SyncBldMappingResultRepository
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
-    SyncGovtDealsRepository,
+    SyncGovtDealRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
     SyncBldDealRepository
@@ -28,8 +28,8 @@ from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
 class OfctlDealUseCase(BaseETLUseCase):
     def __init__(self, govt_deal_repo, bld_mapping_repo, bld_deal_repo, basic_repo, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._bld_mapping_repo: SyncBldMappingResultsRepository = bld_mapping_repo  # input_table
-        self._govt_deal_repo: SyncGovtDealsRepository = govt_deal_repo   # input_table
+        self._bld_mapping_repo: SyncBldMappingResultRepository = bld_mapping_repo  # input_table
+        self._govt_deal_repo: SyncGovtDealRepository = govt_deal_repo   # input_table
         self._bld_deal_reop: SyncBldDealRepository = bld_deal_repo  # result_table
         self._transfer: TransferAptDeals = TransferAptDeals()
         self._basic_repo: SyncBasicRepository = basic_repo

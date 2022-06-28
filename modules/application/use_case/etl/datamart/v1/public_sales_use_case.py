@@ -30,7 +30,7 @@ from modules.adapter.infrastructure.utils.log_helper import logger_
 logger = logger_.getLogger(__name__)
 
 
-class PublicSalesUseCase:
+class PublicSaleUseCase:
     def __init__(self, subscription_repo, public_repo, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._subscription_repo: SyncSubscriptionRepository = subscription_repo
@@ -80,5 +80,5 @@ class PublicSalesUseCase:
                 # general_supply_results=general_supply_results,
                 sub_ids=sub_ids
             )
-
+            # general_supply_results
 
