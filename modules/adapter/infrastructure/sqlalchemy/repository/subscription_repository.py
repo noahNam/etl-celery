@@ -211,7 +211,7 @@ class SyncSubscriptionRepository(SubscriptionRepository):
             session.rollback()
 
     def find_by_update_needed(self,
-                              model: Type[SubscriptionModel | PublicSaleDetailModel]
+                              model: Type[SubscriptionModel | SubscriptionDetailModel]
                               ) -> list[SubsToPublicEntity]\
                                    | list[SubDtToPublicDtEntity]\
                                    |None:
@@ -221,7 +221,7 @@ class SyncSubscriptionRepository(SubscriptionRepository):
         if results:
             if isinstance(model, SubscriptionModel):
                 return [result.to_entity_for_public_sales() for result in results]
-            elif isinstance(model, PublicSaleDetailModel):
+            elif isinstance(model, SubscriptionDetailModel):
                 return [result.to_entity_for_public_sale_details() for result in results]
         else:
             return None
