@@ -12,7 +12,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_ma
 logger = logger_.getLogger(__name__)
 
 
-class SyncBldMappingResultsRepository:
+class SyncBldMappingResultRepository:
     def save_all(self, models: list[BldMappingResultModel] | None) -> None:
         if not models:
             return

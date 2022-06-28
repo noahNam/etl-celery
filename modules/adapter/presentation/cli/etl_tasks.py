@@ -16,14 +16,14 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import
     SyncKaptRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
-    SyncGovtDealsRepository
+    SyncGovtDealRepository
 )
 
 from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
     SyncLegalDongCodeRepository
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
-    SyncBldMappingResultsRepository
+    SyncBldMappingResultRepository
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
     SyncBldDealRepository
@@ -67,16 +67,16 @@ from modules.application.use_case.etl.warehouse.v1.supply_area_use_case import(
 )
 from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
 from modules.application.use_case.etl.warehouse.v1.apt_deal_use_case import AptDealUseCase
-from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import BldMappingResultsUseCase
+from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import BldMappingResultUseCase
 from modules.application.use_case.etl.warehouse.v1.apt_rent_use_case import AptRentUseCase
 from modules.application.use_case.etl.warehouse.v1.ofctl_deal_use_case import OfctlDealUseCase
-from modules.application.use_case.etl.warehouse.v1.ofctl_rent_use_case import OfctlRentsUseCase
+from modules.application.use_case.etl.warehouse.v1.ofctl_rent_use_case import OfctlRentUseCase
 from modules.application.use_case.etl.warehouse.v1.right_lot_out_use_case import RightLotOutUseCase
 from modules.application.use_case.etl.warehouse.v1.subscription_use_case import (
     SubscriptionUseCase,
 )
 from modules.application.use_case.etl.datamart.v1.public_sales_use_case import (
-    PublicSalesUseCase
+    PublicSaleUseCase
 )
 
 logger = logger_.getLogger(__name__)
@@ -138,20 +138,20 @@ def get_task(topic: str):
             kapt_repo=SyncKaptRepository(),
         )
     elif topic == TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value:  # update_needed -> X
-        return BldMappingResultsUseCase(
+        return BldMappingResultUseCase(
             topic=topic,
             kapt_repo=SyncKaptRepository(),
-            govt_repo=SyncGovtDealsRepository(),
+            govt_repo=SyncGovtDealRepository(),
             dong_code_repo=SyncLegalDongCodeRepository(),
-            bld_mapping_repo=SyncBldMappingResultsRepository(),
+            bld_mapping_repo=SyncBldMappingResultRepository(),
         )
     elif (
             topic == TopicEnum.ETL_WH_APT_DEALS.value
     ):  # update_needed -> False - DL.GovtAptDealModel
         return AptDealUseCase(
             topic=topic,
-            govt_deal_repo=SyncGovtDealsRepository(),
-            bld_mapping_repo=SyncBldMappingResultsRepository(),
+            govt_deal_repo=SyncGovtDealRepository(),
+            bld_mapping_repo=SyncBldMappingResultRepository(),
             bld_deal_repo=SyncBldDealRepository(),
             basic_repo=SyncBasicRepository(),
         )
@@ -160,8 +160,8 @@ def get_task(topic: str):
     ):  # update_needed -> False - DL.GovtAptRentModel
         return AptRentUseCase(
             topic=topic,
-            govt_deal_repo=SyncGovtDealsRepository(),
-            bld_mapping_repo=SyncBldMappingResultsRepository(),
+            govt_deal_repo=SyncGovtDealRepository(),
+            bld_mapping_repo=SyncBldMappingResultRepository(),
             bld_deal_repo=SyncBldDealRepository(),
             basic_repo=SyncBasicRepository(),
         )
@@ -169,26 +169,26 @@ def get_task(topic: str):
             topic == TopicEnum.ETL_WH_OFCTL_DEALS
     ):  # update_needed -> False - DL.GovtOfctlDealModel
         return OfctlDealUseCase(
-            govt_deal_repo=SyncGovtDealsRepository(),
-            bld_mapping_repo=SyncBldMappingResultsRepository(),
+            govt_deal_repo=SyncGovtDealRepository(),
+            bld_mapping_repo=SyncBldMappingResultRepository(),
             bld_deal_repo=SyncBldDealRepository(),
             basic_repo=SyncBasicRepository(),
         )
     elif (
             topic == TopicEnum.ETL_WH_OFCTL_RENTS.value
     ):  # update_needed -> False - DL.GovtOfctlRentModel
-        return OfctlRentsUseCase(
-            govt_deal_repo=SyncGovtDealsRepository(),
-            bld_mapping_repo=SyncBldMappingResultsRepository(),
+        return OfctlRentUseCase(
+            govt_deal_repo=SyncGovtDealRepository(),
+            bld_mapping_repo=SyncBldMappingResultRepository(),
             bld_deal_repo=SyncBldDealRepository(),
             basic_repo=SyncBasicRepository(),
         )
     elif (
             topic == TopicEnum.ETL_WH_RIGHT_LOG_OUTS.value
-    ):  #  update_needed -> False - DL.GovtRightLotOutModel
+    ):  # update_needed -> False - DL.GovtRightLotOutModel
         return RightLotOutUseCase(
-            govt_deal_repo=SyncGovtDealsRepository(),
-            bld_mapping_repo=SyncBldMappingResultsRepository(),
+            govt_deal_repo=SyncGovtDealRepository(),
+            bld_mapping_repo=SyncBldMappingResultRepository(),
             bld_deal_repo=SyncBldDealRepository(),
             basic_repo=SyncBasicRepository(),
         )
@@ -199,7 +199,7 @@ def get_task(topic: str):
         )
 
     elif topic == TopicEnum.ETL_MART_PUBLIC_SALES.value:  # update_needed -> X
-        return PublicSalesUseCase(
+        return PublicSaleUseCase(
             topic=topic,
             subscription_repo=SyncSubscriptionRepository(),
             public_repo=SyncPublicSaleRepository()
