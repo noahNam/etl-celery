@@ -1,16 +1,4 @@
-from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
-    SyncBldMappingResultsRepository,
-)
-from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
-    SyncGovtDealsRepository,
-)
-from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
-    SyncBldDealRepository,
-)
-from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
-    SyncBasicRepository,
-)
-from modules.application.use_case.etl import BaseETLUseCase
+from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     GovtOfctlDealJoinKeyEntity,
 )
@@ -18,13 +6,22 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_en
     SupplyAreaEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTypeEnum
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl_deal_model import (
-    OfctlDealModel,
-)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_ofctl_deal_model import (
     GovtOfctlDealModel,
 )
-from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl_deal_model import (
+    OfctlDealModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
+    SyncBasicRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
+    SyncBldDealRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
+    SyncGovtDealsRepository,
+)
+from modules.application.use_case.etl import BaseETLUseCase
 
 
 class OfctlDealUseCase(BaseETLUseCase):
@@ -38,11 +35,9 @@ class OfctlDealUseCase(BaseETLUseCase):
         **kwargs
     ):
         super().__init__(*args, **kwargs)
-        self._bld_mapping_repo: SyncBldMappingResultsRepository = (
-            bld_mapping_repo  # input_table
-        )
+        self._bld_mapping_repo = bld_mapping_repo
         self._govt_deal_repo: SyncGovtDealsRepository = govt_deal_repo  # input_table
-        self._bld_deal_reop: SyncBldDealRepository = bld_deal_repo  # result_table
+        self._bld_deal_repo: SyncBldDealRepository = bld_deal_repo  # result_table
         self._transfer: TransferAptDeals = TransferAptDeals()
         self._basic_repo: SyncBasicRepository = basic_repo
 
@@ -74,7 +69,7 @@ class OfctlDealUseCase(BaseETLUseCase):
         govt_ofctl_deal_ids: list[int] = results[1]
 
         # Load
-        self._bld_deal_reop.save_all(
+        self._bld_deal_repo.save_all(
             insert_models=ofctl_deals,
             ids=govt_ofctl_deal_ids,
             update_model=GovtOfctlDealModel,
