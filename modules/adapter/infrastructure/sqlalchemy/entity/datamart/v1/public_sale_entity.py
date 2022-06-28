@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class PublicDtUniqueEntity(BaseModel):
     id: int
     public_sale_id: int

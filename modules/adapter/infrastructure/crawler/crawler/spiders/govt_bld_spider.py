@@ -1,6 +1,7 @@
 import re
 
 from scrapy import Spider, Request
+from scrapy.exceptions import CloseSpider
 from xmltodict import parse
 
 from modules.adapter.infrastructure.crawler.crawler.enum.govt_bld_enum import (
@@ -32,8 +33,7 @@ class GovtBldSpider(Spider):
             "modules.adapter.infrastructure.crawler.crawler.pipelines.GovtBldPipeline": 300
         },
     }
-    open_api_service_key = GovtBldEnum.SERVICE_KEY_1.value
-    request_count: int = 0
+    open_api_service_key: str = GovtBldEnum.SERVICE_KEY_1.value
 
     def start_requests(self):
         """self.params : list[KaptOpenApiInputEntity] from KaptOpenApiUseCase class"""
@@ -71,7 +71,14 @@ class GovtBldSpider(Spider):
                         "bun:": param.bun if param.bun else "0000",
                         "ji:": param.ji if param.ji else "0000",
                         "url": urls[0]
-                        + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
+                        + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
+                        f"&sigunguCd={param.sigungu_code}"
+                        f"&bjdongCd={param.bjdong_code}"
+                        f"&platGbCd=0"
+                        f"&bun={param.bun if param.bun else '0000'}"
+                        f"&ji={param.ji if param.ji else '0000'}"
+                        f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
+                        f"&pageNo=1",
                     },
                 )
                 yield Request(
@@ -94,8 +101,15 @@ class GovtBldSpider(Spider):
                         "bjd_code": param.origin_bjd_code,
                         "bun:": param.bun if param.bun else "0000",
                         "ji:": param.ji if param.ji else "0000",
-                        "url": urls[0]
-                        + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
+                        "url": urls[1]
+                        + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
+                        f"&sigunguCd={param.sigungu_code}"
+                        f"&bjdongCd={param.bjdong_code}"
+                        f"&platGbCd=0"
+                        f"&bun={param.bun if param.bun else '0000'}"
+                        f"&ji={param.ji if param.ji else '0000'}"
+                        f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
+                        f"&pageNo=1",
                     },
                 )
                 yield Request(
@@ -118,22 +132,144 @@ class GovtBldSpider(Spider):
                         "bjd_code": param.origin_bjd_code,
                         "bun:": param.bun if param.bun else "0000",
                         "ji:": param.ji if param.ji else "0000",
-                        "url": urls[0]
-                        + f"?kaptCode={param.kapt_code}&ServiceKey={GovtBldSpider.open_api_service_key}",
+                        "url": urls[2]
+                        + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
+                        f"&sigunguCd={param.sigungu_code}"
+                        f"&bjdongCd={param.bjdong_code}"
+                        f"&platGbCd=0"
+                        f"&bun={param.bun if param.bun else '0000'}"
+                        f"&ji={param.ji if param.ji else '0000'}"
+                        f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
+                        f"&pageNo=1",
                     },
                 )
+
+    def is_need_to_change_service_key(self, xml_to_dict: dict) -> bool:
+        if (
+            "EXCEEDS" in xml_to_dict["response"]["header"].get("resultMsg")
+            or "EXPIRED" in xml_to_dict["response"]["header"].get("resultMsg")
+        ) and xml_to_dict["response"]["header"].get("resultMsg") != "NORMAL SERVICE.":
+            return True
+        return False
 
     def parse_bld_top_info(self, response):
         xml_to_dict = parse(response.text)
         item: GovtBldTopInfoItem | None = None
 
-        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
-        elif not xml_to_dict["response"]["body"]["items"]:
-            item = None
-        else:
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        if self.is_need_to_change_service_key(xml_to_dict=xml_to_dict):
+            self.save_failure_info(
+                ref_table="govt_bld_top_infos",
+                current_house_id=response.request.meta.get("house_id"),
+                current_kapt_code=response.request.meta.get("kapt_code"),
+                current_bld_name=response.request.meta.get("name"),
+                new_dong_address=response.request.meta.get("new_dong_address"),
+                origin_dong_address=response.request.meta.get("origin_dong_address"),
+                bjd_code=response.request.meta.get("bjd_code"),
+                current_url=response.request.meta.get("url"),
+                bun=response.request.meta.get("bun"),
+                ji=response.request.meta.get("ji"),
+                response_or_failure=response,
+            )
+            if not self._change_service_key():
+                raise CloseSpider(
+                    reason=f"[GovtBldSpider][parse_bld_top_info]: "
+                    f"Daily Request Exceeds and All Service_key expired, Please try again later"
+                )
+            return None
+        try:
+            if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+                for elm in xml_to_dict:
+                    item: GovtBldTopInfoItem = GovtBldTopInfoItem(
+                        house_id=response.request.meta["house_id"],
+                        mgm_bldrgst_pk=elm.get("mgmBldrgstPk"),
+                        itg_bld_grade=elm.get("itgBldGrade"),
+                        itg_bld_cert=elm.get("itgBldCert"),
+                        crtn_day=elm.get("crtnDay"),
+                        na_bjdong_cd=elm.get("naBjdongCd"),
+                        na_ugrnd_cd=elm.get("naUgrndCd"),
+                        na_main_bun=elm.get("naMainBun"),
+                        na_sub_bun=elm.get("naSubBun"),
+                        plat_area=elm.get("platArea"),
+                        arch_area=elm.get("archArea"),
+                        bc_rat=elm.get("bcRat"),
+                        tot_area=elm.get("totArea"),
+                        vl_rat_estm_tot_area=elm.get("vlRatEstmTotArea"),
+                        vl_rat=elm.get("vlRat"),
+                        main_purps_cd=elm.get("mainPurpsCd"),
+                        main_purps_cd_nm=elm.get("mainPurpsCdNm"),
+                        etc_purps=elm.get("etcPurps"),
+                        hhld_cnt=elm.get("hhldCnt"),
+                        fmly_cnt=elm.get("fmlyCnt"),
+                        main_bld_cnt=elm.get("mainBldCnt"),
+                        atch_bld_cnt=elm.get("atchBldCnt"),
+                        atch_bld_area=elm.get("atchBldArea"),
+                        tot_pkng_cnt=elm.get("totPkngCnt"),
+                        indr_mech_utcnt=elm.get("indrMechUtcnt"),
+                        indr_mech_area=elm.get("indrMechArea"),
+                        oudr_mech_utcnt=elm.get("oudrMechUtcnt"),
+                        oudr_mech_area=elm.get("oudrMechArea"),
+                        indr_auto_utcnt=elm.get("indrAutoUtcnt"),
+                        indr_auto_area=elm.get("indrAutoArea"),
+                        oudr_auto_utcnt=elm.get("oudrAutoUtcnt"),
+                        oudr_auto_area=elm.get("oudrAutoArea"),
+                        pms_day=elm.get("pmsDay"),
+                        stcns_day=elm.get("stcnsDay"),
+                        use_apr_day=elm.get("useAprDay"),
+                        pmsno_year=elm.get("pmsnoYear"),
+                        pmsno_kik_cd=elm.get("pmsnoKikCd"),
+                        pmsno_kik_cd_nm=elm.get("pmsnoKikCdNm"),
+                        pmsno_gb_cd=elm.get("pmsnoGbCd"),
+                        pmsno_gb_cd_nm=elm.get("pmsnoGbCdNm"),
+                        ho_cnt=elm.get("hoCnt"),
+                        engr_grade=elm.get("engrGrade"),
+                        engr_rat=elm.get("engrRat"),
+                        engr_epi=elm.get("engrEpi"),
+                        gn_bld_grade=elm.get("gnBldGrade"),
+                        gn_bld_cert=elm.get("gnBldCert"),
+                        rnum=elm.get("rnum"),
+                        plat_plc=elm.get("platPlc"),
+                        sigungu_cd=elm.get("sigunguCd"),
+                        bjdong_cd=elm.get("bjdongCd"),
+                        plat_gb_cd=elm.get("platGbCd"),
+                        bun=elm.get("bun"),
+                        ji=elm.get("ji"),
+                        regstr_gb_cd=elm.get("regstrGbCd"),
+                        regstr_gb_cd_nm=elm.get("regstrGbCdNm"),
+                        regstr_kind_cd=elm.get("regstrKindCd"),
+                        regstr_kind_cd_nm=elm.get("regstrKindCdNm"),
+                        new_old_regstr_gb_cd=elm.get("newOldRegstrGbCd"),
+                        new_old_regstr_gb_cd_nm=elm.get("newOldRegstrGbCdNm"),
+                        new_plat_plc=elm.get("newPlatPlc"),
+                        bld_nm=elm.get("bldNm"),
+                        splot_nm=elm.get("splotNm"),
+                        block=elm.get("block"),
+                        lot=elm.get("lot"),
+                        bylot_cnt=elm.get("bylotCnt"),
+                        na_road_cd=elm.get("naRoadCd"),
+                    )
+                    yield item
+                return None
 
+            elif not xml_to_dict["response"]["body"]["items"]:
+                item = None
+            else:
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        except Exception:
+            self.save_failure_info(
+                ref_table="govt_bld_top_infos",
+                current_house_id=response.request.meta.get("house_id"),
+                current_kapt_code=response.request.meta.get("kapt_code"),
+                current_bld_name=response.request.meta.get("name"),
+                new_dong_address=response.request.meta.get("new_dong_address"),
+                origin_dong_address=response.request.meta.get("origin_dong_address"),
+                bjd_code=response.request.meta.get("bjd_code"),
+                current_url=response.request.meta.get("url"),
+                bun=response.request.meta.get("bun"),
+                ji=response.request.meta.get("ji"),
+                response_or_failure=response,
+            )
+            return None
         try:
             item: GovtBldTopInfoItem = GovtBldTopInfoItem(
                 house_id=response.request.meta["house_id"],
@@ -206,8 +342,6 @@ class GovtBldSpider(Spider):
         except KeyError:
             pass
 
-        self.count_requests()
-
         if item and item.mgm_bldrgst_pk:
             yield item
         else:
@@ -222,19 +356,139 @@ class GovtBldSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bun=response.request.meta.get("bun"),
                 ji=response.request.meta.get("ji"),
-                response=response,
+                response_or_failure=response,
             )
 
     def parse_bld_mid_info(self, response):
         xml_to_dict = parse(response.text)
         item: GovtBldMidInfoItem | None = None
 
-        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
-        elif not xml_to_dict["response"]["body"]["items"]:
-            item = None
-        else:
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        if self.is_need_to_change_service_key(xml_to_dict=xml_to_dict):
+            self.save_failure_info(
+                ref_table="govt_bld_middle_infos",
+                current_house_id=response.request.meta.get("house_id"),
+                current_kapt_code=response.request.meta.get("kapt_code"),
+                current_bld_name=response.request.meta.get("name"),
+                new_dong_address=response.request.meta.get("new_dong_address"),
+                origin_dong_address=response.request.meta.get("origin_dong_address"),
+                bjd_code=response.request.meta.get("bjd_code"),
+                current_url=response.request.meta.get("url"),
+                bun=response.request.meta.get("bun"),
+                ji=response.request.meta.get("ji"),
+                response_or_failure=response,
+            )
+            if not self._change_service_key():
+                raise CloseSpider(
+                    reason=f"[GovtBldSpider][parse_bld_mid_info]: "
+                    f"Daily Request Exceeds and All Service_key expired, Please try again later"
+                )
+            return None
+        try:
+            if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+                for elm in xml_to_dict:
+                    item: GovtBldMidInfoItem = GovtBldMidInfoItem(
+                        house_id=response.request.meta["house_id"],
+                        mgm_bldrgst_pk=elm.get("mgmBldrgstPk"),
+                        main_purps_cd_nm=elm.get("mainPurpsCdNm"),
+                        etc_purps=elm.get("etcPurps"),
+                        roof_cd=elm.get("roofCd"),
+                        roof_cd_nm=elm.get("roofCdNm"),
+                        etc_roof=elm.get("etcRoof"),
+                        hhld_cnt=elm.get("hhldCnt"),
+                        fmly_cnt=elm.get("fmlyCnt"),
+                        heit=elm.get("heit"),
+                        grnd_flr_cnt=elm.get("grndFlrCnt"),
+                        ugrnd_flr_cnt=elm.get("ugrndFlrCnt"),
+                        ride_use_elvt_cnt=elm.get("rideUseElvtCnt"),
+                        emgen_use_elvt_cnt=elm.get("emgenUseElvtCnt"),
+                        atch_bld_cnt=elm.get("atchBldCnt"),
+                        atch_bld_area=elm.get("atchBldArea"),
+                        tot_dong_tot_area=elm.get("totDongTotArea"),
+                        indr_mech_utcnt=elm.get("indrMechUtcnt"),
+                        indr_mech_area=elm.get("indrMechArea"),
+                        oudr_mech_utcnt=elm.get("oudrMechUtcnt"),
+                        oudr_mech_area=elm.get("oudrMechArea"),
+                        indr_auto_utcnt=elm.get("indrAutoUtcnt"),
+                        indr_auto_area=elm.get("indrAutoArea"),
+                        oudr_auto_utcnt=elm.get("oudrAutoUtcnt"),
+                        oudr_auto_area=elm.get("oudrAutoArea"),
+                        pms_day=elm.get("pmsDay"),
+                        stcns_day=elm.get("stcnsDay"),
+                        use_apr_day=elm.get("useAprDay"),
+                        pmsno_year=elm.get("pmsnoYear"),
+                        pmsno_kik_cd=elm.get("pmsnoKikCd"),
+                        pmsno_kik_cd_nm=elm.get("pmsnoKikCdNm"),
+                        pmsno_gb_cd=elm.get("pmsnoGbCd"),
+                        pmsno_gb_cd_nm=elm.get("pmsnoGbCdNm"),
+                        ho_cnt=elm.get("hoCnt"),
+                        engr_grade=elm.get("engrGrade"),
+                        engr_rat=elm.get("engrRat"),
+                        engr_epi=elm.get("engrEpi"),
+                        gn_bld_grade=elm.get("gnBldGrade"),
+                        gn_bld_cert=elm.get("gnBldCert"),
+                        itg_bld_grade=elm.get("itgBldGrade"),
+                        itg_bld_cert=elm.get("itgBldCert"),
+                        crtn_day=elm.get("crtnDay"),
+                        rnum=elm.get("rnum"),
+                        plat_plc=elm.get("platPlc"),
+                        sigungu_cd=elm.get("sigunguCd"),
+                        bjdong_cd=elm.get("bjdongCd"),
+                        plat_gb_cd=elm.get("platGbCd"),
+                        bun=elm.get("bun"),
+                        ji=elm.get("ji"),
+                        regstr_gb_cd=elm.get("regstrGbCd"),
+                        regstr_gb_cd_nm=elm.get("regstrGbCdNm"),
+                        regstr_kind_cd=elm.get("regstrKindCd"),
+                        regstr_kind_cd_nm=elm.get("regstrKindCdNm"),
+                        new_plat_plc=elm.get("newPlatPlc"),
+                        bld_nm=elm.get("bldNm"),
+                        splot_nm=elm.get("splotNm"),
+                        block=elm.get("block"),
+                        lot=elm.get("lot"),
+                        bylot_cnt=elm.get("bylotCnt"),
+                        na_road_cd=elm.get("naRoadCd"),
+                        na_bjdong_cd=elm.get("naBjdongCd"),
+                        na_ugrnd_cd=elm.get("naUgrndCd"),
+                        na_main_bun=elm.get("naMainBun"),
+                        na_sub_bun=elm.get("naSubBun"),
+                        dong_nm=elm.get("dongNm"),
+                        main_atch_gb_cd=elm.get("mainAtchGbCd"),
+                        main_atch_gb_cd_nm=elm.get("mainAtchGbCdNm"),
+                        plat_area=elm.get("platArea"),
+                        arch_area=elm.get("archArea"),
+                        bc_rat=elm.get("bcRat"),
+                        tot_area=elm.get("totArea"),
+                        vl_rat_estm_tot_area=elm.get("vlRatEstmTotArea"),
+                        vl_rat=elm.get("vlRat"),
+                        strct_cd=elm.get("strctCd"),
+                        strct_cd_nm=elm.get("strctCdNm"),
+                        etc_strct=elm.get("etcStrct"),
+                        main_purps_cd=elm.get("mainPurpsCd"),
+                        rserthqk_dsgn_apply_yn=elm.get("rserthqkDsgnApplyYn"),
+                        rserthqk_ablty=elm.get("rserthqkAblty"),
+                    )
+                    yield item
+                return None
+
+            elif not xml_to_dict["response"]["body"]["items"]:
+                item = None
+            else:
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        except Exception:
+            self.save_failure_info(
+                ref_table="govt_bld_middle_infos",
+                current_house_id=response.request.meta.get("house_id"),
+                current_kapt_code=response.request.meta.get("kapt_code"),
+                current_bld_name=response.request.meta.get("name"),
+                new_dong_address=response.request.meta.get("new_dong_address"),
+                origin_dong_address=response.request.meta.get("origin_dong_address"),
+                bjd_code=response.request.meta.get("bjd_code"),
+                current_url=response.request.meta.get("url"),
+                bun=response.request.meta.get("bun"),
+                ji=response.request.meta.get("ji"),
+                response_or_failure=response,
+            )
 
         try:
             item: GovtBldMidInfoItem = GovtBldMidInfoItem(
@@ -321,8 +575,6 @@ class GovtBldSpider(Spider):
         except KeyError:
             pass
 
-        self.count_requests()
-
         if item and item.mgm_bldrgst_pk:
             yield item
         else:
@@ -337,19 +589,103 @@ class GovtBldSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bun=response.request.meta.get("bun"),
                 ji=response.request.meta.get("ji"),
-                response=response,
+                response_or_failure=response,
             )
 
     def parse_bld_area_info(self, response):
         xml_to_dict: dict = parse(response.text)
         item: GovtBldAreaInfoItem | None = None
 
-        if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"][0]
-        elif not xml_to_dict["response"]["body"]["items"]:
-            item = None
-        else:
-            xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        if self.is_need_to_change_service_key(xml_to_dict=xml_to_dict):
+            self.save_failure_info(
+                ref_table="govt_bld_area_infos",
+                current_house_id=response.request.meta.get("house_id"),
+                current_kapt_code=response.request.meta.get("kapt_code"),
+                current_bld_name=response.request.meta.get("name"),
+                new_dong_address=response.request.meta.get("new_dong_address"),
+                origin_dong_address=response.request.meta.get("origin_dong_address"),
+                bjd_code=response.request.meta.get("bjd_code"),
+                current_url=response.request.meta.get("url"),
+                bun=response.request.meta.get("bun"),
+                ji=response.request.meta.get("ji"),
+                response_or_failure=response,
+            )
+            if not self._change_service_key():
+                raise CloseSpider(
+                    reason=f"[GovtBldSpider][parse_bld_area_info]: "
+                    f"Daily Request Exceeds and All Service_key expired, Please try again later"
+                )
+            return None
+
+        try:
+            if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+                for elm in xml_to_dict:
+                    item: GovtBldAreaInfoItem = GovtBldAreaInfoItem(
+                        house_id=response.request.meta["house_id"],
+                        mgm_bldrgst_pk=elm.get("mgmBldrgstPk"),
+                        regstr_gb_cd=elm.get("regstrGbCd"),
+                        regstr_gb_cd_nm=elm.get("regstrGbCdNm"),
+                        regstr_kind_cd=elm.get("regstrKindCd"),
+                        regstr_kind_cd_nm=elm.get("regstrKindCdNm"),
+                        new_plat_plc=elm.get("newPlatPlc"),
+                        bld_nm=elm.get("bldNm"),
+                        splot_nm=elm.get("splotNm"),
+                        block=elm.get("block"),
+                        lot=elm.get("lot"),
+                        bylot_cnt=elm.get("bylotCnt"),
+                        na_road_cd=elm.get("naRoadCd"),
+                        na_bjdong_cd=elm.get("naBjdongCd"),
+                        na_ugrnd_cd=elm.get("naUgrndCd"),
+                        na_main_bun=elm.get("naMainBun"),
+                        na_sub_bun=elm.get("naSubBun"),
+                        dong_nm=elm.get("dongNm"),
+                        ho_nm=elm.get("hoNm"),
+                        flr_gb_cd=elm.get("flrGbCd"),
+                        flr_gb_cd_nm=elm.get("flrGbCdNm"),
+                        flr_no=elm.get("flrNo"),
+                        flr_no_nm=elm.get("flrNoNm"),
+                        expos_pubuse_gb_cd=elm.get("exposPubuseGbCd"),
+                        expos_pubuse_gb_cd_nm=elm.get("exposPubuseGbCdNm"),
+                        main_atch_gb_cd=elm.get("mainAtchGbCd"),
+                        main_atch_gb_cd_nm=elm.get("mainAtchGbCdNm"),
+                        strct_cd=elm.get("strctCd"),
+                        strct_cd_nm=elm.get("strctCdNm"),
+                        etc_strct=elm.get("etcStrct"),
+                        main_purps_cd=elm.get("mainPurpsCd"),
+                        main_purps_cd_nm=elm.get("mainPurpsCdNm"),
+                        etc_purps=elm.get("etcPurps"),
+                        area=elm.get("area"),
+                        crtn_day=elm.get("crtnDay"),
+                        rnum=elm.get("rnum"),
+                        plat_plc=elm.get("platPlc"),
+                        sigungu_cd=elm.get("sigunguCd"),
+                        bjdong_cd=elm.get("bjdongCd"),
+                        plat_gb_cd=elm.get("platGbCd"),
+                        bun=elm.get("bun"),
+                        ji=elm.get("ji"),
+                    )
+                    yield item
+                return None
+
+            elif not xml_to_dict["response"]["body"]["items"]:
+                item = None
+            else:
+                xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
+        except Exception:
+            self.save_failure_info(
+                ref_table="govt_bld_area_infos",
+                current_house_id=response.request.meta.get("house_id"),
+                current_kapt_code=response.request.meta.get("kapt_code"),
+                current_bld_name=response.request.meta.get("name"),
+                new_dong_address=response.request.meta.get("new_dong_address"),
+                origin_dong_address=response.request.meta.get("origin_dong_address"),
+                bjd_code=response.request.meta.get("bjd_code"),
+                current_url=response.request.meta.get("url"),
+                bun=response.request.meta.get("bun"),
+                ji=response.request.meta.get("ji"),
+                response_or_failure=response,
+            )
 
         try:
             item: GovtBldAreaInfoItem = GovtBldAreaInfoItem(
@@ -399,8 +735,6 @@ class GovtBldSpider(Spider):
         except KeyError:
             pass
 
-        self.count_requests()
-
         if item and item.mgm_bldrgst_pk:
             yield item
         else:
@@ -415,7 +749,7 @@ class GovtBldSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bun=response.request.meta.get("bun"),
                 ji=response.request.meta.get("ji"),
-                response=response,
+                response_or_failure=response,
             )
 
     def error_callback_bld_top_info(self, failure):
@@ -430,7 +764,7 @@ class GovtBldSpider(Spider):
             current_url=failure.request.meta.get("url"),
             bun=failure.request.meta.get("bun"),
             ji=failure.request.meta.get("ji"),
-            response=failure,
+            response_or_failure=failure,
         )
 
     def error_callback_bld_mid_info(self, failure):
@@ -445,7 +779,7 @@ class GovtBldSpider(Spider):
             current_url=failure.request.meta.get("url"),
             bun=failure.request.meta.get("bun"),
             ji=failure.request.meta.get("ji"),
-            response=failure,
+            response_or_failure=failure,
         )
 
     def error_callback_bld_area_info(self, failure):
@@ -460,7 +794,7 @@ class GovtBldSpider(Spider):
             current_url=failure.request.meta.get("url"),
             bun=failure.request.meta.get("bun"),
             ji=failure.request.meta.get("ji"),
-            response=failure,
+            response_or_failure=failure,
         )
 
     def get_input_infos(
@@ -535,19 +869,6 @@ class GovtBldSpider(Spider):
         else:
             return None
 
-    def change_service_key(self):
-        if GovtBldSpider.open_api_service_key == GovtBldEnum.SERVICE_KEY_2.value:
-            GovtBldSpider.open_api_service_key = GovtBldEnum.SERVICE_KEY_1.value
-        else:
-            GovtBldSpider.open_api_service_key = GovtBldEnum.SERVICE_KEY_2.value
-
-    def count_requests(self):
-        if GovtBldSpider.request_count >= GovtBldEnum.DAILY_REQUEST_COUNT.value:
-            self.change_service_key()
-            GovtBldSpider.request_count = 0
-        else:
-            GovtBldSpider.request_count += 1
-
     def save_failure_info(
         self,
         ref_table,
@@ -560,7 +881,7 @@ class GovtBldSpider(Spider):
         current_url,
         bun,
         ji,
-        response,
+        response_or_failure,
     ) -> None:
         try:
             fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
@@ -574,7 +895,7 @@ class GovtBldSpider(Spider):
                 f"bun: {bun}, "
                 f"ji: {ji}, "
                 f"bjd_code: {bjd_code}",
-                reason=f"response:{response.text}",
+                reason=f"response:{response_or_failure.text}",
             )
         except AttributeError:
             fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
@@ -586,7 +907,7 @@ class GovtBldSpider(Spider):
                 f"origin_dong_address: {origin_dong_address}, "
                 f"new_dong_address: {new_dong_address}, "
                 f"bjd_code: {bjd_code}",
-                reason=f"response:{response}",
+                reason=f"response:{response_or_failure}",
             )
         if not self.__is_exists_failure(fail_orm=fail_orm):
             self.__save_crawling_failure(fail_orm=fail_orm)
@@ -606,3 +927,15 @@ class GovtBldSpider(Spider):
             fail_orm=fail_orm,
         )
         return event_listener_dict.get(f"{CallFailureTopicEnum.IS_EXISTS.value}")
+
+    def _change_service_key(self) -> bool:
+        if GovtBldSpider.open_api_service_key == GovtBldEnum.SERVICE_KEY_1.value:
+            GovtBldSpider.open_api_service_key = GovtBldEnum.SERVICE_KEY_2.value
+            return True
+        elif GovtBldSpider.open_api_service_key == GovtBldEnum.SERVICE_KEY_2.value:
+            GovtBldSpider.open_api_service_key = GovtBldEnum.SERVICE_KEY_3.value
+            return True
+        elif GovtBldSpider.open_api_service_key == GovtBldEnum.SERVICE_KEY_3.value:
+            GovtBldSpider.open_api_service_key = GovtBldEnum.SERVICE_KEY_4.value
+            return True
+        return False

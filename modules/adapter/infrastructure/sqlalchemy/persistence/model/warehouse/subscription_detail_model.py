@@ -17,7 +17,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subsc
     SubscriptionModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
-    SubDtToPublicDtEntity
+    SubDtToPublicDtEntity,
 )
 
 
@@ -87,11 +87,12 @@ class SubscriptionDetailModel(warehouse_base, TimestampMixin):
     avg_win_point_etc = Column(String(10), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
 
-    subs = relationship("SubscriptionModel",
-                        backref="subscription_details",
-                        uselist=False,
-                        primaryjoin="foreign(SubscriptionDetailModel.subs_id) == SubscriptionModel.subs_id"
-                        )
+    subs = relationship(
+        "SubscriptionModel",
+        backref="subscription_details",
+        uselist=False,
+        primaryjoin="foreign(SubscriptionDetailModel.subs_id) == SubscriptionModel.subs_id",
+    )
 
     def to_entity_for_public_sale_details(self) -> SubDtToPublicDtEntity:
         return SubDtToPublicDtEntity(

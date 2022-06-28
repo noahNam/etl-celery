@@ -80,4 +80,3 @@ class SubDtToPublicDtEntity(BaseModel):
     first_life_vol: str | None
     first_life_vol_etc_gyeonggi: str | None
     first_life_vol_etc: str | None
-

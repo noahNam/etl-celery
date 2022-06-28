@@ -10,7 +10,7 @@ from sqlalchemy import (
 
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     DongInfoEntity,
-    SupplyAreaEntity
+    SupplyAreaEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.mapper import warehouse_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -39,10 +39,13 @@ class DongInfoModel(warehouse_base, TimestampMixin):
     grnd_flr_cnt = Column(SmallInteger, nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
 
-    type_infos = relationship("TypeInfoModel",
-                              backref="dong_infos", uselist=False, lazy='joined',
-                              primaryjoin="foreign(DongInfoModel.id) == TypeInfoModel.dong_id"
-                              )
+    type_infos = relationship(
+        "TypeInfoModel",
+        backref="dong_infos",
+        uselist=False,
+        lazy="joined",
+        primaryjoin="foreign(DongInfoModel.id) == TypeInfoModel.dong_id",
+    )
 
     def to_dong_info_entity(self) -> DongInfoEntity:
         return DongInfoEntity(
@@ -58,5 +61,5 @@ class DongInfoModel(warehouse_base, TimestampMixin):
         return SupplyAreaEntity(
             house_id=self.house_id,
             private_area=self.type_infos.private_area,
-            supply_area=self.type_infos.supply_area
+            supply_area=self.type_infos.supply_area,
         )

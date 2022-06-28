@@ -3,30 +3,41 @@ import re
 from modules.adapter.infrastructure.utils.math_helper import MathHelper
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
     SubsToPublicEntity,
-    SubDtToPublicDtEntity
+    SubDtToPublicDtEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_model import (
-    PublicSaleModel
+    PublicSaleModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_detail_model import (
-    PublicSaleDetailModel
+    PublicSaleDetailModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.special_supply_result_model import (
-    SpecialSupplyResultModel
+    SpecialSupplyResultModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
-    PublicDtUniqueEntity
+    PublicDtUniqueEntity,
 )
 
+
 class TransformPublicSales:
-    def start_transfer_public_sales(self, subscriptions: list[SubsToPublicEntity]) -> list[PublicSaleModel]:
+    def start_transfer_public_sales(
+        self, subscriptions: list[SubsToPublicEntity]
+    ) -> list[PublicSaleModel]:
         return_models = list()
         for subscription in subscriptions:
-            subscription_start_date: str = self._get_start_date(date=subscription.subscription_date)
-            subscription_end_date: str = self._get_end_date(date=subscription.subscription_date)
-            contract_start_date: str = self._get_start_date(date=subscription.contract_date)
+            subscription_start_date: str = self._get_start_date(
+                date=subscription.subscription_date
+            )
+            subscription_end_date: str = self._get_end_date(
+                date=subscription.subscription_date
+            )
+            contract_start_date: str = self._get_start_date(
+                date=subscription.contract_date
+            )
             contract_end_date: str = self._get_end_date(date=subscription.contract_date)
-            move_in_year, move_in_month = self._get_move_year_month(move_in_year=subscription.move_in_date)
+            move_in_year, move_in_month = self._get_move_year_month(
+                move_in_year=subscription.move_in_date
+            )
 
             public_sale = PublicSaleModel(
                 real_estate_id=subscription.place_id,
@@ -74,12 +85,14 @@ class TransformPublicSales:
                 hallway_type=subscription.hallway_type,
                 is_checked=False,
                 is_available=False,
-                update_needed=True
+                update_needed=True,
             )
             return_models.append(public_sale)
         return return_models
 
-    def start_transfer_public_sale_details(self, sub_details: list[SubDtToPublicDtEntity]) -> list[PublicSaleDetailModel]:
+    def start_transfer_public_sale_details(
+        self, sub_details: list[SubDtToPublicDtEntity]
+    ) -> list[PublicSaleDetailModel]:
         return_models = list()
         for sub_detail in sub_details:
             area_type: str = self._get_area_type(raw_type=sub_detail.area_type)
@@ -107,21 +120,21 @@ class TransformPublicSales:
                 direct_window=sub_detail.direct_window,
                 alpha_room=sub_detail.alpha_room,
                 cyber_model_house_link=sub_detail.cyber_model_house_link,
-                update_needed=True
+                update_needed=True,
             )
             return_models.append(public_sale_detail)
 
         return return_models
 
-    def start_transfer_special_supply_results(self,
-                                              sub_details: list[SubDtToPublicDtEntity],
-                                              public_sale_detail_ids: list[PublicDtUniqueEntity]
-                                              ) -> list[SpecialSupplyResultModel]:
+    def start_transfer_special_supply_results(
+        self,
+        sub_details: list[SubDtToPublicDtEntity],
+        public_sale_detail_ids: list[PublicDtUniqueEntity],
+    ) -> list[SpecialSupplyResultModel]:
         return_models = list()
         for sub_detail in sub_details:
             public_sale_detail_id: int = self._get_public_sale_detail_id(
-                sub_detail=sub_detail,
-                public_sale_details=public_sale_detail_ids
+                sub_detail=sub_detail, public_sale_details=public_sale_detail_ids
             )
             if not public_sale_detail_id:
                 continue
@@ -137,7 +150,7 @@ class TransformPublicSales:
                 newlywed_vol=sub_detail.newlywed_vol,
                 old_parent_vol=sub_detail.old_parent_vol,
                 first_life_vol=sub_detail.first_life_vol,
-                update_needed=False
+                update_needed=False,
             )
             gyeonggi_area = SpecialSupplyResultModel(
                 public_sale_detail_id=public_sale_detail_id,
@@ -147,7 +160,7 @@ class TransformPublicSales:
                 newlywed_vol=sub_detail.newlywed_vol_etc_gyeonggi,
                 old_parent_vol=sub_detail.old_parent_vol_etc_gyeonggi,
                 first_life_vol=sub_detail.first_life_vol_etc_gyeonggi,
-                update_needed=False
+                update_needed=False,
             )
             etc_area = SpecialSupplyResultModel(
                 public_sale_detail_id=public_sale_detail_id,
@@ -157,7 +170,7 @@ class TransformPublicSales:
                 newlywed_vol=sub_detail.newlywed_vol_etc,
                 old_parent_vol=sub_detail.old_parent_vol_etc,
                 first_life_vol=sub_detail.first_life_vol_etc,
-                update_needed=False
+                update_needed=False,
             )
 
             return_models.append(area)
@@ -195,29 +208,29 @@ class TransformPublicSales:
         self, private_area: float, supply_price: int
     ) -> int:
         """
-            부동산 정책이 매년 변경되므로 정기적으로 세율 변경 시 업데이트 필요합니다.
-            <취득세 계산 2022년도 기준>
-            - 전용면적을 사용 (공급면적 X)
-            - 부동산 종류가 주택일 경우로 한정 (상가, 오피스텔, 토지, 건물 제외)
-            - 1주택자 기준
+        부동산 정책이 매년 변경되므로 정기적으로 세율 변경 시 업데이트 필요합니다.
+        <취득세 계산 2022년도 기준>
+        - 전용면적을 사용 (공급면적 X)
+        - 부동산 종류가 주택일 경우로 한정 (상가, 오피스텔, 토지, 건물 제외)
+        - 1주택자 기준
 
-            [parameters]
-            - private_area: 전용면적(제곱미터)
-            - supply_price: 공급금액 (DB 저장 단위: 만원)
+        [parameters]
+        - private_area: 전용면적(제곱미터)
+        - supply_price: 공급금액 (DB 저장 단위: 만원)
 
-            [계산법]
-            6억 이하, 85제곱미터 이하 : 1.1%
-            6억 이하, 85제곱미터 초과 : 1.3%
-            6억 초과 9억 이하, 85제곱미터 이하 : (집값 x 2 / 3억 - 3) * 0.01 * 1.1
-            6억 초과 9억 이하, 85제곱미터 초과 : (집값 x 2 / 3억 - 3) * 0.01 * 1.1 + 0.002
-            9억 초과, 85제곱미터 이하 : 3.3%
-            9억 초과, 85제곱미터 초과 : 3.5%
+        [계산법]
+        6억 이하, 85제곱미터 이하 : 1.1%
+        6억 이하, 85제곱미터 초과 : 1.3%
+        6억 초과 9억 이하, 85제곱미터 이하 : (집값 x 2 / 3억 - 3) * 0.01 * 1.1
+        6억 초과 9억 이하, 85제곱미터 초과 : (집값 x 2 / 3억 - 3) * 0.01 * 1.1 + 0.002
+        9억 초과, 85제곱미터 이하 : 3.3%
+        9억 초과, 85제곱미터 초과 : 3.5%
 
-            [return]
-            - total_acquisition_tax : 최종 취득세
+        [return]
+        - total_acquisition_tax : 최종 취득세
 
-            출처1 : https://hwanggum.tistory.com/335
-            출처2 : http://xn--989a00af8jnslv3dba.com/%EC%B7%A8%EB%93%9D%EC%84%B8
+        출처1 : https://hwanggum.tistory.com/335
+        출처2 : http://xn--989a00af8jnslv3dba.com/%EC%B7%A8%EB%93%9D%EC%84%B8
         """
         if (
             not private_area
@@ -243,9 +256,7 @@ class TransformPublicSales:
             else:
                 tax_rate = 0.035
 
-        total_acquisition_tax = MathHelper.round(
-            num=supply_price * tax_rate
-        )
+        total_acquisition_tax = MathHelper.round(num=supply_price * tax_rate)
 
         return total_acquisition_tax
 
@@ -255,23 +266,32 @@ class TransformPublicSales:
             sub_ids.append(sub_detail.subs_id)
         return sub_ids
 
-    def _get_public_sale_detail_id(self,
-                                   sub_detail: SubDtToPublicDtEntity,
-                                   public_sale_details: list[PublicDtUniqueEntity]
-                                   ) -> int:
+    def _get_public_sale_detail_id(
+        self,
+        sub_detail: SubDtToPublicDtEntity,
+        public_sale_details: list[PublicDtUniqueEntity],
+    ) -> int:
         public_sale_detail_id = None
         for public_sale_detail in public_sale_details:
             area_type = self._get_area_type(sub_detail.area_type)
             private_area = self._get_private_area(sub_detail.area_type)
-            if public_sale_detail.area_type == area_type and public_sale_detail.private_area == private_area:
+            if (
+                public_sale_detail.area_type == area_type
+                and public_sale_detail.private_area == private_area
+            ):
                 public_sale_detail_id = public_sale_detail.id
         return public_sale_detail_id
 
     def _get_region_percent(self, sub_detail: SubDtToPublicDtEntity) -> list[int]:
-        if sub_detail.supply_rate is not None and sub_detail.supply_rate_etc is not None:
+        if (
+            sub_detail.supply_rate is not None
+            and sub_detail.supply_rate_etc is not None
+        ):
             supply_rate = int(sub_detail.supply_rate)
             supply_rate_etc = int(sub_detail.supply_rate_etc)
-            supply_rate_gyeonggi = 100 - int(sub_detail.supply_rate) - int(sub_detail.supply_rate_etc)
+            supply_rate_gyeonggi = (
+                100 - int(sub_detail.supply_rate) - int(sub_detail.supply_rate_etc)
+            )
             return [supply_rate, supply_rate_gyeonggi, supply_rate_etc]
 
         elif sub_detail.housing_category == "민영":

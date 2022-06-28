@@ -12,7 +12,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity im
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
     SubsToPublicEntity,
-    SubDtToPublicDtEntity
+    SubDtToPublicDtEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_info_model import (
     SubscriptionInfoModel,
@@ -27,7 +27,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subsc
     SubscriptionModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_detail_model import (
-    PublicSaleDetailModel
+    PublicSaleDetailModel,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
@@ -210,11 +210,9 @@ class SyncSubscriptionRepository(SubscriptionRepository):
             )
             session.rollback()
 
-    def find_by_update_needed(self,
-                              model: Type[SubscriptionModel | SubscriptionDetailModel]
-                              ) -> list[SubsToPublicEntity]\
-                                   | list[SubDtToPublicDtEntity]\
-                                   |None:
+    def find_by_update_needed(
+        self, model: Type[SubscriptionModel | SubscriptionDetailModel]
+    ) -> list[SubsToPublicEntity] | list[SubDtToPublicDtEntity] | None:
         query = select(model)
         results = session.execute(query).scalars().all()
 
@@ -222,6 +220,8 @@ class SyncSubscriptionRepository(SubscriptionRepository):
             if isinstance(model, SubscriptionModel):
                 return [result.to_entity_for_public_sales() for result in results]
             elif isinstance(model, SubscriptionDetailModel):
-                return [result.to_entity_for_public_sale_details() for result in results]
+                return [
+                    result.to_entity_for_public_sale_details() for result in results
+                ]
         else:
             return None
