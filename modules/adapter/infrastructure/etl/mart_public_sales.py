@@ -17,6 +17,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.specia
 from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
     PublicDtUniqueEntity
 )
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.general_supply_result_model import (
+    GeneralSupplyResultModel
+)
 
 class TransformPublicSales:
     def start_transfer_public_sales(self, subscriptions: list[SubsToPublicEntity]) -> list[PublicSaleModel]:
@@ -29,6 +32,7 @@ class TransformPublicSales:
             move_in_year, move_in_month = self._get_move_year_month(move_in_year=subscription.move_in_date)
 
             public_sale = PublicSaleModel(
+                id=subscription.subs_id,
                 real_estate_id=subscription.place_id,
                 name=subscription.name,
                 region=subscription.region,
@@ -89,6 +93,7 @@ class TransformPublicSales:
             )
 
             public_sale_detail = PublicSaleDetailModel(
+                id=sub_detail.id,
                 public_sale_id=sub_detail.subs_id,
                 area_type=area_type,
                 private_area=private_area,
@@ -115,54 +120,86 @@ class TransformPublicSales:
 
     def start_transfer_special_supply_results(self,
                                               sub_details: list[SubDtToPublicDtEntity],
-                                              public_sale_detail_ids: list[PublicDtUniqueEntity]
                                               ) -> list[SpecialSupplyResultModel]:
         return_models = list()
         for sub_detail in sub_details:
-            public_sale_detail_id: int = self._get_public_sale_detail_id(
-                sub_detail=sub_detail,
-                public_sale_details=public_sale_detail_ids
-            )
-            if not public_sale_detail_id:
-                continue
-
             # region_percents: [해당지역, 기타경기, 기타지역]
             region_percents: list[int] = self._get_region_percent(sub_detail=sub_detail)
 
             area = SpecialSupplyResultModel(
-                public_sale_detail_id=public_sale_detail_id,
+                public_sale_detail_id=sub_detail.id,
                 region="해당지역",
                 region_percent=region_percents[0],
-                multi_children_vol=sub_detail.multi_children_vol,
-                newlywed_vol=sub_detail.newlywed_vol,
-                old_parent_vol=sub_detail.old_parent_vol,
-                first_life_vol=sub_detail.first_life_vol,
+                multi_children_vol=self._str_to_float(value=sub_detail.multi_children_vol),
+                newlywed_vol=self._str_to_float(value=sub_detail.newlywed_vol),
+                old_parent_vol=self._str_to_float(value=sub_detail.old_parent_vol),
+                first_life_vol=self._str_to_float(value=sub_detail.first_life_vol),
                 update_needed=False
             )
             gyeonggi_area = SpecialSupplyResultModel(
-                public_sale_detail_id=public_sale_detail_id,
+                public_sale_detail_id=sub_detail.id,
                 region="기타경기",
                 region_percent=region_percents[1],
-                multi_children_vol=sub_detail.multi_children_vol_etc_gyeonggi,
-                newlywed_vol=sub_detail.newlywed_vol_etc_gyeonggi,
-                old_parent_vol=sub_detail.old_parent_vol_etc_gyeonggi,
-                first_life_vol=sub_detail.first_life_vol_etc_gyeonggi,
+                multi_children_vol=self._str_to_float(value=sub_detail.multi_children_vol_etc_gyeonggi),
+                newlywed_vol=self._str_to_float(value=sub_detail.newlywed_vol_etc_gyeonggi),
+                old_parent_vol=self._str_to_float(value=sub_detail.old_parent_vol_etc_gyeonggi),
+                first_life_vol=self._str_to_float(value=sub_detail.first_life_vol_etc_gyeonggi),
                 update_needed=False
             )
             etc_area = SpecialSupplyResultModel(
-                public_sale_detail_id=public_sale_detail_id,
+                public_sale_detail_id=sub_detail.id,
                 region="기타지역",
                 region_percent=region_percents[2],
-                multi_children_vol=sub_detail.multi_children_vol_etc,
-                newlywed_vol=sub_detail.newlywed_vol_etc,
-                old_parent_vol=sub_detail.old_parent_vol_etc,
-                first_life_vol=sub_detail.first_life_vol_etc,
+                multi_children_vol=self._str_to_float(value=sub_detail.multi_children_vol_etc),
+                newlywed_vol=self._str_to_float(value=sub_detail.newlywed_vol_etc),
+                old_parent_vol=self._str_to_float(value=sub_detail.old_parent_vol_etc),
+                first_life_vol=self._str_to_float(value=sub_detail.first_life_vol_etc),
                 update_needed=False
             )
 
             return_models.append(area)
             return_models.append(gyeonggi_area)
             return_models.append(etc_area)
+        return return_models
+
+    def start_transfer_general_supply_results(self,
+                                              sub_details: list[SubDtToPublicDtEntity],
+                                              ) -> list[GeneralSupplyResultModel]:
+        return_models = list()
+        for sub_detail in sub_details:
+            region_percents: list[int] = self._get_region_percent(sub_detail=sub_detail)
+
+            area = GeneralSupplyResultModel(
+                public_sale_detail_id=sub_detail.id,
+                region="해당지역",
+                region_percent=region_percents[0],
+                applicant_num=self._str_to_float(value=sub_detail.first_accept_cnt),
+                competition_rate=self._get_competition_rate(value=sub_detail.first_cmptt_rate),
+                win_point=self._get_win_point(value=sub_detail.lowest_win_point),
+                update_needed=False
+            )
+            gyeonggi_area = GeneralSupplyResultModel(
+                public_sale_detail_id=sub_detail.id,
+                region="기타경기",
+                region_percent=region_percents[1],
+                applicant_num=self._str_to_float(value=sub_detail.first_accept_cnt_gyeonggi),
+                competition_rate=self._get_competition_rate(value=sub_detail.first_cmptt_rate_gyeonggi),
+                win_point=self._get_win_point(value=sub_detail.lowest_win_point_gyeonggi),
+                update_needed=False
+            )
+            etc_area = GeneralSupplyResultModel(
+                public_sale_detail_id=sub_detail.id,
+                region="기타지역",
+                region_percent=region_percents[2],
+                applicant_num=self._str_to_float(value=sub_detail.first_accept_cnt_etc),
+                competition_rate=self._get_competition_rate(value=sub_detail.first_cmptt_rate_etc),
+                win_point=self._get_win_point(value=sub_detail.lowest_win_point_etc),
+                update_needed=False
+            )
+            return_models.append(area)
+            return_models.append(gyeonggi_area)
+            return_models.append(etc_area)
+
         return return_models
 
     def _get_start_date(self, date: str) -> str | None:
@@ -255,18 +292,6 @@ class TransformPublicSales:
             sub_ids.append(sub_detail.subs_id)
         return sub_ids
 
-    def _get_public_sale_detail_id(self,
-                                   sub_detail: SubDtToPublicDtEntity,
-                                   public_sale_details: list[PublicDtUniqueEntity]
-                                   ) -> int:
-        public_sale_detail_id = None
-        for public_sale_detail in public_sale_details:
-            area_type = self._get_area_type(sub_detail.area_type)
-            private_area = self._get_private_area(sub_detail.area_type)
-            if public_sale_detail.area_type == area_type and public_sale_detail.private_area == private_area:
-                public_sale_detail_id = public_sale_detail.id
-        return public_sale_detail_id
-
     def _get_region_percent(self, sub_detail: SubDtToPublicDtEntity) -> list[int]:
         if sub_detail.supply_rate is not None and sub_detail.supply_rate_etc is not None:
             supply_rate = int(sub_detail.supply_rate)
@@ -282,3 +307,25 @@ class TransformPublicSales:
                 return [30, 20, 50]
             else:
                 return [50, 0, 50]
+
+    def _str_to_float(self, value: str) -> float | None:
+        if not value or value == "":
+            return None
+        else:
+            return float(value)
+
+    def _get_competition_rate(self, value: str) -> float | None:
+        if not value or value == "":
+            return None
+        elif not re.search('△', value):
+            return float(value)  # 특수문자 없음
+        else:
+            return None
+
+    def _get_win_point(self, value: str) -> float | None:
+        if not value:
+            return None
+        elif value == "" or value == "-":
+            return None
+        else:
+            return float(value)
