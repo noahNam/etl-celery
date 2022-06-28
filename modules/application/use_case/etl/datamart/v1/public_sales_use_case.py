@@ -4,7 +4,6 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repositor
 from modules.adapter.infrastructure.sqlalchemy.repository.public_sale_repository import (
     SyncPublicSaleRepository
 )
-
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
     SubsToPublicEntity,
     SubDtToPublicDtEntity
@@ -18,6 +17,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_model import (
     SubscriptionModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_detail_model import (
+    SubscriptionDetailModel
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
     PublicDtUniqueEntity
