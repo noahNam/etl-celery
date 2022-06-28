@@ -117,6 +117,7 @@ class GovtTransferEntity(BaseModel):
     매핑테이블 전처리를 위한 임시 Entity
     TransferBldMappingResults 에서 사용.
     """
+
     addr_code: str | None
     build_year: str | None
     jibun: str | None
@@ -126,8 +127,9 @@ class GovtTransferEntity(BaseModel):
 
 class GovtAptDealsJoinKeyEntity(BaseModel):
     """
-        govt_apt_deals 와 bld_mapping_results table의 키값을 join 함
+    govt_apt_deals 와 bld_mapping_results table의 키값을 join 함
     """
+
     id: int
     house_id: int
     dong: str | None

@@ -8,7 +8,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     GovtRightLotOutsEntity,
-    GovtRightLotOutJoinKeyEntity
+    GovtRightLotOutJoinKeyEntity,
 )
 
 
@@ -35,13 +35,16 @@ class GovtRightLotOutModel(datalake_base, TimestampMixin):
     floor = Column(String(4), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
 
-    bld_mapping = relationship("BldMappingResultModel",
-                               backref="govt_right_lot_outs", uselist=False, lazy='joined',
-                               primaryjoin="and_(foreign(GovtRightLotOutModel.regional_cd) == BldMappingResultModel.regional_cd,"
-                                           "foreign(GovtRightLotOutModel.jibun) == BldMappingResultModel.jibun,"
-                                           "foreign(GovtRightLotOutModel.dong) == BldMappingResultModel.dong,"
-                                           "foreign(GovtRightLotOutModel.name) == BldMappingResultModel.bld_name)"
-                               )
+    bld_mapping = relationship(
+        "BldMappingResultModel",
+        backref="govt_right_lot_outs",
+        uselist=False,
+        lazy="joined",
+        primaryjoin="and_(foreign(GovtRightLotOutModel.regional_cd) == BldMappingResultModel.regional_cd,"
+        "foreign(GovtRightLotOutModel.jibun) == BldMappingResultModel.jibun,"
+        "foreign(GovtRightLotOutModel.dong) == BldMappingResultModel.dong,"
+        "foreign(GovtRightLotOutModel.name) == BldMappingResultModel.bld_name)",
+    )
 
     # GovtRightLotOutsEntity
     def to_entity_for_bld_mapping_results(self) -> GovtRightLotOutsEntity:
@@ -50,7 +53,7 @@ class GovtRightLotOutModel(datalake_base, TimestampMixin):
             regional_cd=self.regional_cd,
             dong=self.dong,
             jibun=self.jibun,
-            name=self.name
+            name=self.name,
         )
 
     def to_entity_for_right_lot_outs(self) -> GovtRightLotOutJoinKeyEntity:

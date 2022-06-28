@@ -16,17 +16,17 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import
     SyncKaptRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
-    SyncGovtDealsRepository
+    SyncGovtDealsRepository,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
-    SyncLegalDongCodeRepository
+    SyncLegalDongCodeRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
-    SyncBldMappingResultsRepository
+    SyncBldMappingResultsRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
-    SyncBldDealRepository
+    SyncBldDealRepository,
 )
 
 
@@ -59,16 +59,28 @@ from modules.application.use_case.etl.datamart.v1.private_sale_use_case import (
 from modules.application.use_case.etl.datamart.v1.real_estate_use_case import (
     RealEstateUseCase,
 )
-from modules.application.use_case.etl.warehouse.v1.supply_area_use_case import(
-    DealSupplyAreaUseCase
+from modules.application.use_case.etl.warehouse.v1.supply_area_use_case import (
+    DealSupplyAreaUseCase,
 )
 from modules.application.use_case.etl.warehouse.v1.basic_use_case import BasicUseCase
-from modules.application.use_case.etl.warehouse.v1.apt_deal_use_case import AptDealUseCase
-from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import BldMappingResultsUseCase
-from modules.application.use_case.etl.warehouse.v1.apt_rent_use_case import AptRentUseCase
-from modules.application.use_case.etl.warehouse.v1.ofctl_deal_use_case import OfctlDealUseCase
-from modules.application.use_case.etl.warehouse.v1.ofctl_rent_use_case import OfctlRentsUseCase
-from modules.application.use_case.etl.warehouse.v1.right_lot_out_use_case import RightLotOutUseCase
+from modules.application.use_case.etl.warehouse.v1.apt_deal_use_case import (
+    AptDealUseCase,
+)
+from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import (
+    BldMappingResultsUseCase,
+)
+from modules.application.use_case.etl.warehouse.v1.apt_rent_use_case import (
+    AptRentUseCase,
+)
+from modules.application.use_case.etl.warehouse.v1.ofctl_deal_use_case import (
+    OfctlDealUseCase,
+)
+from modules.application.use_case.etl.warehouse.v1.ofctl_rent_use_case import (
+    OfctlRentsUseCase,
+)
+from modules.application.use_case.etl.warehouse.v1.right_lot_out_use_case import (
+    RightLotOutUseCase,
+)
 from modules.application.use_case.etl.warehouse.v1.subscription_use_case import (
     SubscriptionUseCase,
 )
