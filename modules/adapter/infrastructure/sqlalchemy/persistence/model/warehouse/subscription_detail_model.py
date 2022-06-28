@@ -113,6 +113,8 @@ class SubscriptionDetailModel(warehouse_base, TimestampMixin):
             cyber_model_house_link=self.subs.cyber_model_house_link,
             housing_category=self.subs.housing_category,
             region=self.subs.region,
+            supply_rate=self.subs.supply_rate,
+            supply_rate_etc=self.subs.supply_rate_etc,
             multi_children_vol=self.multi_children_vol,
             multi_children_vol_etc_gyeonggi=self.multi_children_vol_etc_gyeonggi,
             multi_children_vol_etc=self.multi_children_vol_etc,

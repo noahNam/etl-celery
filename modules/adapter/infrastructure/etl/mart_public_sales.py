@@ -115,18 +115,18 @@ class TransformPublicSales:
 
     def start_transfer_special_supply_results(self,
                                               sub_details: list[SubDtToPublicDtEntity],
-                                              public_sale_details: list[PublicDtUniqueEntity]
+                                              public_sale_detail_ids: list[PublicDtUniqueEntity]
                                               ) -> list[SpecialSupplyResultModel]:
         return_models = list()
         for sub_detail in sub_details:
             public_sale_detail_id: int = self._get_public_sale_detail_id(
                 sub_detail=sub_detail,
-                public_sale_details=public_sale_details
+                public_sale_details=public_sale_detail_ids
             )
             if not public_sale_detail_id:
                 continue
 
-            # 해당지역, 기타경기, 기타지역
+            # region_percents: [해당지역, 기타경기, 기타지역]
             region_percents: list[int] = self._get_region_percent(sub_detail=sub_detail)
 
             area = SpecialSupplyResultModel(
@@ -268,8 +268,15 @@ class TransformPublicSales:
         return public_sale_detail_id
 
     def _get_region_percent(self, sub_detail: SubDtToPublicDtEntity) -> list[int]:
-        if sub_detail.housing_category == "민영":
+        if sub_detail.supply_rate is not None and sub_detail.supply_rate_etc is not None:
+            supply_rate = int(sub_detail.supply_rate)
+            supply_rate_etc = int(sub_detail.supply_rate_etc)
+            supply_rate_gyeonggi = 100 - int(sub_detail.supply_rate) - int(sub_detail.supply_rate_etc)
+            return [supply_rate, supply_rate_gyeonggi, supply_rate_etc]
+
+        elif sub_detail.housing_category == "민영":
             return [100, 0, 0]
+
         else:
             if sub_detail.region == "경기":
                 return [30, 20, 50]

@@ -66,6 +66,8 @@ class SubDtToPublicDtEntity(BaseModel):
     cyber_model_house_link: str | None
     housing_category: str
     region: str
+    supply_rate: float | None
+    supply_rate_etc: float | None
     multi_children_vol: str | None
     multi_children_vol_etc_gyeonggi: str | None
     multi_children_vol_etc: str | None
