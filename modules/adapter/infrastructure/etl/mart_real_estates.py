@@ -45,6 +45,7 @@ class TransformRealEstate:
                     front_legal_code=target_entity.sigungu_cd,
                     back_legal_code=target_entity.bjdong_cd,
                     is_available=target_entity.is_available,
+                    update_needed=True,
                 )
             )
         return result

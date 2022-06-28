@@ -110,6 +110,7 @@ class TransformBasic:
                     dong_id=target_entity.dong_id,
                     private_area=private_area,
                     supply_area=supply_area,
+                    update_needed=True,
                 )
             )
         return result
@@ -125,6 +126,7 @@ class TransformBasic:
                     name=target_entity.dong_nm,
                     hhld_cnt=target_entity.hhld_cnt,
                     grnd_flr_cnt=target_entity.grnd_flr_cnt,
+                    update_needed=True,
                 )
             )
         return result
@@ -144,6 +146,7 @@ class TransformBasic:
                         ji=target_entity.ji,
                         bc_rat=target_entity.bc_rat,
                         vl_rat=target_entity.vl_rat,
+                        update_needed=True,
                     ),
                 )
             )
@@ -163,6 +166,7 @@ class TransformBasic:
                     individual_fee=target_entity.individual_fee,
                     public_part_imp_cost=target_entity.public_part_imp_cost,
                     etc_income_amount=target_entity.etc_income_amount,
+                    update_needed=True,
                 )
             )
         return result
@@ -182,6 +186,7 @@ class TransformBasic:
                         kaptd_wtimesub=target_entity.kaptd_wtimesub,
                         convenient_facility=target_entity.convenient_facility,
                         education_facility=target_entity.education_facility,
+                        update_needed=True,
                     ),
                 )
             )
@@ -196,6 +201,7 @@ class TransformBasic:
                     items=dict(
                         priv_area=target_entity.priv_area,
                         bjdong_cd=target_entity.bjd_code,
+                        update_needed=True,
                     ),
                 )
             )
@@ -305,6 +311,7 @@ class TransformBasic:
                     road_number=road_number,
                     road_name=road_name,
                     land_number=land_number,
+                    update_needed=True,
                 )
             )
         return result
