@@ -127,4 +127,13 @@ class SubscriptionDetailModel(warehouse_base, TimestampMixin):
             first_life_vol=self.first_life_vol,
             first_life_vol_etc_gyeonggi=self.first_life_vol_etc_gyeonggi,
             first_life_vol_etc=self.first_life_vol_etc,
+            first_accept_cnt=self.first_accept_cnt,
+            first_accept_cnt_gyeonggi=self.first_accept_cnt_gyeonggi,
+            first_accept_cnt_etc=self.first_accept_cnt_etc,
+            first_cmptt_rate=self.first_cmptt_rate,
+            first_cmptt_rate_gyeonggi=self.first_cmptt_rate_gyeonggi,
+            first_cmptt_rate_etc=self.first_cmptt_rate_etc,
+            lowest_win_point=self.lowest_win_point,
+            lowest_win_point_gyeonggi=self.lowest_win_point_gyeonggi,
+            lowest_win_point_etc=self.lowest_win_point_etc,
         )

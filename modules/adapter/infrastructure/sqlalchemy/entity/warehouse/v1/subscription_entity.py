@@ -80,4 +80,12 @@ class SubDtToPublicDtEntity(BaseModel):
     first_life_vol: str | None
     first_life_vol_etc_gyeonggi: str | None
     first_life_vol_etc: str | None
-
+    first_accept_cnt: str | None
+    first_accept_cnt_gyeonggi: str | None
+    first_accept_cnt_etc: str | None
+    first_cmptt_rate: str | None
+    first_cmptt_rate_gyeonggi: str | None
+    first_cmptt_rate_etc: str | None
+    lowest_win_point: str | None
+    lowest_win_point_gyeonggi: str | None
+    lowest_win_point_etc: str | None
