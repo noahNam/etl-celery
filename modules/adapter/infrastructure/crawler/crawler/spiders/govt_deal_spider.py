@@ -94,8 +94,8 @@ class GovtHouseDealSpider(Spider):
         urls: list = [
             GovtHouseDealEnum.APT_DEAL_END_POINT.value,
             GovtHouseDealEnum.APT_RENT_END_POINT.value,
-            GovtHouseDealEnum.OPCTL_DEAL_END_POINT.value,
-            GovtHouseDealEnum.OPCTL_RENT_END_POINT.value,
+            GovtHouseDealEnum.OFCTL_DEAL_END_POINT.value,
+            GovtHouseDealEnum.OFCTL_RENT_END_POINT.value,
             GovtHouseDealEnum.APT_RIGHT_LOT_OUT_END_POINT.value,
         ]
 
@@ -161,8 +161,8 @@ class GovtHouseDealSpider(Spider):
                         f"&pageNo=1"
                         f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
                         f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
-                        callback=self.parse_opctl_deal_info,
-                        errback=self.error_callback_opctl_deal_info,
+                        callback=self.parse_ofctl_deal_info,
+                        errback=self.error_callback_ofctl_deal_info,
                         meta={
                             "url": urls[2]
                             + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
@@ -182,8 +182,8 @@ class GovtHouseDealSpider(Spider):
                         f"&pageNo=1"
                         f"&numOfRows={GovtHouseDealEnum.NUMBER_OF_ROWS.value}"
                         f"&DEAL_YMD={GovtHouseDealSpider.date_counter.current_ym()}",
-                        callback=self.parse_opctl_rent_info,
-                        errback=self.error_callback_opctl_rent_info,
+                        callback=self.parse_ofctl_rent_info,
+                        errback=self.error_callback_ofctl_rent_info,
                         meta={
                             "url": urls[3]
                             + f"?ServiceKey={GovtHouseDealSpider.open_api_service_key}"
@@ -406,7 +406,7 @@ class GovtHouseDealSpider(Spider):
             )
         self.count_requests()
 
-    def parse_opctl_deal_info(self, response):
+    def parse_ofctl_deal_info(self, response):
         xml_to_dict: dict = parse(response.text)
         item: GovtOfctlDealInfoItem | None = None
 
@@ -421,7 +421,7 @@ class GovtHouseDealSpider(Spider):
                         else None,
                         build_year=elm.get("건축년도"),
                         deal_year=elm.get("년"),
-                        opctl_name=elm.get("단지"),
+                        ofctl_name=elm.get("단지"),
                         dong=elm.get("법정동"),
                         sigungu=elm.get("시군구"),
                         deal_month=elm.get("월"),
@@ -448,7 +448,7 @@ class GovtHouseDealSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bjd_front_code=response.request.meta.get("bjd_front_code"),
                 year_month=response.request.meta.get("year_month"),
-                ref_table="govt_opctl_deals",
+                ref_table="govt_ofctl_deals",
                 response_or_failure=response,
             )
 
@@ -460,7 +460,7 @@ class GovtHouseDealSpider(Spider):
                 else None,
                 build_year=xml_to_dict.get("건축년도"),
                 deal_year=xml_to_dict.get("년"),
-                opctl_name=xml_to_dict.get("단지"),
+                ofctl_name=xml_to_dict.get("단지"),
                 dong=xml_to_dict.get("법정동"),
                 sigungu=xml_to_dict.get("시군구"),
                 deal_month=xml_to_dict.get("월"),
@@ -484,12 +484,12 @@ class GovtHouseDealSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bjd_front_code=response.request.meta.get("bjd_front_code"),
                 year_month=response.request.meta.get("year_month"),
-                ref_table="govt_opctl_deals",
+                ref_table="govt_ofctl_deals",
                 response_or_failure=response,
             )
         self.count_requests()
 
-    def parse_opctl_rent_info(self, response):
+    def parse_ofctl_rent_info(self, response):
         xml_to_dict: dict = parse(response.text)
         item: GovtOfctlRentInfoItem | None = None
 
@@ -500,7 +500,7 @@ class GovtHouseDealSpider(Spider):
                 for elm in xml_to_dict:
                     item = GovtOfctlRentInfoItem(
                         deal_year=elm.get("년"),
-                        opctl_name=elm.get("단지"),
+                        ofctl_name=elm.get("단지"),
                         dong=elm.get("법정동"),
                         deposit=int(elm.get("보증금액").replace(",", ""))
                         if elm.get("보증금액")
@@ -528,7 +528,7 @@ class GovtHouseDealSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bjd_front_code=response.request.meta.get("bjd_front_code"),
                 year_month=response.request.meta.get("year_month"),
-                ref_table="govt_opctl_rents",
+                ref_table="govt_ofctl_rents",
                 response_or_failure=response,
             )
             return None
@@ -537,7 +537,7 @@ class GovtHouseDealSpider(Spider):
             # 결과가 단일인 경우
             item = GovtOfctlRentInfoItem(
                 deal_year=xml_to_dict.get("년"),
-                opctl_name=xml_to_dict.get("단지"),
+                ofctl_name=xml_to_dict.get("단지"),
                 dong=xml_to_dict.get("법정동"),
                 deposit=int(xml_to_dict.get("보증금액").replace(",", ""))
                 if xml_to_dict.get("보증금액")
@@ -563,7 +563,7 @@ class GovtHouseDealSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bjd_front_code=response.request.meta.get("bjd_front_code"),
                 year_month=response.request.meta.get("year_month"),
-                ref_table="govt_opctl_rents",
+                ref_table="govt_ofctl_rents",
                 response_or_failure=response,
             )
         self.count_requests()
@@ -582,7 +582,7 @@ class GovtHouseDealSpider(Spider):
                         else None,
                         classification_owner_ship=elm.get("구분"),
                         deal_year=elm.get("년"),
-                        opctl_name=elm.get("단지"),
+                        ofctl_name=elm.get("단지"),
                         dong=elm.get("법정동"),
                         sigungu=elm.get("시군구"),
                         deal_month=elm.get("월"),
@@ -604,7 +604,7 @@ class GovtHouseDealSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bjd_front_code=response.request.meta.get("bjd_front_code"),
                 year_month=response.request.meta.get("year_month"),
-                ref_table="govt_opctl_deals",
+                ref_table="govt_ofctl_deals",
                 response_or_failure=response,
             )
             return None
@@ -617,7 +617,7 @@ class GovtHouseDealSpider(Spider):
                 else None,
                 classification_owner_ship=xml_to_dict.get("구분"),
                 deal_year=xml_to_dict.get("년"),
-                opctl_name=xml_to_dict.get("단지"),
+                ofctl_name=xml_to_dict.get("단지"),
                 dong=xml_to_dict.get("법정동"),
                 sigungu=xml_to_dict.get("시군구"),
                 deal_month=xml_to_dict.get("월"),
@@ -637,7 +637,7 @@ class GovtHouseDealSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bjd_front_code=response.request.meta.get("bjd_front_code"),
                 year_month=response.request.meta.get("year_month"),
-                ref_table="govt_opctl_deals",
+                ref_table="govt_ofctl_deals",
                 response_or_failure=response,
             )
         self.count_requests()
@@ -660,21 +660,21 @@ class GovtHouseDealSpider(Spider):
             response_or_failure=failure,
         )
 
-    def error_callback_opctl_deal_info(self, failure) -> None:
+    def error_callback_ofctl_deal_info(self, failure) -> None:
         self.save_failure_info(
             current_url=failure.request.meta.get("url"),
             bjd_front_code=failure.request.meta.get("bjd_front_code"),
             year_month=failure.request.meta.get("year_month"),
-            ref_table="govt_opctl_deals",
+            ref_table="govt_ofctl_deals",
             response_or_failure=failure,
         )
 
-    def error_callback_opctl_rent_info(self, failure) -> None:
+    def error_callback_ofctl_rent_info(self, failure) -> None:
         self.save_failure_info(
             current_url=failure.request.meta.get("url"),
             bjd_front_code=failure.request.meta.get("bjd_front_code"),
             year_month=failure.request.meta.get("year_month"),
-            ref_table="govt_opctl_rents",
+            ref_table="govt_ofctl_rents",
             response_or_failure=failure,
         )
 
