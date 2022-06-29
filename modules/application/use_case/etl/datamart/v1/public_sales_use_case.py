@@ -55,7 +55,7 @@ class PublicSaleUseCase:
             public_sales: list[
                 PublicSaleModel
             ] = self._transfer.start_transfer_public_sales(subscriptions=subscriptions)
-            sub_ids: list[int] = self._transfer.get_sub_ids(sub_details=subscriptions)
+            sub_ids: list[int] = self._transfer._get_sub_ids(sub_details=subscriptions)
             self.public_repo.save_all(models=public_sales, sub_ids=sub_ids)
 
         # extract subscription_details
