@@ -79,11 +79,9 @@ class DongTypeUseCase(BaseETLUseCase):
                 if not exists_result:
                     # insert
                     self._private_sale_repo.save(value=result)
-                    key_div = "I"
                 else:
                     # update
                     self._private_sale_repo.update(value=result)
-                    key_div = "U"
 
                 self._basic_repo.change_update_needed_status(value=result)
 
@@ -92,7 +90,7 @@ class DongTypeUseCase(BaseETLUseCase):
                     "dong_infos" if isinstance(result, DongInfoModel) else "type_infos"
                 )
                 self._redis.set(
-                    key=f"sync:{key_div}:{ref_table}:{result.id}",
+                    key=f"sync:{ref_table}:{result.id}",
                     value=json.dumps(result.to_dict(), ensure_ascii=False).encode(
                         "utf-8"
                     ),
