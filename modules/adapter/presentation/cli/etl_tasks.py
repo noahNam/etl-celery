@@ -10,17 +10,11 @@ from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository im
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
     SyncBldMappingResultRepository,
 )
-from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
-    SyncBldMappingResultsRepository,
-)
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_bld_repository import (
     SyncGovtBldRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
     SyncGovtDealRepository,
-)
-from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
-    SyncGovtDealsRepository,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repository import (
     SyncKakaoApiRepository,
@@ -50,9 +44,6 @@ from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import (
     BldMappingResultUseCase,
-)
-from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import (
-    BldMappingResultsUseCase,
 )
 from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
@@ -84,15 +75,6 @@ from modules.application.use_case.etl.warehouse.v1.ofctl_deal_use_case import (
 )
 from modules.application.use_case.etl.warehouse.v1.ofctl_rent_use_case import (
     OfctlRentUseCase,
-)
-from modules.application.use_case.etl.warehouse.v1.right_lot_out_use_case import (
-    RightLotOutUseCase,
-)
-from modules.application.use_case.etl.warehouse.v1.ofctl_deal_use_case import (
-    OfctlDealUseCase,
-)
-from modules.application.use_case.etl.warehouse.v1.ofctl_rent_use_case import (
-    OfctlRentsUseCase,
 )
 from modules.application.use_case.etl.warehouse.v1.right_lot_out_use_case import (
     RightLotOutUseCase,
@@ -228,7 +210,7 @@ def get_task(topic: str):
         )
 
     elif (
-            topic == TopicEnum.ETL_MART_PUBLIC_SALES.value
+        topic == TopicEnum.ETL_MART_PUBLIC_SALES.value
     ):  # update_needed -> False - DW.subscription_detail, DW.subscription
         return PublicSaleUseCase(
             topic=topic,

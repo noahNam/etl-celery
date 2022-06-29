@@ -1,6 +1,6 @@
 from typing import Callable, AsyncContextManager, Type, List, Dict
 
-from sqlalchemy import exc, update, func
+from sqlalchemy import exc, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -9,8 +9,6 @@ from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
     GovtBldTopInfoEntity,
-    GovtBldMiddleInfoEntity,
-    GovtBldAreaInfoEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptOpenApiInputEntity,
