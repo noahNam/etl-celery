@@ -26,9 +26,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subsc
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_model import (
     SubscriptionModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_detail_model import (
-    PublicSaleDetailModel,
-)
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
