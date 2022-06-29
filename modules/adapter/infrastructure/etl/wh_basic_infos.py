@@ -23,6 +23,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.mgmt_
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import (
     TypeInfoModel,
 )
+from modules.adapter.infrastructure.utils.math_helper import MathHelper
 
 
 class TransformBasic:
@@ -102,8 +103,8 @@ class TransformBasic:
             result.append(
                 TypeInfoModel(
                     dong_id=target_entity.dong_id,
-                    private_area=private_area,
-                    supply_area=supply_area,
+                    private_area=MathHelper().round(private_area, 2) if private_area else None,
+                    supply_area=MathHelper().round(supply_area, 2) if supply_area else None,
                     update_needed=True,
                 )
             )
