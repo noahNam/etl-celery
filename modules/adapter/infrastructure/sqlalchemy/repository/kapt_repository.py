@@ -109,6 +109,10 @@ class SyncKaptRepository(KaptRepository):
 
         if find_type == KaptFindTypeEnum.KAKAO_API_INPUT.value:
             return kapt_basic_info.to_kakao_api_input_entity()
+        elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
+            return kapt_basic_info.to_entity_for_bld_mapping_results()
+        elif find_type == KaptFindTypeEnum.KAPT_BASIC_INFOS.value:
+            return kapt_basic_info.to_kapt_basic_info_entity()
 
         return kapt_basic_info.to_open_api_input_entity()
 
