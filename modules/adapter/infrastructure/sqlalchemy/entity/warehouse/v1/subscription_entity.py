@@ -8,7 +8,6 @@ class SubsToPublicEntity(BaseModel):
     region: str
     housing_category: str
     rent_type: str
-    # trade_type 데이터가 없음
     construct_company: str | None
     supply_household: str
     offer_date: str | None
