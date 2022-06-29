@@ -108,7 +108,9 @@ class SyncGovtBldRepository(GovtBldRepository):
             # 총괄부 표제 동 정보
             filters = list()
             filters.append(
-                and_(GovtBldMiddleInfoModel.update_needed == True, )
+                and_(
+                    GovtBldMiddleInfoModel.update_needed == True,
+                )
                 & not_(
                     or_(
                         GovtBldAreaInfoModel.etc_purps.like("%상가%"),
@@ -144,7 +146,9 @@ class SyncGovtBldRepository(GovtBldRepository):
             # 총괄부 표제 타입 정보
             filters = list()
             filters.append(
-                and_(GovtBldAreaInfoModel.update_needed == True, )
+                and_(
+                    GovtBldAreaInfoModel.update_needed == True,
+                )
                 & not_(
                     or_(
                         GovtBldMiddleInfoModel.etc_purps.like("%주차장%"),

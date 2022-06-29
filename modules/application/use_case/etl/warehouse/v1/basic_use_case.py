@@ -74,7 +74,7 @@ class BasicUseCase(BaseETLUseCase):
         kakao_repo: SyncKakaoApiRepository,
         govt_bld_repo: SyncGovtBldRepository,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self._basic_repo: SyncBasicRepository = basic_repo
@@ -148,7 +148,9 @@ class BasicUseCase(BaseETLUseCase):
         )
 
         if area_infos:
-            self.__update_to_warehouse(target_model=KaptAreaInfoEntity, results=area_infos)
+            self.__update_to_warehouse(
+                target_model=KaptAreaInfoEntity, results=area_infos
+            )
 
         # todo. 총괄부는 크롤링 데이터가 없는 상태라 ETL 확인 필요함. 특히, TransformBasic._etl_govt_bld_area_infos 함수
         # 총괄부 표제 단지 정보
@@ -195,7 +197,6 @@ class BasicUseCase(BaseETLUseCase):
             # GovtBldMiddleInfoModel와 GovtBldAreaInfoModel transaction 단위는 all success, all fail
             self._kapt_repo.change_update_needed_status_all(value=bld_area_infos)
 
-
     """
     key mapping
     """
@@ -233,8 +234,12 @@ class BasicUseCase(BaseETLUseCase):
             except Exception as e:
                 logger.error(f"☠️\tBasicUseCase - Failure! {result}:{e}")
                 self._save_crawling_failure(
-                    failure_value=result.house_id if isinstance(result, BasicInfoModel) else result.id,
-                    ref_table="basic_infos" if isinstance(result, BasicInfoModel) else "mgmt_costs",
+                    failure_value=result.house_id
+                    if isinstance(result, BasicInfoModel)
+                    else result.id,
+                    ref_table="basic_infos"
+                    if isinstance(result, BasicInfoModel)
+                    else "mgmt_costs",
                     param=result,
                     reason=e,
                 )
@@ -245,7 +250,9 @@ class BasicUseCase(BaseETLUseCase):
 
     def __update_to_warehouse(
         self,
-        target_model: Type[KaptLocationInfoEntity, KaptAreaInfoEntity, GovtBldTopInfoEntity],
+        target_model: Type[
+            KaptLocationInfoEntity, KaptAreaInfoEntity, GovtBldTopInfoEntity
+        ],
         results: list[dict],
     ) -> None:
         for result in results:
@@ -254,7 +261,9 @@ class BasicUseCase(BaseETLUseCase):
                 self._basic_repo.dynamic_update(value=result)
 
                 # KaptLocationInfoModel, KaptAreaInfoModel, GovtBldTopInfoModel
-                self._kapt_repo.change_update_needed_status_by_dict(target_model=target_model, value=result)
+                self._kapt_repo.change_update_needed_status_by_dict(
+                    target_model=target_model, value=result
+                )
 
             except Exception as e:
                 logger.error(f"☠️\tBasicUseCase - Failure! {result}:{e}")
