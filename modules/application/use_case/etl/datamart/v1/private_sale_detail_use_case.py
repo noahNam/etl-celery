@@ -158,11 +158,9 @@ class PrivateSaleDetailUseCase(BaseETLUseCase):
 
                     # insert
                     self._private_sale_repo.save(value=result)
-                    key_div = "I"
                 else:
                     # update
                     self._private_sale_repo.update(value=result)
-                    key_div = "U"
 
                 self._bld_deal_repo.change_update_needed_status(
                     target_model=update_needed_target_entities[0],
@@ -171,7 +169,7 @@ class PrivateSaleDetailUseCase(BaseETLUseCase):
 
                 # message publish to redis
                 self._redis.set(
-                    key=f"sync:{key_div}:private_sale_details:{result.id}",
+                    key=f"sync:private_sale_details:{result.id}",
                     value=json.dumps(result.to_dict(), ensure_ascii=False).encode(
                         "utf-8"
                     ),

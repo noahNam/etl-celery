@@ -69,15 +69,13 @@ class RealEstateUseCase(BaseETLUseCase):
                 if not exists_result:
                     # insert
                     self._real_estate_repo.save(value=result)
-                    key_div = "I"
                 else:
                     # update
                     self._real_estate_repo.update(value=result)
-                    key_div = "U"
 
                 # message publish to redis
                 self._redis.set(
-                    key=f"sync:{key_div}:real_estates:{result.id}",
+                    key=f"sync:real_estates:{result.id}",
                     value=json.dumps(result.to_dict(), ensure_ascii=False).encode(
                         "utf-8"
                     ),
