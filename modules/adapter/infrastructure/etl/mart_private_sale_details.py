@@ -41,7 +41,6 @@ class TransformPrivateSaleDetail:
     ) -> list[PrivateSaleDetailModel]:
         results = list()
 
-        # todo. 1. 전월세 -> 전세/월세 구분 (PrivateSaleTradeTypeEnum) /  2. classification_owner_ship -> 분양입주권 구분
         if isinstance(target_list[0], AptDealEntity):
             for target_obj in target_list:
                 contract_date = self._get_contract_date(target_obj=target_obj)
@@ -64,6 +63,8 @@ class TransformPrivateSaleDetail:
         elif isinstance(target_list[0], AptRentEntity):
             for target_obj in target_list:
                 contract_date = self._get_contract_date(target_obj=target_obj)
+                trade_type = PrivateSaleTradeTypeEnum.LONG_TERM_RENT.value if not target_obj.monthly_amount else PrivateSaleTradeTypeEnum.MONTHLY_RENT.value
+
                 results.append(
                     PrivateSaleDetailModel(
                         id=target_obj.id,
@@ -75,7 +76,7 @@ class TransformPrivateSaleDetail:
                         deposit_price=target_obj.deposit,
                         rent_price=target_obj.monthly_amount,
                         floor=int(target_obj.floor),
-                        trade_type=PrivateSaleTradeTypeEnum.MONTHLY_RENT.value,
+                        trade_type=trade_type,
                         is_available=target_obj.is_available,
                         update_needed=target_obj.update_needed,
                     )
@@ -103,6 +104,8 @@ class TransformPrivateSaleDetail:
         elif isinstance(target_list[0], OfctlRentEntity):
             for target_obj in target_list:
                 contract_date = self._get_contract_date(target_obj=target_obj)
+                trade_type = PrivateSaleTradeTypeEnum.LONG_TERM_RENT.value if not target_obj.monthly_amount else PrivateSaleTradeTypeEnum.MONTHLY_RENT.value
+
                 results.append(
                     PrivateSaleDetailModel(
                         id=target_obj.id,
@@ -114,7 +117,7 @@ class TransformPrivateSaleDetail:
                         deposit_price=target_obj.deposit,
                         rent_price=target_obj.monthly_amount,
                         floor=int(target_obj.floor),
-                        trade_type=PrivateSaleTradeTypeEnum.MONTHLY_RENT.value,
+                        trade_type=trade_type,
                         is_available=target_obj.is_available,
                         update_needed=target_obj.update_needed,
                     )
@@ -123,6 +126,8 @@ class TransformPrivateSaleDetail:
         elif isinstance(target_list[0], RightLotOutEntity):
             for target_obj in target_list:
                 contract_date = self._get_contract_date(target_obj=target_obj)
+                trade_type = PrivateSaleTradeTypeEnum.PUBLIC_TRADE.value if not target_obj.classification_owner_ship else PrivateSaleTradeTypeEnum.PRIVATE_TRADE.value
+
                 results.append(
                     PrivateSaleDetailModel(
                         id=target_obj.id,
@@ -133,7 +138,7 @@ class TransformPrivateSaleDetail:
                         contract_ym=int(contract_date[-2:]),
                         trade_price=target_obj.deal_amount,
                         floor=int(target_obj.floor),
-                        trade_type=PrivateSaleTradeTypeEnum.PUBLIC_TRADE.value,
+                        trade_type=trade_type,
                         is_available=target_obj.is_available,
                         update_needed=target_obj.update_needed,
                     )
