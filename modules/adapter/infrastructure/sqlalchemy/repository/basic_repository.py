@@ -137,7 +137,10 @@ class SyncBasicRepository(BasicRepository):
         elif isinstance(value, DongInfoModel):
             session.execute(
                 update(DongInfoModel)
-                .where(DongInfoModel.house_id == value.house_id, DongInfoModel.name == value.name)
+                .where(
+                    DongInfoModel.house_id == value.house_id,
+                    DongInfoModel.name == value.name,
+                )
                 .values(
                     hhld_cnt=value.hhld_cnt,
                     grnd_flr_cnt=value.grnd_flr_cnt,
@@ -148,7 +151,10 @@ class SyncBasicRepository(BasicRepository):
         elif isinstance(value, TypeInfoModel):
             session.execute(
                 update(TypeInfoModel)
-                .where(TypeInfoModel.dong_id == value.dong_id, TypeInfoModel.private_area == value.private_area)
+                .where(
+                    TypeInfoModel.dong_id == value.dong_id,
+                    TypeInfoModel.private_area == value.private_area,
+                )
                 .values(
                     supply_area=value.supply_area,
                     update_needed=True,

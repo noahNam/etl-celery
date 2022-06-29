@@ -50,11 +50,15 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_m
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import DongInfoModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import (
+    DongInfoModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.mgmt_cost_model import (
     MgmtCostModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import TypeInfoModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import (
+    TypeInfoModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.repository import (
     BaseAsyncRepository,
 )
@@ -301,9 +305,7 @@ class SyncKaptRepository(KaptRepository):
 
     def change_update_needed_status_by_model(
         self,
-        value: [
-            BasicInfoModel | MgmtCostModel
-        ],
+        value: [BasicInfoModel | MgmtCostModel],
     ):
         try:
             if isinstance(value, BasicInfoModel):
@@ -334,7 +336,9 @@ class SyncKaptRepository(KaptRepository):
 
     def change_update_needed_status_by_dict(
         self,
-        target_model: Type[KaptLocationInfoEntity, KaptAreaInfoEntity, GovtBldTopInfoEntity],
+        target_model: Type[
+            KaptLocationInfoEntity, KaptAreaInfoEntity, GovtBldTopInfoEntity
+        ],
         value: Dict,
     ):
         try:
@@ -374,9 +378,7 @@ class SyncKaptRepository(KaptRepository):
 
     def change_update_needed_status_all(
         self,
-        value: List[
-            DongInfoModel | TypeInfoModel
-        ],
+        value: List[DongInfoModel | TypeInfoModel],
     ):
         try:
             if isinstance(value, DongInfoModel):

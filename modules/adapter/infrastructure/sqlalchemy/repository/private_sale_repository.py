@@ -143,10 +143,9 @@ class SyncPrivateSaleRepository:
 
     def change_update_needed_status(
         self,
-        value: [PrivateSaleModel
-        | DongInfoModel
-        | TypeInfoModel
-        | PrivateSaleDetailModel]
+        value: [
+            PrivateSaleModel | DongInfoModel | TypeInfoModel | PrivateSaleDetailModel
+        ],
     ) -> None:
         try:
             if isinstance(value, PrivateSaleModel):

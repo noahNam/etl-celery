@@ -103,8 +103,12 @@ class TransformBasic:
             result.append(
                 TypeInfoModel(
                     dong_id=target_entity.dong_id,
-                    private_area=MathHelper().round(private_area, 2) if private_area else None,
-                    supply_area=MathHelper().round(supply_area, 2) if supply_area else None,
+                    private_area=MathHelper().round(private_area, 2)
+                    if private_area
+                    else None,
+                    supply_area=MathHelper().round(supply_area, 2)
+                    if supply_area
+                    else None,
                     update_needed=True,
                 )
             )

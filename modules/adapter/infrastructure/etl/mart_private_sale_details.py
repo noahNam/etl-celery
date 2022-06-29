@@ -63,7 +63,11 @@ class TransformPrivateSaleDetail:
         elif isinstance(target_list[0], AptRentEntity):
             for target_obj in target_list:
                 contract_date = self._get_contract_date(target_obj=target_obj)
-                trade_type = PrivateSaleTradeTypeEnum.LONG_TERM_RENT.value if not target_obj.monthly_amount else PrivateSaleTradeTypeEnum.MONTHLY_RENT.value
+                trade_type = (
+                    PrivateSaleTradeTypeEnum.LONG_TERM_RENT.value
+                    if not target_obj.monthly_amount
+                    else PrivateSaleTradeTypeEnum.MONTHLY_RENT.value
+                )
 
                 results.append(
                     PrivateSaleDetailModel(
@@ -104,7 +108,11 @@ class TransformPrivateSaleDetail:
         elif isinstance(target_list[0], OfctlRentEntity):
             for target_obj in target_list:
                 contract_date = self._get_contract_date(target_obj=target_obj)
-                trade_type = PrivateSaleTradeTypeEnum.LONG_TERM_RENT.value if not target_obj.monthly_amount else PrivateSaleTradeTypeEnum.MONTHLY_RENT.value
+                trade_type = (
+                    PrivateSaleTradeTypeEnum.LONG_TERM_RENT.value
+                    if not target_obj.monthly_amount
+                    else PrivateSaleTradeTypeEnum.MONTHLY_RENT.value
+                )
 
                 results.append(
                     PrivateSaleDetailModel(
@@ -126,7 +134,11 @@ class TransformPrivateSaleDetail:
         elif isinstance(target_list[0], RightLotOutEntity):
             for target_obj in target_list:
                 contract_date = self._get_contract_date(target_obj=target_obj)
-                trade_type = PrivateSaleTradeTypeEnum.PUBLIC_TRADE.value if not target_obj.classification_owner_ship else PrivateSaleTradeTypeEnum.PRIVATE_TRADE.value
+                trade_type = (
+                    PrivateSaleTradeTypeEnum.PUBLIC_TRADE.value
+                    if not target_obj.classification_owner_ship
+                    else PrivateSaleTradeTypeEnum.PRIVATE_TRADE.value
+                )
 
                 results.append(
                     PrivateSaleDetailModel(

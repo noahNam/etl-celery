@@ -35,7 +35,7 @@ class SubscriptionUseCase(BaseETLUseCase):
         subscription_repo: SyncSubscriptionRepository,
         subs_info_repo: SyncSubscriptionInfoRepository,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self._subscription_repo: SyncSubscriptionRepository = subscription_repo
@@ -52,9 +52,7 @@ class SubscriptionUseCase(BaseETLUseCase):
 
         results: dict[
             str, list[SubscriptionModel] | list[SubscriptionDetailModel]
-        ] | None = self._transfer.start_etl(
-            target_list=subscription_infos
-        )
+        ] | None = self._transfer.start_etl(target_list=subscription_infos)
         if results:
             self.__upsert_to_warehouse(results=results.get("subscriptions"))
             self.__upsert_to_warehouse(results=results.get("subscription_details"))
@@ -134,10 +132,16 @@ class SubscriptionUseCase(BaseETLUseCase):
                 )
 
             except Exception as e:
-                logger.error(f"☠️\tSubscriptionUseCase - Failure! {update_needed_target_entities[0].id}:{e}")
+                logger.error(
+                    f"☠️\tSubscriptionUseCase - Failure! {update_needed_target_entities[0].id}:{e}"
+                )
                 self._save_crawling_failure(
                     failure_value=update_needed_target_entities[0].id,
-                    ref_table="subscriptions" if isinstance(update_needed_target_entities[0], SubscriptionInfoEntity) else "subscription_details",
+                    ref_table="subscriptions"
+                    if isinstance(
+                        update_needed_target_entities[0], SubscriptionInfoEntity
+                    )
+                    else "subscription_details",
                     param=update_needed_target_entities[0],
                     reason=e,
                 )
