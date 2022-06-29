@@ -299,87 +299,6 @@ class SyncKaptRepository(KaptRepository):
         )
         session.commit()
 
-    def change_update_needed_status2(
-        self,
-        target_list: list[
-            KaptBasicInfoEntity
-            | KaptMgmtCostEntity
-            | KaptLocationInfoEntity
-            | KaptAreaInfoEntity
-            | GovtBldTopInfoEntity
-            | GovtBldMiddleInfoEntity
-            | GovtBldAreaInfoEntity
-        ],
-    ):
-        try:
-            keys = [entity.kapt_code for entity in target_list]
-            if isinstance(target_list[0], KaptBasicInfoEntity):
-                session.execute(
-                    update(KaptBasicInfoModel)
-                    .where(KaptBasicInfoModel.kapt_code.in_(keys))
-                    .values(
-                        update_needed=False,
-                    )
-                )
-            elif isinstance(target_list[0], KaptMgmtCostEntity):
-                session.execute(
-                    update(KaptMgmtCostModel)
-                    .where(KaptMgmtCostModel.kapt_code.in_(keys))
-                    .values(
-                        update_needed=False,
-                    )
-                )
-            elif isinstance(target_list[0], KaptLocationInfoEntity):
-                session.execute(
-                    update(KaptLocationInfoModel)
-                    .where(KaptLocationInfoModel.kapt_code.in_(keys))
-                    .values(
-                        update_needed=False,
-                    )
-                )
-            elif isinstance(target_list[0], KaptAreaInfoEntity):
-                session.execute(
-                    update(KaptAreaInfoModel)
-                    .where(KaptAreaInfoModel.kapt_code.in_(keys))
-                    .values(
-                        update_needed=False,
-                    )
-                )
-
-            keys = [entity.id for entity in target_list]
-            if isinstance(target_list[0], GovtBldTopInfoEntity):
-                session.execute(
-                    update(GovtBldTopInfoModel)
-                    .where(GovtBldTopInfoModel.id.in_(keys))
-                    .values(
-                        update_needed=False,
-                    )
-                )
-            elif isinstance(target_list[0], GovtBldMiddleInfoEntity):
-                session.execute(
-                    update(GovtBldMiddleInfoModel)
-                    .where(GovtBldMiddleInfoModel.id.in_(keys))
-                    .values(
-                        update_needed=False,
-                    )
-                )
-            elif isinstance(target_list[0], GovtBldAreaInfoEntity):
-                session.execute(
-                    update(GovtBldAreaInfoModel)
-                    .where(GovtBldAreaInfoModel.id.in_(keys))
-                    .values(
-                        update_needed=False,
-                    )
-                )
-
-            session.commit()
-
-        except exc.IntegrityError as e:
-            logger.error(
-                f"[SyncKaptRepository] change_update_needed_status -> {type(target_list[0])} error : {e}"
-            )
-            session.rollback()
-
     def change_update_needed_status_by_model(
         self,
         value: [
@@ -411,6 +330,7 @@ class SyncKaptRepository(KaptRepository):
                 f"[SyncKaptRepository] change_update_needed_status -> {type(value)} error : {e}"
             )
             session.rollback()
+            raise
 
     def change_update_needed_status_by_dict(
         self,
@@ -450,6 +370,7 @@ class SyncKaptRepository(KaptRepository):
                 f"[SyncKaptRepository] change_update_needed_status -> {type(value)} error : {e}"
             )
             session.rollback()
+            raise
 
     def change_update_needed_status_all(
         self,
@@ -482,3 +403,4 @@ class SyncKaptRepository(KaptRepository):
                 f"[SyncKaptRepository] change_update_needed_status -> {type(value[0])} error : {e}"
             )
             session.rollback()
+            raise
