@@ -11,13 +11,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.real_e
 class TransformRealEstate:
     def start_etl(
         self,
-        from_model: str,
         target_list: list[BasicInfoEntity],
     ) -> list[Any] | None:
         if not target_list:
             return None
 
-        if from_model == "basic_infos":
+        if isinstance(target_list[0], BasicInfoEntity):
             return self._etl_basic_infos(target_list)
 
     def _etl_basic_infos(

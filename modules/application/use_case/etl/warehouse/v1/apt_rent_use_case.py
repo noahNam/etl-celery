@@ -1,4 +1,20 @@
 from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
+from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
+    SyncBldMappingResultsRepository,
+)
+
+from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
+    SyncGovtDealsRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
+    SyncBasicRepository,
+)
+
+from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
+    SyncBldDealRepository,
+)
+
+from modules.application.use_case.etl import BaseETLUseCase
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     GovtAptRentsJoinKeyEntity,
 )
@@ -22,6 +38,13 @@ from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository 
     SyncGovtDealsRepository,
 )
 from modules.application.use_case.etl import BaseETLUseCase
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_rent_model import (
+    AptRentModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_rent_model import (
+    GovtAptRentModel,
+)
+from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
 
 
 class AptRentUseCase(BaseETLUseCase):
@@ -36,6 +59,10 @@ class AptRentUseCase(BaseETLUseCase):
     ):
         super().__init__(*args, **kwargs)
         self._bld_mapping_repo = bld_mapping_repo
+        self._govt_deal_repo: SyncGovtDealsRepository = govt_deal_repo  # input_table
+        self._bld_mapping_repo: SyncBldMappingResultsRepository = (
+            bld_mapping_repo  # input_table
+        )
         self._govt_deal_repo: SyncGovtDealsRepository = govt_deal_repo  # input_table
         self._bld_deal_reop: SyncBldDealRepository = bld_deal_repo  # result_table
         self._transfer: TransferAptDeals = TransferAptDeals()

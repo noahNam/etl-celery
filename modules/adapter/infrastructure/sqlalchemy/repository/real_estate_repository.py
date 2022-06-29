@@ -1,7 +1,7 @@
 from sqlalchemy import update, exc
+from sqlalchemy.exc import StatementError
 from sqlalchemy.future import select
 
-from exceptions.base import NotUniqueErrorException
 from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.real_estate_model import (
     RealEstateModel,
@@ -13,15 +13,7 @@ logger = logger_.getLogger(__name__)
 
 class SyncRealEstateRepository:
     def save(self, value: RealEstateModel) -> None:
-        try:
-            session.add(value)
-            session.commit()
-        except exc.IntegrityError as e:
-            logger.error(
-                f"[SyncRealEstateRepository][save] target_model RealEstateModel error : {e}"
-            )
-            session.rollback()
-            raise NotUniqueErrorException
+        session.add(value)
 
     def update(self, value: RealEstateModel) -> None:
         if isinstance(value, RealEstateModel):
@@ -47,8 +39,6 @@ class SyncRealEstateRepository:
                 )
             )
 
-        session.commit()
-
     def exists_by_key(self, value: RealEstateModel) -> bool:
         query = select(RealEstateModel.id).where(RealEstateModel.id == value.id)
         result = session.execute(query).scalars().first()
@@ -57,3 +47,23 @@ class SyncRealEstateRepository:
             return True
 
         return False
+
+    def change_update_needed_status(self, value: RealEstateModel) -> None:
+        try:
+            if isinstance(value, RealEstateModel):
+                session.execute(
+                    update(RealEstateModel)
+                    .where(RealEstateModel.id == value.id)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            session.commit()
+
+        except exc.IntegrityError | StatementError as e:
+            logger.error(
+                f"[SyncRealEstateRepository] change_update_needed_status -> {type(value)} error : {e}"
+            )
+            session.rollback()
+            raise

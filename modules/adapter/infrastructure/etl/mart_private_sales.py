@@ -10,20 +10,19 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.privat
 class TransformPrivateSale:
     def start_etl(
         self,
-        from_model: str,
         target_list: list[BasicInfoEntity],
         options: list[list[CalcMgmtCostEntity]] | None,
     ) -> list[PrivateSaleModel] | None:
         if not target_list:
             return None
 
-        if from_model == "basic_infos":
+        if isinstance(target_list[0], BasicInfoEntity):
             return self._etl_private_sales(basic_infos=target_list, mgmt_costs=options)
 
     def _etl_private_sales(
         self,
         basic_infos: list[BasicInfoEntity],
-        mgmt_costs: list[CalcMgmtCostEntity] | None,
+        mgmt_costs: list[list[CalcMgmtCostEntity]] | None,
     ) -> list[PrivateSaleModel]:
 
         manage_cost_results = dict()
@@ -116,18 +115,13 @@ class TransformPrivateSale:
                 else None
             )
 
-            # test_code
-            is_available = True
-            if basic_info.house_id == 19000:
-                is_available = "AAAAA"
-
             result.append(
                 PrivateSaleModel(
                     id=basic_info.house_id,
                     real_estate_id=basic_info.place_id,
                     name=basic_info.name,
                     building_type=basic_info.code_apt_nm,
-                    build_year=basic_info.use_apr_day,
+                    build_year=basic_info.use_apr_day[:4],
                     move_in_date=basic_info.use_apr_day,
                     dong_cnt=basic_info.dong_cnt,
                     hhld_cnt=basic_info.hhld_cnt,
@@ -150,8 +144,7 @@ class TransformPrivateSale:
                     avg_mgmt_cost=manage_cost_result[2] if manage_cost_result else None,
                     public_ref_id=basic_info.public_ref_id,
                     rebuild_ref_id=basic_info.rebuild_ref_id,
-                    is_available=is_available,
-                    # is_available=basic_info.is_available,
+                    is_available=basic_info.is_available,
                     update_needed=basic_info.update_needed,
                 )
             )

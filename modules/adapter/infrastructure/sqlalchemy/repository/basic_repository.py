@@ -1,6 +1,7 @@
 from typing import Type, Any
 
 from sqlalchemy import update, exc, desc
+from sqlalchemy.exc import StatementError
 from sqlalchemy.future import select
 
 from core.domain.warehouse.basic.interface.basic_repository import BasicRepository
@@ -116,6 +117,7 @@ class SyncBasicRepository(BasicRepository):
                     land_number=value.land_number,
                     x_vl=value.x_vl,
                     y_vl=value.y_vl,
+                    update_needed=True,
                 )
             )
 
@@ -128,41 +130,47 @@ class SyncBasicRepository(BasicRepository):
                     individual_fee=value.individual_fee,
                     public_part_imp_cost=value.public_part_imp_cost,
                     etc_income_amount=value.etc_income_amount,
+                    update_needed=True,
                 )
             )
 
         elif isinstance(value, DongInfoModel):
             session.execute(
                 update(DongInfoModel)
-                .where(DongInfoModel.id == value.id)
+                .where(
+                    DongInfoModel.house_id == value.house_id,
+                    DongInfoModel.name == value.name,
+                )
                 .values(
-                    name=value.name,
                     hhld_cnt=value.hhld_cnt,
                     grnd_flr_cnt=value.grnd_flr_cnt,
+                    update_needed=True,
                 )
             )
 
         elif isinstance(value, TypeInfoModel):
             session.execute(
                 update(TypeInfoModel)
-                .where(TypeInfoModel.id == value.id)
+                .where(
+                    TypeInfoModel.dong_id == value.dong_id,
+                    TypeInfoModel.private_area == value.private_area,
+                )
                 .values(
-                    private_area=value.private_area,
                     supply_area=value.supply_area,
+                    update_needed=True,
                 )
             )
 
-    def dynamic_update(self, target_model: Type[BasicInfoModel], value: dict) -> None:
+    def dynamic_update(self, value: dict) -> None:
         key = value.get("key")
         items = value.get("items")
-        query = select(BasicInfoModel).where(target_model.house_id == key)
+        query = select(BasicInfoModel).where(BasicInfoModel.house_id == key)
         col_info = session.execute(query).scalars().first()
 
         if col_info:
             for (key, value) in items.items():
-                if hasattr(target_model, key):
+                if hasattr(BasicInfoModel, key):
                     setattr(col_info, key, value)
-                    session.commit()
 
     def exists_by_key(
         self, value: BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel
@@ -193,8 +201,8 @@ class SyncBasicRepository(BasicRepository):
                 select(TypeInfoModel.id)
                 .where(
                     TypeInfoModel.dong_id == value.dong_id,
-                    TypeInfoModel.private_area == value.private_area
-                    and TypeInfoModel.supply_area == value.supply_area,
+                    TypeInfoModel.private_area == value.private_area,
+                    TypeInfoModel.supply_area == value.supply_area,
                 )
                 .limit(1)
             )
@@ -286,7 +294,7 @@ class SyncBasicRepository(BasicRepository):
 
     def change_update_needed_status(
         self, value: PrivateSaleModel | MartDongInfoModel | MartTypeInfoModel
-    ):
+    ) -> None:
         try:
             if isinstance(value, PrivateSaleModel):
                 session.execute(
@@ -316,11 +324,13 @@ class SyncBasicRepository(BasicRepository):
                 )
 
             session.commit()
-        except exc.IntegrityError as e:
+
+        except exc.IntegrityError | StatementError as e:
             logger.error(
                 f"[SyncBasicRepository] change_update_needed_status -> {type(value)} error : {e}"
             )
             session.rollback()
+            raise
 
     def find_supply_areas_by_house_ids(
         self, house_ids: list[int]
