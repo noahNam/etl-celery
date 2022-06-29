@@ -204,7 +204,9 @@ def get_task(topic: str):
             bld_deal_repo=SyncBldDealRepository(),
         )
 
-    elif topic == TopicEnum.ETL_MART_PUBLIC_SALES.value:  # update_needed -> X
+    elif (
+            topic == TopicEnum.ETL_MART_PUBLIC_SALES.value
+    ):  # update_needed -> False - DW.subscription_detail, DW.subscription
         return PublicSaleUseCase(
             topic=topic,
             subscription_repo=SyncSubscriptionRepository(),
