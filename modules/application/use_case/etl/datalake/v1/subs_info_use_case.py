@@ -37,7 +37,7 @@ class SubscriptionInfoUseCase(BaseETLUseCase):
         )
 
         results: list[SubscriptionInfoModel] | None = self._transfer.start_etl(
-            from_model="apply_homes", target_list=apply_homes
+            target_list=apply_homes
         )
         if results:
             self.__upsert_to_datalake(results=results)
@@ -48,7 +48,7 @@ class SubscriptionInfoUseCase(BaseETLUseCase):
         ] | None = self._subs_info_repo.find_all(target_model=GoogleSheetApplyHomeModel)
 
         results: list[SubscriptionManualInfoModel] | None = self._transfer.start_etl(
-            from_model="google_sheet_applys", target_list=google_sheet_applys
+            target_list=google_sheet_applys
         )
         if results:
             self.__upsert_to_datalake(results=results)

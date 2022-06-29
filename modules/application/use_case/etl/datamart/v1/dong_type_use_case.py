@@ -47,7 +47,7 @@ class DongTypeUseCase(BaseETLUseCase):
             target_model=DongInfoModel
         )
         results: list[DongInfoModel] | None = self._transfer.start_etl(
-            from_model="dong_infos", target_list=dong_infos
+            target_list=dong_infos
         )
 
         if results:
@@ -58,7 +58,7 @@ class DongTypeUseCase(BaseETLUseCase):
             target_model=TypeInfoModel
         )
         results: list[TypeInfoModel] | None = self._transfer.start_etl(
-            from_model="type_infos", target_list=type_infos
+            target_list=type_infos
         )
 
         if results:
@@ -100,7 +100,7 @@ class DongTypeUseCase(BaseETLUseCase):
             except Exception as e:
                 logger.error(f"☠️\tDongTypeUseCase - Failure! {result.id}:{e}")
                 self._save_crawling_failure(
-                    failure_value=result,
+                    failure_value=result.id,
                     ref_table="dong_infos"
                     if isinstance(result, DongInfoModel)
                     else "type_infos",

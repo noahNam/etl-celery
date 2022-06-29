@@ -1,4 +1,4 @@
-from typing import Callable, AsyncContextManager, Type
+from typing import Callable, AsyncContextManager, Type, List, Dict
 
 from sqlalchemy import exc, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -50,9 +50,11 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_m
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
     BasicInfoModel,
 )
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import DongInfoModel
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.mgmt_cost_model import (
     MgmtCostModel,
 )
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import TypeInfoModel
 from modules.adapter.infrastructure.sqlalchemy.repository import (
     BaseAsyncRepository,
 )
@@ -297,7 +299,7 @@ class SyncKaptRepository(KaptRepository):
         )
         session.commit()
 
-    def change_update_needed_status(
+    def change_update_needed_status2(
         self,
         target_list: list[
             KaptBasicInfoEntity
@@ -314,7 +316,7 @@ class SyncKaptRepository(KaptRepository):
             if isinstance(target_list[0], KaptBasicInfoEntity):
                 session.execute(
                     update(KaptBasicInfoModel)
-                    .where(KaptBasicInfoModel.kapt_code.in_([keys]))
+                    .where(KaptBasicInfoModel.kapt_code.in_(keys))
                     .values(
                         update_needed=False,
                     )
@@ -322,7 +324,7 @@ class SyncKaptRepository(KaptRepository):
             elif isinstance(target_list[0], KaptMgmtCostEntity):
                 session.execute(
                     update(KaptMgmtCostModel)
-                    .where(KaptMgmtCostModel.kapt_code.in_([keys]))
+                    .where(KaptMgmtCostModel.kapt_code.in_(keys))
                     .values(
                         update_needed=False,
                     )
@@ -330,7 +332,7 @@ class SyncKaptRepository(KaptRepository):
             elif isinstance(target_list[0], KaptLocationInfoEntity):
                 session.execute(
                     update(KaptLocationInfoModel)
-                    .where(KaptLocationInfoModel.kapt_code.in_([keys]))
+                    .where(KaptLocationInfoModel.kapt_code.in_(keys))
                     .values(
                         update_needed=False,
                     )
@@ -338,7 +340,7 @@ class SyncKaptRepository(KaptRepository):
             elif isinstance(target_list[0], KaptAreaInfoEntity):
                 session.execute(
                     update(KaptAreaInfoModel)
-                    .where(KaptAreaInfoModel.kapt_code.in_([keys]))
+                    .where(KaptAreaInfoModel.kapt_code.in_(keys))
                     .values(
                         update_needed=False,
                     )
@@ -348,7 +350,7 @@ class SyncKaptRepository(KaptRepository):
             if isinstance(target_list[0], GovtBldTopInfoEntity):
                 session.execute(
                     update(GovtBldTopInfoModel)
-                    .where(GovtBldTopInfoModel.id.in_([keys]))
+                    .where(GovtBldTopInfoModel.id.in_(keys))
                     .values(
                         update_needed=False,
                     )
@@ -356,7 +358,7 @@ class SyncKaptRepository(KaptRepository):
             elif isinstance(target_list[0], GovtBldMiddleInfoEntity):
                 session.execute(
                     update(GovtBldMiddleInfoModel)
-                    .where(GovtBldMiddleInfoModel.id.in_([keys]))
+                    .where(GovtBldMiddleInfoModel.id.in_(keys))
                     .values(
                         update_needed=False,
                     )
@@ -364,7 +366,7 @@ class SyncKaptRepository(KaptRepository):
             elif isinstance(target_list[0], GovtBldAreaInfoEntity):
                 session.execute(
                     update(GovtBldAreaInfoModel)
-                    .where(GovtBldAreaInfoModel.id.in_([keys]))
+                    .where(GovtBldAreaInfoModel.id.in_(keys))
                     .values(
                         update_needed=False,
                     )
@@ -375,5 +377,108 @@ class SyncKaptRepository(KaptRepository):
         except exc.IntegrityError as e:
             logger.error(
                 f"[SyncKaptRepository] change_update_needed_status -> {type(target_list[0])} error : {e}"
+            )
+            session.rollback()
+
+    def change_update_needed_status_by_model(
+        self,
+        value: [
+            BasicInfoModel | MgmtCostModel
+        ],
+    ):
+        try:
+            if isinstance(value, BasicInfoModel):
+                session.execute(
+                    update(KaptBasicInfoModel)
+                    .where(KaptBasicInfoModel.kapt_code == value.kapt_code)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+            elif isinstance(value, MgmtCostModel):
+                session.execute(
+                    update(KaptMgmtCostModel)
+                    .where(KaptMgmtCostModel.id == value.id)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            session.commit()
+
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncKaptRepository] change_update_needed_status -> {type(value)} error : {e}"
+            )
+            session.rollback()
+
+    def change_update_needed_status_by_dict(
+        self,
+        target_model: Type[KaptLocationInfoEntity, KaptAreaInfoEntity, GovtBldTopInfoEntity],
+        value: Dict,
+    ):
+        try:
+            if isinstance(target_model, KaptLocationInfoEntity):
+                session.execute(
+                    update(KaptLocationInfoModel)
+                    .where(KaptLocationInfoModel.kapt_code == value.get("kapt_code"))
+                    .values(
+                        update_needed=False,
+                    )
+                )
+            elif isinstance(target_model, KaptAreaInfoEntity):
+                session.execute(
+                    update(KaptAreaInfoModel)
+                    .where(KaptAreaInfoModel.kapt_code == value.get("kapt_code"))
+                    .values(
+                        update_needed=False,
+                    )
+                )
+            elif isinstance(target_model, GovtBldTopInfoEntity):
+                session.execute(
+                    update(GovtBldTopInfoModel)
+                    .where(GovtBldTopInfoModel.house_id == value.get("house_id"))
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            session.commit()
+
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncKaptRepository] change_update_needed_status -> {type(value)} error : {e}"
+            )
+            session.rollback()
+
+    def change_update_needed_status_all(
+        self,
+        value: List[
+            DongInfoModel | TypeInfoModel
+        ],
+    ):
+        try:
+            if isinstance(value, DongInfoModel):
+                session.execute(
+                    update(GovtBldMiddleInfoModel)
+                    .where(update_needed=True)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+            elif isinstance(value, TypeInfoModel):
+                session.execute(
+                    update(GovtBldAreaInfoModel)
+                    .where(update_needed=True)
+                    .values(
+                        update_needed=False,
+                    )
+                )
+
+            session.commit()
+
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncKaptRepository] change_update_needed_status -> {type(value[0])} error : {e}"
             )
             session.rollback()

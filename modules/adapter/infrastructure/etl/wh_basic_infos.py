@@ -28,7 +28,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_
 class TransformBasic:
     def start_etl(
         self,
-        from_model: str,
         target_list: list[
             KaptBasicInfoEntity
             | KaptAreaInfoEntity
@@ -42,19 +41,19 @@ class TransformBasic:
         if not target_list:
             return None
 
-        if from_model == "kapt_basic_infos":
+        if isinstance(target_list[0], KaptBasicInfoEntity):
             return self._etl_kapt_basic_infos(target_list)
-        elif from_model == "kapt_mgmt_costs":
+        elif isinstance(target_list[0], KaptMgmtCostEntity):
             return self._etl_kapt_mgmt_costs(target_list)
-        elif from_model == "kapt_location_infos":
+        elif isinstance(target_list[0], KaptLocationInfoEntity):
             return self._etl_kapt_location_infos(target_list)
-        elif from_model == "kapt_area_infos":
+        elif isinstance(target_list[0], KaptAreaInfoEntity):
             return self._etl_kapt_area_infos(target_list)
-        elif from_model == "govt_bld_top_infos":
+        elif isinstance(target_list[0], GovtBldTopInfoEntity):
             return self._etl_govt_bld_top_infos(target_list)
-        elif from_model == "govt_bld_middle_infos":
+        elif isinstance(target_list[0], GovtBldMiddleInfoEntity):
             return self._etl_govt_bld_middle_infos(target_list)
-        elif from_model == "govt_bld_area_infos":
+        elif isinstance(target_list[0], GovtBldAreaInfoEntity):
             return self._etl_govt_bld_area_infos(target_list)
 
     def _etl_govt_bld_area_infos(
@@ -66,7 +65,6 @@ class TransformBasic:
         bld_nm = None
         dong_nm = None
         ho_nm = None
-        not_contain_words = ["주차장", "관리", "기계", "전기", "제어", "경비"]
 
         for target_entity in target_list:
             rnum = target_entity.rnum  # 1부터 시작
@@ -88,10 +86,6 @@ class TransformBasic:
 
             # 아파트인 경우는 주건축물만 취급
             if target_entity.main_atch_gb_cd != "0":  # 0(주건축물), 1(부건축물)
-                continue
-
-            # 해당 단어를 포함하고 있으면 면적에 포함하지 않음
-            if target_entity.etc_purps in not_contain_words:
                 continue
 
             if target_entity.expos_pubuse_gb_cd_nm == "전유":
@@ -180,6 +174,7 @@ class TransformBasic:
                 dict(
                     key=target_entity.house_id,
                     items=dict(
+                        kapt_code=target_entity.kapt_code,
                         kaptd_wtimebus=target_entity.kaptd_wtimebus,
                         subway_line=target_entity.subway_line,
                         subway_station=target_entity.subway_station,
@@ -199,6 +194,7 @@ class TransformBasic:
                 dict(
                     key=target_entity.house_id,
                     items=dict(
+                        kapt_code=target_entity.kapt_code,
                         priv_area=target_entity.priv_area,
                         bjdong_cd=target_entity.bjd_code,
                         update_needed=True,

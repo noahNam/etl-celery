@@ -1,6 +1,6 @@
 from typing import Type
 
-from sqlalchemy import select, exc
+from sqlalchemy import select, exc, and_, not_, or_
 
 from core.domain.datalake.govt_bld_info.interface.govt_bld_info_repository import (
     GovtBldRepository,
@@ -106,9 +106,32 @@ class SyncGovtBldRepository(GovtBldRepository):
 
         elif target_model == GovtBldMiddleInfoModel:
             # 총괄부 표제 동 정보
+            filters = list()
+            filters.append(
+                and_(GovtBldMiddleInfoModel.update_needed == True, )
+                & not_(
+                    or_(
+                        GovtBldAreaInfoModel.etc_purps.like("%상가%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%주차%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%경비%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%관리%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%전기%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%주민%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%가스%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%경로%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%펌프%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%기계%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%시설%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%문고%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%실%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%타워%"),
+                    )
+                )
+            )
+
             query = (
                 select(GovtBldMiddleInfoModel)
-                .where(GovtBldMiddleInfoModel.update_needed == True)
+                .where(*filters)
                 .order_by(GovtBldMiddleInfoModel.id)
             )
             results = session.execute(query).scalars().all()
@@ -119,9 +142,24 @@ class SyncGovtBldRepository(GovtBldRepository):
 
         elif target_model == GovtBldAreaInfoModel:
             # 총괄부 표제 타입 정보
+            filters = list()
+            filters.append(
+                and_(GovtBldAreaInfoModel.update_needed == True, )
+                & not_(
+                    or_(
+                        GovtBldMiddleInfoModel.etc_purps.like("%주차장%"),
+                        GovtBldMiddleInfoModel.etc_purps.like("%관리%"),
+                        GovtBldMiddleInfoModel.etc_purps.like("%기계%"),
+                        GovtBldMiddleInfoModel.etc_purps.like("%전기%"),
+                        GovtBldMiddleInfoModel.etc_purps.like("%제어%"),
+                        GovtBldMiddleInfoModel.etc_purps.like("%경비%"),
+                    )
+                )
+            )
+
             query = (
                 select(GovtBldAreaInfoModel)
-                .where(GovtBldAreaInfoModel.update_needed == True)
+                .where(*filters)
                 .order_by(GovtBldAreaInfoModel.id)
             )
             results = session.execute(query).scalars().all()

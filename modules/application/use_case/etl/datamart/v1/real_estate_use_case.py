@@ -48,7 +48,7 @@ class RealEstateUseCase(BaseETLUseCase):
             target_model=BasicInfoModel
         )
         results: list[RealEstateModel] | None = self._transfer.start_etl(
-            from_model="basic_infos", target_list=basic_infos
+            target_list=basic_infos
         )
 
         if results:
@@ -85,7 +85,7 @@ class RealEstateUseCase(BaseETLUseCase):
             except Exception as e:
                 logger.error(f"☠️\tRealEstateUseCase - Failure! {result.id}:{e}")
                 self._save_crawling_failure(
-                    failure_value=result,
+                    failure_value=result.id,
                     ref_table="real_estates",
                     param=result,
                     reason=e,

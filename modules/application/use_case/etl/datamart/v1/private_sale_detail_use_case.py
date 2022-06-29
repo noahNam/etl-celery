@@ -181,7 +181,7 @@ class PrivateSaleDetailUseCase(BaseETLUseCase):
 
                 last_seq -= 1
                 self._save_crawling_failure(
-                    failure_value=result,
+                    failure_value=result.id,
                     ref_table="private_sale_details",
                     param=result,
                     reason=e,
