@@ -15,7 +15,6 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entit
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptOpenApiInputEntity,
     KakaoApiInputEntity,
-    GovtBldInputEntity,
     KaptBasicInfoEntity,
     KaptAreaInfoEntity,
     KaptLocationInfoEntity,
@@ -46,12 +45,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_l
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_mgmt_cost_model import (
     KaptMgmtCostModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.basic_info_model import (
-    BasicInfoModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.mgmt_cost_model import (
-    MgmtCostModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository import (
     BaseAsyncRepository,
@@ -121,7 +114,9 @@ class SyncKaptRepository(KaptRepository):
 
     def find_all(
         self, find_type: int = 0
-    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | list[KaptMappingEntity]:
+    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | list[
+        KaptMappingEntity
+    ]:
         queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
 
         if not queryset:
@@ -131,6 +126,8 @@ class SyncKaptRepository(KaptRepository):
             return [query.to_kakao_api_input_entity() for query in queryset]
         elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
             return [result.to_entity_for_bld_mapping_results() for result in queryset]
+        elif find_type == KaptFindTypeEnum.KAPT_BASIC_INFOS.value:
+            return [query.to_kapt_basic_info_entity() for query in queryset]
 
         return [query.to_open_api_input_entity() for query in queryset]
 
@@ -184,48 +181,6 @@ class SyncKaptRepository(KaptRepository):
         )
         session.commit()
         return None
-
-    def find_all_bld_infos(self) -> list[GovtBldInputEntity] | None:
-        area_entities: list[KaptAreaInfoEntity] = list()
-        basic_entities: list[KaptBasicInfoEntity] = list()
-        bld_input_entities: list[GovtBldInputEntity] = list()
-
-        # step_1
-        query = select(KaptAreaInfoModel)
-        queryset: list[KaptAreaInfoModel] = session.execute(query).scalars().all()
-
-        if queryset:
-            [
-                area_entities.append(query.to_kapt_area_info_entity())
-                for query in queryset
-            ]
-        else:
-            return None
-
-        # step_2
-        for area_info in area_entities:
-            query = (
-                select(KaptBasicInfoModel)
-                .filter_by(kapt_code=area_info.kapt_code)
-                .limit(1)
-            )
-            result: KaptBasicInfoModel | None = session.execute(query).scalars().first()
-            if result:
-                basic_entities.append(result.to_kapt_basic_info_entity())
-
-        for area, basic in zip(area_entities, basic_entities):
-            bld_input_entities.append(
-                GovtBldInputEntity(
-                    house_id=basic.house_id,
-                    kapt_code=area.kapt_code,
-                    name=area.name,
-                    origin_dong_address=basic.origin_dong_address,
-                    new_dong_address=basic.new_dong_address,
-                    bjd_code=area.bjd_code,
-                )
-            )
-
-        return bld_input_entities
 
     def find_to_update(
         self,

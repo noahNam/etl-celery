@@ -17,7 +17,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
     TimestampMixin,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
-    PublicDtUniqueEntity
+    PublicDtUniqueEntity,
 )
 
 
@@ -57,5 +57,5 @@ class PublicSaleDetailModel(datamart_base, TimestampMixin):
             id=self.id,
             public_sale_id=self.public_sale_id,
             area_type=self.area_type,
-            private_area=self.private_area
+            private_area=self.private_area,
         )

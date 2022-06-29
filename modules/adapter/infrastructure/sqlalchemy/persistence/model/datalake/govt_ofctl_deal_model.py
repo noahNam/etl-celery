@@ -7,7 +7,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     GovtOfctlDealsEntity,
-    GovtOfctlDealJoinKeyEntity
+    GovtOfctlDealJoinKeyEntity,
 )
 
 
@@ -37,13 +37,16 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
     rdealer_lawdnm = Column(String(150), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
 
-    bld_mapping = relationship("BldMappingResultModel",
-                               backref="govt_ofctl_deals", uselist=False, lazy='joined',
-                               primaryjoin="and_(foreign(GovtOfctlDealModel.regional_cd) == BldMappingResultModel.regional_cd,"
-                                           "foreign(GovtOfctlDealModel.jibun) == BldMappingResultModel.jibun,"
-                                           "foreign(GovtOfctlDealModel.dong) == BldMappingResultModel.dong,"
-                                           "foreign(GovtOfctlDealModel.ofctl_name) == BldMappingResultModel.bld_name)"
-                               )
+    bld_mapping = relationship(
+        "BldMappingResultModel",
+        backref="govt_ofctl_deals",
+        uselist=False,
+        lazy="joined",
+        primaryjoin="and_(foreign(GovtOfctlDealModel.regional_cd) == BldMappingResultModel.regional_cd,"
+        "foreign(GovtOfctlDealModel.jibun) == BldMappingResultModel.jibun,"
+        "foreign(GovtOfctlDealModel.dong) == BldMappingResultModel.dong,"
+        "foreign(GovtOfctlDealModel.ofctl_name) == BldMappingResultModel.bld_name)",
+    )
 
     def to_entity_for_bld_mapping_results(self) -> GovtOfctlDealsEntity:
         return GovtOfctlDealsEntity(
@@ -51,7 +54,7 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
             regional_cd=self.regional_cd,
             dong=self.dong,
             jibun=self.jibun,
-            ofctl_name=self.ofctl_name
+            ofctl_name=self.ofctl_name,
         )
 
     def to_entity_for_ofctl_deals(self) -> GovtOfctlDealJoinKeyEntity:
@@ -70,5 +73,5 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
             cancel_deal_type=self.cancel_deal_type,
             cancel_deal_day=self.cancel_deal_day,
             req_gbn=self.req_gbn,
-            rdealer_lawdnm=self.rdealer_lawdnm
+            rdealer_lawdnm=self.rdealer_lawdnm,
         )
