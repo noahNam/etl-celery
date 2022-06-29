@@ -79,7 +79,7 @@ class PrivateSaleUseCase(BaseETLUseCase):
                     mgmt_costs.append(mgmt_cost_results)
 
         results: list[PrivateSaleModel] | None = self._transfer.start_etl(
-            from_model="basic_infos", target_list=basic_infos, options=mgmt_costs
+            target_list=basic_infos, options=mgmt_costs
         )
 
         if results:
@@ -118,7 +118,7 @@ class PrivateSaleUseCase(BaseETLUseCase):
             except Exception as e:
                 logger.error(f"☠️\tPrivateSaleUseCase - Failure! {result.id}:{e}")
                 self._save_crawling_failure(
-                    failure_value=result,
+                    failure_value=result.id,
                     ref_table="private_sales",
                     param=result,
                     reason=e,

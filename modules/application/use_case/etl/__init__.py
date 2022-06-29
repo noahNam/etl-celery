@@ -37,7 +37,7 @@ class BaseETLUseCase:
         reason: Exception,
     ) -> None:
         fail_orm: CallFailureHistoryModel = CallFailureHistoryModel(
-            ref_id=failure_value.id,
+            ref_id=failure_value,
             ref_table=ref_table,
             param=param,
             reason=reason,

@@ -10,20 +10,19 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.privat
 class TransformPrivateSale:
     def start_etl(
         self,
-        from_model: str,
         target_list: list[BasicInfoEntity],
         options: list[list[CalcMgmtCostEntity]] | None,
     ) -> list[PrivateSaleModel] | None:
         if not target_list:
             return None
 
-        if from_model == "basic_infos":
+        if isinstance(target_list[0], BasicInfoEntity):
             return self._etl_private_sales(basic_infos=target_list, mgmt_costs=options)
 
     def _etl_private_sales(
         self,
         basic_infos: list[BasicInfoEntity],
-        mgmt_costs: list[CalcMgmtCostEntity] | None,
+        mgmt_costs: list[list[CalcMgmtCostEntity]] | None,
     ) -> list[PrivateSaleModel]:
 
         manage_cost_results = dict()

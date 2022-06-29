@@ -117,6 +117,7 @@ class SyncBasicRepository(BasicRepository):
                     land_number=value.land_number,
                     x_vl=value.x_vl,
                     y_vl=value.y_vl,
+                    update_needed=True,
                 )
             )
 
@@ -129,41 +130,41 @@ class SyncBasicRepository(BasicRepository):
                     individual_fee=value.individual_fee,
                     public_part_imp_cost=value.public_part_imp_cost,
                     etc_income_amount=value.etc_income_amount,
+                    update_needed=True,
                 )
             )
 
         elif isinstance(value, DongInfoModel):
             session.execute(
                 update(DongInfoModel)
-                .where(DongInfoModel.id == value.id)
+                .where(DongInfoModel.house_id == value.house_id, DongInfoModel.name == value.name)
                 .values(
-                    name=value.name,
                     hhld_cnt=value.hhld_cnt,
                     grnd_flr_cnt=value.grnd_flr_cnt,
+                    update_needed=True,
                 )
             )
 
         elif isinstance(value, TypeInfoModel):
             session.execute(
                 update(TypeInfoModel)
-                .where(TypeInfoModel.id == value.id)
+                .where(TypeInfoModel.dong_id == value.dong_id, TypeInfoModel.private_area == value.private_area)
                 .values(
-                    private_area=value.private_area,
                     supply_area=value.supply_area,
+                    update_needed=True,
                 )
             )
 
-    def dynamic_update(self, target_model: Type[BasicInfoModel], value: dict) -> None:
+    def dynamic_update(self, value: dict) -> None:
         key = value.get("key")
         items = value.get("items")
-        query = select(BasicInfoModel).where(target_model.house_id == key)
+        query = select(BasicInfoModel).where(BasicInfoModel.house_id == key)
         col_info = session.execute(query).scalars().first()
 
         if col_info:
             for (key, value) in items.items():
-                if hasattr(target_model, key):
+                if hasattr(BasicInfoModel, key):
                     setattr(col_info, key, value)
-                    session.commit()
 
     def exists_by_key(
         self, value: BasicInfoModel | DongInfoModel | TypeInfoModel | MgmtCostModel
@@ -194,8 +195,8 @@ class SyncBasicRepository(BasicRepository):
                 select(TypeInfoModel.id)
                 .where(
                     TypeInfoModel.dong_id == value.dong_id,
-                    TypeInfoModel.private_area == value.private_area
-                    and TypeInfoModel.supply_area == value.supply_area,
+                    TypeInfoModel.private_area == value.private_area,
+                    TypeInfoModel.supply_area == value.supply_area,
                 )
                 .limit(1)
             )

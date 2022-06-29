@@ -53,7 +53,7 @@ class SubscriptionUseCase(BaseETLUseCase):
         results: dict[
             str, list[SubscriptionModel] | list[SubscriptionDetailModel]
         ] | None = self._transfer.start_etl(
-            from_model="subscription_infos", target_list=subscription_infos
+            target_list=subscription_infos
         )
         if results:
             self.__upsert_to_warehouse(results=results.get("subscriptions"))
@@ -71,7 +71,6 @@ class SubscriptionUseCase(BaseETLUseCase):
         )
 
         results: dict[str, [dict]] | None = self._transfer.start_etl(
-            from_model="subscription_manual_infos",
             target_list=subscription_manual_infos,
         )
         if results:
@@ -129,6 +128,16 @@ class SubscriptionUseCase(BaseETLUseCase):
         ],
     ) -> None:
         if update_needed_target_entities:
-            self._subscription_repo.change_update_needed_status(
-                target_list=update_needed_target_entities
-            )
+            try:
+                self._subscription_repo.change_update_needed_status(
+                    target_list=update_needed_target_entities
+                )
+
+            except Exception as e:
+                logger.error(f"☠️\tSubscriptionUseCase - Failure! {update_needed_target_entities[0].id}:{e}")
+                self._save_crawling_failure(
+                    failure_value=update_needed_target_entities[0].id,
+                    ref_table="subscriptions" if isinstance(update_needed_target_entities[0], SubscriptionInfoEntity) else "subscription_details",
+                    param=update_needed_target_entities[0],
+                    reason=e,
+                )
