@@ -15,7 +15,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subsc
 class TransformSubscription:
     def start_etl(
         self,
-        from_model: str,
         target_list: list[SubscriptionInfoEntity | SubscriptionManualInfoEntity],
     ) -> dict[
         str, list[SubscriptionModel] | list[SubscriptionDetailModel] | Any
@@ -23,9 +22,9 @@ class TransformSubscription:
         if not target_list:
             return None
 
-        if from_model == "subscription_infos":
+        if isinstance(target_list[0], SubscriptionInfoEntity):
             return self._subscription_infos(target_list)
-        elif from_model == "subscription_manual_infos":
+        elif isinstance(target_list[0], SubscriptionManualInfoEntity):
             return self._subscription_manual_infos(target_list)
 
     def _subscription_infos(
