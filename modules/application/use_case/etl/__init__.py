@@ -29,7 +29,6 @@ class BaseETLUseCase:
         """각 UseCase마다 직접 구현"""
         pass
 
-
     def _save_crawling_failure(
         self,
         failure_value: Any,

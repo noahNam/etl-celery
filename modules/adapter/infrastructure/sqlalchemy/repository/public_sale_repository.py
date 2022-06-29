@@ -4,9 +4,8 @@ from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
     PublicDtUniqueEntity,
 )
-from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
-    SubsToPublicEntity,
-    SubDtToPublicDtEntity,
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.general_supply_result_model import (
+    GeneralSupplyResultModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_detail_model import (
     PublicSaleDetailModel,
@@ -17,27 +16,19 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.special_supply_result_model import (
     SpecialSupplyResultModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.general_supply_result_model import (
-    GeneralSupplyResultModel,
-)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_detail_model import (
     SubscriptionDetailModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_model import (
     SubscriptionModel,
 )
-
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
 
 
 class SyncPublicSaleRepository:
-    def save_all(
-            self,
-            models: list[PublicSaleModel],
-            sub_ids: list[int]
-    ) -> None:
+    def save_all(self, models: list[PublicSaleModel], sub_ids: list[int]) -> None:
         if not models:
             return None
 
@@ -45,8 +36,8 @@ class SyncPublicSaleRepository:
             session.add_all(models)
             session.execute(
                 update(SubscriptionModel)
-                    .where(SubscriptionModel.subs_id.in_(sub_ids))
-                    .values(update_needed=False)
+                .where(SubscriptionModel.subs_id.in_(sub_ids))
+                .values(update_needed=False)
             )
             session.commit()
 
@@ -67,11 +58,11 @@ class SyncPublicSaleRepository:
         return [result.to_unique_entity() for result in results]
 
     def save_all_details(
-            self,
-            public_sale_details: list[PublicSaleDetailModel],
-            special_supply_results: list[SpecialSupplyResultModel],
-            general_supply_results: list[GeneralSupplyResultModel],
-            sub_detail_ids: list[int]
+        self,
+        public_sale_details: list[PublicSaleDetailModel],
+        special_supply_results: list[SpecialSupplyResultModel],
+        general_supply_results: list[GeneralSupplyResultModel],
+        sub_detail_ids: list[int],
     ) -> None:
         if not public_sale_details:
             return None
@@ -82,8 +73,8 @@ class SyncPublicSaleRepository:
             session.add_all(general_supply_results)
             session.execute(
                 update(SubscriptionDetailModel)
-                    .where(SubscriptionDetailModel.id.in_(sub_detail_ids))
-                    .values(update_needed=False)
+                .where(SubscriptionDetailModel.id.in_(sub_detail_ids))
+                .values(update_needed=False)
             )
             session.commit()
         except Exception as e:
