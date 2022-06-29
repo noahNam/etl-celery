@@ -1,3 +1,4 @@
+import logging
 import re
 
 from scrapy import Spider, Request
@@ -24,6 +25,10 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.call_failure_history_model import (
     CallFailureHistoryModel,
 )
+from modules.adapter.infrastructure.utils.log_helper import logger_
+
+logger = logger_.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class GovtBldSpider(Spider):
@@ -48,6 +53,7 @@ class GovtBldSpider(Spider):
         input_params: list[GovtBldInputInfo] | None = self.get_input_infos(
             bld_info_list=self.params
         )
+
         if input_params:
             for param in input_params:
                 yield Request(
@@ -180,6 +186,8 @@ class GovtBldSpider(Spider):
             if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
                 xml_to_dict = xml_to_dict["response"]["body"]["items"]["item"]
                 for elm in xml_to_dict:
+                    logger.info("@@@")
+                    logger.info(f"찾은 갯수 : {len(xml_to_dict)}개")
                     item: GovtBldTopInfoItem = GovtBldTopInfoItem(
                         house_id=response.request.meta["house_id"],
                         mgm_bldrgst_pk=elm.get("mgmBldrgstPk"),
@@ -909,8 +917,7 @@ class GovtBldSpider(Spider):
                 f"bjd_code: {bjd_code}",
                 reason=f"response:{response_or_failure}",
             )
-        if not self.__is_exists_failure(fail_orm=fail_orm):
-            self.__save_crawling_failure(fail_orm=fail_orm)
+        self.__save_crawling_failure(fail_orm=fail_orm)
 
     def __save_crawling_failure(self, fail_orm: CallFailureHistoryModel) -> None:
         send_message(
