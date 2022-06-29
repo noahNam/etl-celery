@@ -309,33 +309,17 @@ class TransformPublicSales:
 
         return total_acquisition_tax
 
-    def get_sub_ids(self, sub_details: list[SubsToPublicEntity]) -> list[int]:
+    def _get_sub_ids(self, sub_details: list[SubsToPublicEntity]) -> list[int]:
         sub_ids = list()
         for sub_detail in sub_details:
             sub_ids.append(sub_detail.subs_id)
         return sub_ids
 
-    def get_ids(self, models: list[SubDtToPublicDtEntity]):
+    def _get_ids(self, models: list[SubDtToPublicDtEntity]):
         ids = list()
         for model in models:
             ids.append(model.id)
         return ids
-
-    def _get_public_sale_detail_id(
-        self,
-        sub_detail: SubDtToPublicDtEntity,
-        public_sale_details: list[PublicDtUniqueEntity],
-    ) -> int:
-        public_sale_detail_id = None
-        for public_sale_detail in public_sale_details:
-            area_type = self._get_area_type(sub_detail.area_type)
-            private_area = self._get_private_area(sub_detail.area_type)
-            if (
-                public_sale_detail.area_type == area_type
-                and public_sale_detail.private_area == private_area
-            ):
-                public_sale_detail_id = public_sale_detail.id
-        return public_sale_detail_id
 
     def _get_region_percent(self, sub_detail: SubDtToPublicDtEntity) -> list[int]:
         if (
