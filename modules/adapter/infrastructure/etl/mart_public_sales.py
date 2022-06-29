@@ -14,12 +14,11 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.special_supply_result_model import (
     SpecialSupplyResultModel
 )
-from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
-    PublicDtUniqueEntity
-)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.general_supply_result_model import (
     GeneralSupplyResultModel
 )
+from modules.adapter.infrastructure.pypubsub.enum.etl_enum import TaxEnum, AreaRatioEnum
+
 
 class TransformPublicSales:
     def start_transfer_public_sales(self, subscriptions: list[SubsToPublicEntity]) -> list[PublicSaleModel]:
@@ -38,7 +37,7 @@ class TransformPublicSales:
                 region=subscription.region,
                 housing_category=subscription.housing_category,
                 rent_type=subscription.rent_type,
-                trade_type=None,  # todo, 아직 데이터 없음
+                trade_type=None,
                 construct_company=subscription.construct_company,
                 supply_household=float(subscription.supply_household),
                 offer_date=subscription.offer_date,
@@ -88,7 +87,7 @@ class TransformPublicSales:
         for sub_detail in sub_details:
             area_type: str = self._get_area_type(raw_type=sub_detail.area_type)
             private_area: float = self._get_private_area(raw_type=sub_detail.area_type)
-            acquisition_tax: int = self._calculate_house_acquisition_xax(
+            acquisition_tax: int = self._calculate_house_acquisition_tax(
                 private_area=private_area, supply_price=int(sub_detail.supply_price)
             )
 
@@ -228,7 +227,7 @@ class TransformPublicSales:
         val = re.search("([0-9]+[.][0-9]+)", raw_type)
         return MathHelper().round(float(val[0]), 2)
 
-    def _calculate_house_acquisition_xax(
+    def _calculate_house_acquisition_tax(
         self, private_area: float, supply_price: int
     ) -> int:
         """
@@ -266,19 +265,30 @@ class TransformPublicSales:
 
         if supply_price <= 60000:
             if private_area <= 85:
-                tax_rate = 0.011
+                tax_rate = TaxEnum.PRICE_6_AREA_85.value
             else:
-                tax_rate = 0.013
+                tax_rate = TaxEnum.PRICE_6.value
         elif 60000 < supply_price <= 90000:
             if private_area <= 85:
-                tax_rate = (supply_price * 2 / 30000 - 3) * 0.01 * 1.1
+                tax_rate = ((supply_price
+                            * TaxEnum.PRICE_6_AREA_85.value[0]
+                            / TaxEnum.PRICE_6_AREA_85.value[1]
+                            - TaxEnum.PRICE_6_AREA_85.value[2])
+                            * TaxEnum.PRICE_6_AREA_85.value[3]
+                            * TaxEnum.PRICE_6_AREA_85.value[4])
             else:
-                tax_rate = (supply_price * 2 / 30000 - 3) * 0.01 * 1.1 + 0.002
+                tax_rate = ((supply_price
+                             * TaxEnum.PRICE_9.value[0]
+                             / TaxEnum.PRICE_9.value[1]
+                             - TaxEnum.PRICE_9.value[2])
+                            * TaxEnum.PRICE_9.value[3]
+                            * TaxEnum.PRICE_9.value[4]
+                            + TaxEnum.PRICE_9.value[5])
         else:
             if private_area <= 85:
-                tax_rate = 0.033
+                tax_rate = TaxEnum.AREA_85.value
             else:
-                tax_rate = 0.035
+                tax_rate = TaxEnum.MAX_TAX.value
 
         total_acquisition_tax = MathHelper.round(
             num=supply_price * tax_rate
@@ -286,11 +296,17 @@ class TransformPublicSales:
 
         return total_acquisition_tax
 
-    def get_sub_ids(self, sub_details: list[SubDtToPublicDtEntity]) -> list[int]:
+    def get_sub_ids(self, sub_details: list[SubsToPublicEntity]) -> list[int]:
         sub_ids = list()
         for sub_detail in sub_details:
             sub_ids.append(sub_detail.subs_id)
         return sub_ids
+
+    def get_ids(self, models: list[SubDtToPublicDtEntity]):
+        ids = list()
+        for model in models:
+            ids.append(model.id)
+        return ids
 
     def _get_region_percent(self, sub_detail: SubDtToPublicDtEntity) -> list[int]:
         if sub_detail.supply_rate is not None and sub_detail.supply_rate_etc is not None:
@@ -300,13 +316,13 @@ class TransformPublicSales:
             return [supply_rate, supply_rate_gyeonggi, supply_rate_etc]
 
         elif sub_detail.housing_category == "민영":
-            return [100, 0, 0]
+            return AreaRatioEnum.PRIVATE.value
 
         else:
             if sub_detail.region == "경기":
-                return [30, 20, 50]
+                return AreaRatioEnum.PUBLIC_GYEONGGI.value
             else:
-                return [50, 0, 50]
+                return AreaRatioEnum.PRIVATE.value
 
     def _str_to_float(self, value: str) -> float | None:
         if not value or value == "":
@@ -318,7 +334,7 @@ class TransformPublicSales:
         if not value or value == "":
             return None
         elif not re.search('△', value):
-            return float(value)  # 특수문자 없음
+            return float(value)
         else:
             return None
 

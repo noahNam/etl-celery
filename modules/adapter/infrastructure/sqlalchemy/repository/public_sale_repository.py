@@ -35,14 +35,10 @@ logger = logger_.getLogger(__name__)
 class SyncPublicSaleRepository:
     def save_all(self,
                  models: list[PublicSaleModel],
-                 subscriptions: list[SubsToPublicEntity]
+                 sub_ids: list[int]
                  ) -> None:
         if not models:
             return None
-
-        sub_ids = list()
-        for subscription in subscriptions:
-            sub_ids.append(subscription.subs_id)
 
         try:
             session.add_all(models)
@@ -71,14 +67,10 @@ class SyncPublicSaleRepository:
                          public_sale_details: list[PublicSaleDetailModel],
                          special_supply_results: list[SpecialSupplyResultModel],
                          general_supply_results: list[GeneralSupplyResultModel],
-                         sub_details: list[SubDtToPublicDtEntity]
+                         sub_detail_ids: list[int]
                          ) -> None:
-        if not special_supply_results:
+        if not public_sale_details:
             return None
-
-        sub_detail_ids = list()
-        for sub_detail in sub_details:
-            sub_detail_ids.append(sub_detail.id)
 
         try:
             session.add_all(public_sale_details)

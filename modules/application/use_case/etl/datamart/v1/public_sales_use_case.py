@@ -21,9 +21,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subsc
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_detail_model import (
     SubscriptionDetailModel
 )
-from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
-    PublicDtUniqueEntity
-)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.special_supply_result_model import (
     SpecialSupplyResultModel
 )
@@ -43,7 +40,7 @@ class PublicSaleUseCase:
         self.public_repo: SyncPublicSaleRepository = public_repo
 
     def execute(self):
-        # public_sales
+        # extract subscriptions
         subscriptions: list[SubsToPublicEntity] = self._subscription_repo.find_by_update_needed(
             model=SubscriptionModel
         )
@@ -55,7 +52,8 @@ class PublicSaleUseCase:
             public_sales: list[PublicSaleModel] = self._transfer.start_transfer_public_sales(
                 subscriptions=subscriptions
             )
-            self.public_repo.save_all(models=public_sales, subscriptions=subscriptions)
+            sub_ids: list[int] = self._transfer.get_sub_ids(sub_details=subscriptions)
+            self.public_repo.save_all(models=public_sales, sub_ids=sub_ids)
 
         # extract subscription_details
         sub_details: list[SubDtToPublicDtEntity] = self._subscription_repo.find_by_update_needed(
@@ -76,9 +74,10 @@ class PublicSaleUseCase:
                 sub_details=sub_details
             )
 
+            sub_detail_ids: list[int] = self._transfer.get_ids(models=sub_details)
             self.public_repo.save_all_details(
                 public_sale_details=public_sale_details,
                 special_supply_results=special_supply_results,
                 general_supply_results=general_supply_results,
-                sub_details=sub_details
+                sub_detail_ids=sub_detail_ids
             )
