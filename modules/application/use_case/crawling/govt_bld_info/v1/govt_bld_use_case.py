@@ -36,8 +36,7 @@ class GovtBldUseCase(BaseSyncUseCase):
         kapt_basic_list: list[KaptBasicInfoEntity] = self._repo.find_all(
             find_type=KaptFindTypeEnum.KAPT_BASIC_INFOS.value
         )
-        # kapt_basic_list = list()
-        # kapt_basic_list.append(self._repo.find_by_id(house_id=57, find_type=KaptFindTypeEnum.KAPT_BASIC_INFOS.value))
+
         legal_dong_code_infos: list[
             LegalDongCodeEntity
         ] = self.__get_all_legal_code_infos()

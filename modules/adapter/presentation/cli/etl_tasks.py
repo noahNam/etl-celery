@@ -205,7 +205,7 @@ def get_task(topic: str):
         )
 
     elif (
-            topic == TopicEnum.ETL_MART_PUBLIC_SALES.value
+        topic == TopicEnum.ETL_MART_PUBLIC_SALES.value
     ):  # update_needed -> False - DW.subscription_detail, DW.subscription
         return PublicSaleUseCase(
             topic=topic,

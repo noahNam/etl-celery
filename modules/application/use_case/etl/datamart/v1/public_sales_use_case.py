@@ -28,7 +28,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.specia
     SpecialSupplyResultModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.general_supply_result_model import (
-    GeneralSupplyResultModel
+    GeneralSupplyResultModel,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
@@ -88,5 +88,5 @@ class PublicSaleUseCase:
                 public_sale_details=public_sale_details,
                 special_supply_results=special_supply_results,
                 general_supply_results=general_supply_results,
-                sub_detail_ids=sub_detail_ids
+                sub_detail_ids=sub_detail_ids,
             )

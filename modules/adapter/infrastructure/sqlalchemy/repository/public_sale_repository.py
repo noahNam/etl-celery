@@ -33,11 +33,7 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncPublicSaleRepository:
-    def save_all(
-            self,
-            models: list[PublicSaleModel],
-            sub_ids: list[int]
-    ) -> None:
+    def save_all(self, models: list[PublicSaleModel], sub_ids: list[int]) -> None:
         if not models:
             return None
 
@@ -45,8 +41,8 @@ class SyncPublicSaleRepository:
             session.add_all(models)
             session.execute(
                 update(SubscriptionModel)
-                    .where(SubscriptionModel.subs_id.in_(sub_ids))
-                    .values(update_needed=False)
+                .where(SubscriptionModel.subs_id.in_(sub_ids))
+                .values(update_needed=False)
             )
             session.commit()
 
@@ -67,11 +63,11 @@ class SyncPublicSaleRepository:
         return [result.to_unique_entity() for result in results]
 
     def save_all_details(
-            self,
-            public_sale_details: list[PublicSaleDetailModel],
-            special_supply_results: list[SpecialSupplyResultModel],
-            general_supply_results: list[GeneralSupplyResultModel],
-            sub_detail_ids: list[int]
+        self,
+        public_sale_details: list[PublicSaleDetailModel],
+        special_supply_results: list[SpecialSupplyResultModel],
+        general_supply_results: list[GeneralSupplyResultModel],
+        sub_detail_ids: list[int],
     ) -> None:
         if not public_sale_details:
             return None
@@ -82,8 +78,8 @@ class SyncPublicSaleRepository:
             session.add_all(general_supply_results)
             session.execute(
                 update(SubscriptionDetailModel)
-                    .where(SubscriptionDetailModel.id.in_(sub_detail_ids))
-                    .values(update_needed=False)
+                .where(SubscriptionDetailModel.id.in_(sub_detail_ids))
+                .values(update_needed=False)
             )
             session.commit()
         except Exception as e:
