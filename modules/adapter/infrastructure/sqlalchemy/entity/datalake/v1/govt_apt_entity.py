@@ -112,6 +112,25 @@ class GovtRightLotOutsEntity(BaseModel):
     updated_at: datetime
 
 
+class MappingGovtDetailEntity(BaseModel):
+    id: int
+    sigungu_cd: str
+    eubmyundong_cd: str | None
+    build_year: str | None
+    jibun: str | None
+    apt_name: str
+    dong: str | None
+
+
+class MappingGovtEntity(BaseModel):
+    id: int
+    regional_cd: str
+    dong: str | None
+    build_year: str | None
+    jibun: str | None
+    apt_name: str
+
+
 class GovtTransferEntity(BaseModel):
     """
     매핑테이블 전처리를 위한 임시 Entity

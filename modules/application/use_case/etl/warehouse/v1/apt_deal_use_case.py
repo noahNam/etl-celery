@@ -6,6 +6,9 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_en
     SupplyAreaEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTypeEnum
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_deal_model import (
+    GovtAptDealModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_deal_model import (
     AptDealModel,
 )
@@ -14,7 +17,6 @@ from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository impor
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_deal_repository import (
     SyncBldDealRepository,
-    GovtAptDealModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
     SyncGovtDealRepository,
@@ -34,7 +36,6 @@ class AptDealUseCase(BaseETLUseCase):
     ):
         super().__init__(*args, **kwargs)
         self._bld_mapping_repo = bld_mapping_repo
-        self._govt_deal_repo: SyncGovtDealRepository = govt_deal_repo  # input_table
         self._govt_deal_repo: SyncGovtDealRepository = govt_deal_repo  # input_table
         self._bld_deal_reop: SyncBldDealRepository = bld_deal_repo  # result_table
         self._transfer: TransferAptDeals = TransferAptDeals()

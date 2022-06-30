@@ -22,11 +22,8 @@ from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_re
 from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTypeEnum
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
-    GovtAptDealsEntity,
-    GovtAptRentsEntity,
-    GovtOfctlDealsEntity,
-    GovtOfctlRentsEntity,
-    GovtRightLotOutsEntity,
+    MappingGovtDetailEntity,
+    MappingGovtEntity,
 )
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
@@ -76,33 +73,42 @@ class BldMappingResultUseCase(BaseETLUseCase):
         )
 
         govt_apt_deals: list[
-            GovtAptDealsEntity
+            MappingGovtDetailEntity
         ] = self._govt_repo.find_by_update_needed(
             find_type=GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value
         )
 
-        govt_apt_rents: list[
-            GovtAptRentsEntity
-        ] = self._govt_repo.find_by_update_needed(
+        govt_apt_rents: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
             find_type=GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value
         )
 
-        govt_ofctl_deals: list[
-            GovtOfctlDealsEntity
-        ] = self._govt_repo.find_by_update_needed(
-            find_type=GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value
+        govt_ofctl_deals = []
+        # govt_ofctl_deals: list[
+        #     MappingGovtEntity
+        # ] = self._govt_repo.find_by_update_needed(
+        #     find_type=GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value
+        # )
+
+        govt_ofctl_rents = []
+        # govt_ofctl_rents: list[
+        #     MappingGovtEntity
+        # ] = self._govt_repo.find_by_update_needed(
+        #     find_type=GovtFindTypeEnum.GOV_OFCTL_RENT_MAPPING.value
+        # )
+
+        govt_right_lot_outs = []
+        # govt_right_lot_outs: list[
+        #     MappingGovtEntity
+        # ] = self._govt_repo.find_by_update_needed(
+        #     find_type=GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value
+        # )
+
+        # transfer kapt_basic_address_codes
+        basic_address_infos: list[int] = self._transfer.get_basic_address_infos(
+            kapt_basic_infos, dong_codes
         )
 
-        govt_ofctl_rents: list[
-            GovtOfctlRentsEntity
-        ] = self._govt_repo.find_by_update_needed(
-            find_type=GovtFindTypeEnum.GOV_OFCTL_RENT_MAPPING.value
-        )
-        govt_right_lot_outs: list[
-            GovtRightLotOutsEntity
-        ] = self._govt_repo.find_by_update_needed(
-            find_type=GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value
-        )
+        self.kapt_addr_repo.save_all(kapt_basic_address_codes)
 
         # transfer
         bld_mapping_result_models: list[
@@ -114,6 +120,7 @@ class BldMappingResultUseCase(BaseETLUseCase):
             govt_ofctl_rents=govt_ofctl_rents,
             govt_right_lot_outs=govt_right_lot_outs,
             basices=kapt_basic_infos,
+            kapt_basic_address_codes=kapt_basic_address_codes,
             dongs=dong_codes,
             today=today,
         )
