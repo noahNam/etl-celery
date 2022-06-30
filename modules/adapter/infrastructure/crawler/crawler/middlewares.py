@@ -122,7 +122,7 @@ class SeleniumDownloaderMiddleware:
         print("[SeleniumDownloaderMiddleware][from_crawler]")
         middleware = cls()
         crawler.signals.connect(middleware.spider_opened, signal=signals.spider_opened)
-        # crawler.signals.connect(middleware.spider_closed, signal=signals.spider_closed)
+        crawler.signals.connect(middleware.spider_closed, signal=signals.spider_closed)
 
         return middleware
 
@@ -163,16 +163,17 @@ class SeleniumDownloaderMiddleware:
         pass
 
     def spider_opened(self, spider):
-        print("!!!")
         spider.logger.info("Spider opened: %s" % spider.name)
 
         options = webdriver.ChromeOptions()
-        # options.add_argument("headless")
+        options.add_argument("headless")
+        # excutable_path : 절대 경로로 사용
         self.driver = webdriver.Chrome(
-            options=options, service=Service()
+            options=options, service=Service(
+                executable_path=r"/Users/seonwoong-hwang/Documents/dev/Apartalk/"
+                                r"antgirl/modules/adapter/infrastructure/crawler/crawler/driver"
+                                r"/chromedriver")
         )
-        print("@@@@@@@@@@@@@@@@@@@@")
 
     def spider_closed(self, spider):
-        print("[SeleniumDownloaderMiddleware][spider_closed]")
         self.driver.close()
