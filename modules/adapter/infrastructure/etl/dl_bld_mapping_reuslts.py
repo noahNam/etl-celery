@@ -19,22 +19,23 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_cod
     LegalDongCodeEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_addr_info_entity import (
-    KaptAddrInfoEntity
+    KaptAddrInfoEntity,
 )
+
 logger = logger_.getLogger(__name__)
 
 
 class TransferBldMappingResults(Transfer):
     def start_transfer(
-            self,
-            govt_apt_deals: list[MappingGovtDetailEntity],
-            govt_apt_rents: list[MappingGovtEntity],
-            govt_ofctl_deals: list[MappingGovtEntity],
-            govt_ofctl_rents: list[MappingGovtEntity],
-            govt_right_lot_outs: list[MappingGovtEntity],
-            basices: list[KaptMappingEntity],
-            dongs: list[LegalDongCodeEntity],
-            today: date,
+        self,
+        govt_apt_deals: list[MappingGovtDetailEntity],
+        govt_apt_rents: list[MappingGovtEntity],
+        govt_ofctl_deals: list[MappingGovtEntity],
+        govt_ofctl_rents: list[MappingGovtEntity],
+        govt_right_lot_outs: list[MappingGovtEntity],
+        basices: list[KaptMappingEntity],
+        dongs: list[LegalDongCodeEntity],
+        today: date,
     ) -> list[BldMappingResultModel]:
         """
         input data
@@ -61,7 +62,6 @@ class TransferBldMappingResults(Transfer):
         # 1. basics 전처리
         basic_adress_codes = list()
         basic_jibuns = list()
-
 
         # 2. govts 전처리
         govts = list()
@@ -184,9 +184,9 @@ class TransferBldMappingResults(Transfer):
         return return_values
 
     def transfer_kapt_addr_infos(
-            self,
-            basices: list[KaptMappingEntity],
-            dongs: list[LegalDongCodeEntity],
+        self,
+        basices: list[KaptMappingEntity],
+        dongs: list[LegalDongCodeEntity],
     ) -> list[KaptAddrInfoEntity]:
         basic_adress_codes = list()
         basic_jibuns = list()
@@ -211,9 +211,10 @@ class TransferBldMappingResults(Transfer):
                 address=basic_entity.origin_dong_address,
             )
             basic_jibuns.append(basic_jibun)
+        return []
 
     def _filter_basices_by_apt_name(
-            self, basic_indexes: list[int], basices: list[KaptMappingEntity], apt_name: str
+        self, basic_indexes: list[int], basices: list[KaptMappingEntity], apt_name: str
     ) -> int | None:
         return_idx = None
         for idx in basic_indexes:
@@ -224,7 +225,7 @@ class TransferBldMappingResults(Transfer):
         return return_idx
 
     def _filter_basices_by_jibun(
-            self, basic_indexes: list[int], basic_jibuns: list[str], jibun: str
+        self, basic_indexes: list[int], basic_jibuns: list[str], jibun: str
     ) -> list[int]:
         if jibun is None:
             return basic_indexes
@@ -241,10 +242,10 @@ class TransferBldMappingResults(Transfer):
             return new_basic_indexes
 
     def _filter_basices_by_build_year(
-            self,
-            basic_indexes: list[int],
-            basices: list[KaptMappingEntity],
-            build_year: str | None,
+        self,
+        basic_indexes: list[int],
+        basices: list[KaptMappingEntity],
+        build_year: str | None,
     ) -> list[int]:
         if not build_year:
             return basic_indexes
@@ -258,7 +259,7 @@ class TransferBldMappingResults(Transfer):
         return new_basic_indexes
 
     def _filter_basices_by_addr_code(
-            self, addr_code: str, basic_addr_codes: list[str]
+        self, addr_code: str, basic_addr_codes: list[str]
     ) -> list[int] | None:
         addr_8_code = addr_code[0:8] + "00"
         addr_5_code = addr_code[0:5] + "00000"
@@ -280,7 +281,7 @@ class TransferBldMappingResults(Transfer):
         return basic_indexes
 
     def _find_all_index(
-            self, value: str | int, values: list[str] | list[int]
+        self, value: str | int, values: list[str] | list[int]
     ) -> list[int]:
         indexes = list()
         for i in range(len(values)):
@@ -289,12 +290,12 @@ class TransferBldMappingResults(Transfer):
         return indexes
 
     def _get_basic_adress_code(
-            self,
-            sido,
-            sigungu,
-            eubmyun,
-            dongri,
-            dong_code_entities: list[LegalDongCodeEntity],
+        self,
+        sido,
+        sigungu,
+        eubmyun,
+        dongri,
+        dong_code_entities: list[LegalDongCodeEntity],
     ) -> str | None:
         regexes = list()
         if not sido:
@@ -329,13 +330,13 @@ class TransferBldMappingResults(Transfer):
         return code
 
     def _get_jibun(
-            self,
-            sido: str,
-            sigungu: str,
-            eubmyun: str,
-            dongri: str,
-            apt_name: str,
-            address: str,
+        self,
+        sido: str,
+        sigungu: str,
+        eubmyun: str,
+        dongri: str,
+        apt_name: str,
+        address: str,
     ) -> str | None:
         return_addr = address.replace(apt_name, "")
         return_addr = return_addr.replace(sido, "")
@@ -362,9 +363,9 @@ class TransferBldMappingResults(Transfer):
         return address_code
 
     def _get_address_code(
-            self,
-            govt_deal: MappingGovtEntity,
-            dong_codes: list[LegalDongCodeEntity] | None,
+        self,
+        govt_deal: MappingGovtEntity,
+        dong_codes: list[LegalDongCodeEntity] | None,
     ) -> str | None:
         """
         실행 순서
@@ -377,9 +378,7 @@ class TransferBldMappingResults(Transfer):
         dong_code = "000"
         for dong_entity in dong_codes:
             # 시도, 시군구가 같은지 비교
-            addr_code_5 = "".join(
-                [str(dong_entity.sido_cd), str(dong_entity.sgg_cd)]
-            )
+            addr_code_5 = "".join([str(dong_entity.sido_cd), str(dong_entity.sgg_cd)])
             if address_code == addr_code_5:
                 # 읍면동 비교
                 if dong in dong_entity.locatadd_nm:

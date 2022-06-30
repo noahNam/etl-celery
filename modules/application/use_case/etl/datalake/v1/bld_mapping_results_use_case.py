@@ -78,9 +78,7 @@ class BldMappingResultUseCase(BaseETLUseCase):
             find_type=GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value
         )
 
-        govt_apt_rents: list[
-            MappingGovtEntity
-        ] = self._govt_repo.find_by_update_needed(
+        govt_apt_rents: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
             find_type=GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value
         )
 
