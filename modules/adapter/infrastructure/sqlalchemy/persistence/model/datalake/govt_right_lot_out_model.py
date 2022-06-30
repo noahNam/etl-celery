@@ -7,7 +7,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 )
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
-    GovtRightLotOutsEntity,
+    MappingGovtEntity,
     GovtRightLotOutJoinKeyEntity,
 )
 
@@ -47,13 +47,14 @@ class GovtRightLotOutModel(datalake_base, TimestampMixin):
     )
 
     # GovtRightLotOutsEntity
-    def to_entity_for_bld_mapping_results(self) -> GovtRightLotOutsEntity:
-        return GovtRightLotOutsEntity(
+    def to_entity_for_bld_mapping_results(self) -> MappingGovtEntity:
+        return MappingGovtEntity(
             id=self.id,
             regional_cd=self.regional_cd,
             dong=self.dong,
+            build_year=None,
             jibun=self.jibun,
-            name=self.name,
+            apt_name=self.name,
         )
 
     def to_entity_for_right_lot_outs(self) -> GovtRightLotOutJoinKeyEntity:

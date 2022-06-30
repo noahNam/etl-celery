@@ -6,7 +6,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
     TimestampMixin,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
-    GovtOfctlDealsEntity,
+    MappingGovtEntity,
     GovtOfctlDealJoinKeyEntity,
 )
 
@@ -48,13 +48,14 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
         "foreign(GovtOfctlDealModel.ofctl_name) == BldMappingResultModel.bld_name)",
     )
 
-    def to_entity_for_bld_mapping_results(self) -> GovtOfctlDealsEntity:
-        return GovtOfctlDealsEntity(
+    def to_entity_for_bld_mapping_results(self) -> MappingGovtEntity:
+        return MappingGovtEntity(
             id=self.id,
             regional_cd=self.regional_cd,
             dong=self.dong,
+            build_year=None,
             jibun=self.jibun,
-            ofctl_name=self.ofctl_name,
+            apt_name=self.ofctl_name,
         )
 
     def to_entity_for_ofctl_deals(self) -> GovtOfctlDealJoinKeyEntity:

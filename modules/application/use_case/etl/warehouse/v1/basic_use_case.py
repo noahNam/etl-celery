@@ -250,8 +250,10 @@ class BasicUseCase(BaseETLUseCase):
 
     def __update_to_warehouse(
         self,
-        target_model: Type[
-            KaptLocationInfoEntity, KaptAreaInfoEntity, GovtBldTopInfoEntity
+        target_model: [
+            KaptLocationInfoEntity,
+            KaptAreaInfoEntity,
+            GovtBldTopInfoEntity,
         ],
         results: list[dict],
     ) -> None:
