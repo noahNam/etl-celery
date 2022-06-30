@@ -293,8 +293,10 @@ class SyncKaptRepository(KaptRepository):
 
     def change_update_needed_status_by_dict(
         self,
-        target_model: Type[
-            KaptLocationInfoEntity, KaptAreaInfoEntity, GovtBldTopInfoEntity
+        target_model: [
+            KaptLocationInfoEntity,
+            KaptAreaInfoEntity,
+            GovtBldTopInfoEntity,
         ],
         value: Dict,
     ):
