@@ -18,7 +18,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_ma
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
 )
-
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_addr_info_entity import (
+    KaptAddrInfoEntity
+)
 logger = logger_.getLogger(__name__)
 
 
