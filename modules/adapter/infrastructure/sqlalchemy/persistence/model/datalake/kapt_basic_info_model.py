@@ -86,6 +86,20 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
         primaryjoin="KaptBasicInfoModel.kapt_code == foreign(KaptMgmtCostModel.kapt_code)",
     )
 
+    addr_info = relationship(
+        "KaptAddrInfoModel",
+        backref="kapt_basic_infos",
+        uselist=False,
+        primaryjoin="KaptBasicInfoModel.house_id == foreign(KaptAddrInfoModel.house_id)",
+    )
+
+    # area_info = relationship(
+    #     "KaptAreaInfoModel",
+    #     backref="kapt_basic_infos",
+    #     uselist=False,
+    #     primaryjoin="KaptBasicInfoModel.house_id == foreign(KaptAddrInfoModel.house_id)",
+    # )
+
     def to_open_api_input_entity(self) -> KaptOpenApiInputEntity:
         return KaptOpenApiInputEntity(
             house_id=self.house_id, kapt_code=self.kapt_code, name=self.name
@@ -175,4 +189,7 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
             use_apr_day=self.use_apr_day,
             origin_dong_address=self.origin_dong_address,
             name=self.name,
+            addr_code=self.addr_info.addr_code,
+            # addr_code_second=self.
+            jibun=self.addr_info.jibun,
         )
