@@ -40,11 +40,13 @@ class TransferBldMappingResults(Transfer):
         - govs's columns : id, sigungu_cd, eubmyundong_cd, build_year, jibun, apt_name, dong
 
         전처리 순서
-        1. govs 전처리
-            - 10자리 주소 코드 생성
-        2. basics 전처리
+        1. basics 전처리
             - 10자리 주소 코드 생성
             - 주소에서 지번 추출
+
+        2. govs 전처리
+            - 10자리 주소 코드 생성
+
         3. govs 기준으로 basics 매핑
             - 지번주소로 필터링
             - 건축년도로 필터링
@@ -54,7 +56,12 @@ class TransferBldMappingResults(Transfer):
         return:
         BldMappingResultsEntity's columns:  house_id, regional_cd, jibun, dong, bld_name, created_at, updated_at
         """
-        # 1. govts 전처리
+        # 1. basics 전처리
+        basic_adress_codes = list()
+        basic_jibuns = list()
+
+
+        # 2. govts 전처리
         govts = list()
         if govt_apt_deals:
             for govt_apt_deal in govt_apt_deals:
@@ -71,7 +78,7 @@ class TransferBldMappingResults(Transfer):
                 govts.append(govt_transfer_entity)
         if govt_apt_rents:
             i = 0
-            for govt_apt_rent in govt_apt_rents:
+            for govt_apt_rent in [govt_apt_rents[0]]:
                 i += 1
                 if i % 100 == 0:
                     logger.info(
@@ -131,16 +138,57 @@ class TransferBldMappingResults(Transfer):
                 )
                 govts.append(govt_transfer_entity)
 
-        # 2. basics 전처리
+        # 3. 매핑 (govs, basics)
+        return_values = list()  # BldMappingResultsEntity list
+        for i in range(len(govts)):
+            # 1. 주소 코드 같은 apt_basic 필터링
+            basic_indexes = self._filter_basices_by_addr_code(
+                addr_code=govts[i].addr_code, basic_addr_codes=basic_adress_codes
+            )
+            if not basic_indexes:
+                continue
+
+            # 2. 건축년도로 apt_basic 필터링
+            basic_indexes = self._filter_basices_by_build_year(
+                basic_indexes=basic_indexes,
+                basices=basices,
+                build_year=govts[i].build_year,
+            )
+            # 3. 지번으로 apt_basic 필터링
+            basic_indexes = self._filter_basices_by_jibun(
+                basic_indexes=basic_indexes,
+                basic_jibuns=basic_jibuns,
+                jibun=govts[i].jibun,
+            )
+            # 4. 아파트 이름으로 apt_basic 필터링
+            basic_index = self._filter_basices_by_apt_name(
+                basic_indexes=basic_indexes, basices=basices, apt_name=govts[i].apt_name
+            )
+            if not basic_index:
+                continue
+            else:
+                house_id = basices[basic_index].house_id
+
+            model = BldMappingResultModel(
+                house_id=house_id,
+                regional_cd=govts[i].addr_code,
+                jibun=govts[i].jibun,
+                dong=govts[i].dong,
+                bld_name=govts[i].apt_name,
+                created_at=today,
+                updated_at=today,
+            )
+            return_values.append(model)
+        return return_values
+
+    def transfer_kapt_addr_infos(
+            self,
+            basices: list[KaptMappingEntity],
+            dongs: list[LegalDongCodeEntity],
+    ) -> list[KaptAddrInfoEntity]:
         basic_adress_codes = list()
         basic_jibuns = list()
-        i = 0
         for basic_entity in basices:
-            i += 1
-            if i % 100 == 0:
-                logger.info(
-                    f"[TransferBldMappingResults][start_transfer] transfer basics : {i}"
-                )
             # addr_code 10자리 주소코드
             addr_code: str | None = self._get_basic_adress_code(
                 sido=basic_entity.sido,
@@ -161,46 +209,6 @@ class TransferBldMappingResults(Transfer):
                 address=basic_entity.origin_dong_address,
             )
             basic_jibuns.append(basic_jibun)
-
-        # 3. 매핑 (govs, basics)
-        return_values = list()  # BldMappingResultsEntity list
-        for i in range(len(govts)):
-            # 1. 주소 코드 같은 apt_basic 필터링
-            basic_indexes = self._filter_basices_by_addr_code(
-                addr_code=govts[i].addr_code, basic_addr_codes=basic_adress_codes
-            )
-            # 2. 건축년도로 apt_basic 필터링
-            basic_indexes = self._filter_basices_by_build_year(
-                basic_indexes=basic_indexes,
-                basices=basices,
-                build_year=govts[i].build_year,
-            )
-            # 3. 지번으로 apt_basic 필터링
-            basic_indexes = self._filter_basices_by_jibun(
-                basic_indexes=basic_indexes,
-                basic_jibuns=basic_jibuns,
-                jibun=govts[i].jibun,
-            )
-            # 4. 아파트 이름으로 apt_basic 필터링
-            basic_index = self._filter_basices_by_apt_name(
-                basic_indexes=basic_indexes, basices=basices, apt_name=govts[i].apt_name
-            )
-            if basic_index is None:
-                continue
-            else:
-                house_id = basices[basic_index].house_id
-
-            model = BldMappingResultModel(
-                house_id=house_id,
-                regional_cd=govts[i].addr_code,
-                jibun=govts[i].jibun,
-                dong=govts[i].dong,
-                bld_name=govts[i].apt_name,
-                created_at=today,
-                updated_at=today,
-            )
-            return_values.append(model)
-        return return_values
 
     def _filter_basices_by_apt_name(
             self, basic_indexes: list[int], basices: list[KaptMappingEntity], apt_name: str
@@ -225,7 +233,7 @@ class TransferBldMappingResults(Transfer):
                 new_basic_indexes.append(idx)
             else:
                 pass
-        if len(new_basic_indexes) == 0:
+        if new_basic_indexes:
             return basic_indexes
         else:
             return new_basic_indexes
@@ -236,7 +244,7 @@ class TransferBldMappingResults(Transfer):
             basices: list[KaptMappingEntity],
             build_year: str | None,
     ) -> list[int]:
-        if build_year is None:
+        if not build_year:
             return basic_indexes
 
         new_basic_indexes = list()
@@ -250,8 +258,8 @@ class TransferBldMappingResults(Transfer):
     def _filter_basices_by_addr_code(
             self, addr_code: str, basic_addr_codes: list[str]
     ) -> list[int] | None:
-        addr_8_code = addr_code[8:10] + "00"
-        addr_5_code = addr_code[6:10] + "00000"
+        addr_8_code = addr_code[0:8] + "00"
+        addr_5_code = addr_code[0:5] + "00000"
 
         if addr_code in basic_addr_codes:
             basic_indexes = self._find_all_index(
@@ -287,12 +295,8 @@ class TransferBldMappingResults(Transfer):
             dong_code_entities: list[LegalDongCodeEntity],
     ) -> str | None:
         regexes = list()
-        if sido:
+        if not sido:
             return None
-
-        if eubmyun and dongri:
-            regex_dongri = "".join([sido, ".*", eubmyun, ".*", dongri, ".*"])
-            regexes.append(regex_dongri)
 
         if dongri:
             regex_dongri = "".join([sido, ".*", dongri, ".*"])
@@ -306,7 +310,7 @@ class TransferBldMappingResults(Transfer):
             regex_sigungu = "".join([sido, ".*", sigungu, ".*"])
             regexes.append(regex_sigungu)
 
-        if regexes:
+        if not regexes:
             return None
 
         code = None
@@ -347,9 +351,9 @@ class TransferBldMappingResults(Transfer):
         설명 : 주소코드 앞 5자리, 주소코드 뒷 5자리 합쳐서 사용
         """
         sigungu_cd = govt_deal.sigungu_cd
-        eubmyundong_cd = govt_deal.sigungu_cd
+        eubmyundong_cd = govt_deal.eubmyundong_cd
 
-        if eubmyundong_cd is None:
+        if not eubmyundong_cd:
             address_code = "".join([sigungu_cd, "00000"])
         else:
             address_code = "".join([sigungu_cd, eubmyundong_cd])

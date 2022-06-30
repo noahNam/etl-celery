@@ -105,6 +105,13 @@ class BldMappingResultUseCase(BaseETLUseCase):
         #     find_type=GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value
         # )
 
+        # transfer kapt_basic_address_codes
+        basic_address_infos: list[int] = self._transfer.get_basic_address_infos(
+            kapt_basic_infos, dong_codes
+        )
+
+        self.kapt_addr_repo.save_all(kapt_basic_address_codes)
+
         # transfer
         bld_mapping_result_models: list[
             BldMappingResultModel
@@ -115,6 +122,7 @@ class BldMappingResultUseCase(BaseETLUseCase):
             govt_ofctl_rents=govt_ofctl_rents,
             govt_right_lot_outs=govt_right_lot_outs,
             basices=kapt_basic_infos,
+            kapt_basic_address_codes=kapt_basic_address_codes,
             dongs=dong_codes,
             today=today,
         )
