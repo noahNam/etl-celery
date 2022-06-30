@@ -1,4 +1,3 @@
-from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     GovtAptRentsJoinKeyEntity,
 )
@@ -6,12 +5,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_en
     SupplyAreaEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTypeEnum
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_rent_model import (
-    GovtAptRentModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_rent_model import (
-    AptRentModel,
-)
+
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
 )
@@ -22,6 +16,13 @@ from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository 
     SyncGovtDealRepository,
 )
 from modules.application.use_case.etl import BaseETLUseCase
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.apt_rent_model import (
+    AptRentModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_apt_rent_model import (
+    GovtAptRentModel,
+)
+from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
 
 
 class AptRentUseCase(BaseETLUseCase):

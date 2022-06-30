@@ -185,7 +185,7 @@ class SyncSubscriptionRepository(SubscriptionRepository):
             if isinstance(target_list[0], SubscriptionInfoEntity):
                 session.execute(
                     update(SubscriptionInfoModel)
-                    .where(SubscriptionInfoModel.id.in_([keys]))
+                    .where(SubscriptionInfoModel.id.in_(keys))
                     .values(
                         update_needed=False,
                     )
@@ -193,7 +193,7 @@ class SyncSubscriptionRepository(SubscriptionRepository):
             elif isinstance(target_list[0], SubscriptionManualInfoEntity):
                 session.execute(
                     update(SubscriptionManualInfoModel)
-                    .where(SubscriptionManualInfoModel.id.in_([keys]))
+                    .where(SubscriptionManualInfoModel.id.in_(keys))
                     .values(
                         update_needed=False,
                     )
@@ -206,6 +206,7 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                 f"[SyncKaptRepository] change_update_needed_status -> {type(target_list[0])} error : {e}"
             )
             session.rollback()
+            raise
 
     def find_by_update_needed(
         self, model: Type[SubscriptionModel | SubscriptionDetailModel]

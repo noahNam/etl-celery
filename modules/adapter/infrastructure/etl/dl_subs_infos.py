@@ -15,15 +15,14 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscr
 class TransformSubsInfo:
     def start_etl(
         self,
-        from_model: str,
         target_list: list[ApplyHomeEntity | GoogleSheetApplyHomeEntity],
     ) -> list[SubscriptionInfoModel | SubscriptionManualInfoModel] | None:
         if not target_list:
             return None
 
-        if from_model == "apply_homes":
+        if isinstance(target_list[0], ApplyHomeEntity):
             return self._etl_apply_homes(target_list)
-        elif from_model == "google_sheet_applys":
+        elif isinstance(target_list[0], GoogleSheetApplyHomeEntity):
             return self._etl_google_sheet_applys(target_list)
 
     def _etl_apply_homes(

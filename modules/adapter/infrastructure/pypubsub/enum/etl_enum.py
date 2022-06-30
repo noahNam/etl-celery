@@ -8,7 +8,7 @@ class ETLEnum(Enum):
 class TaxEnum(Enum):
     PRICE_6_AREA_85 = 0.011
     PRICE_6 = 0.013
-    PRICE_9_AREA_85 = [2, 30000, 3,  0.01, 1.1]
+    PRICE_9_AREA_85 = [2, 30000, 3, 0.01, 1.1]
     PRICE_9 = [2, 30000, 3, 0.01, 1.1, 0.002]
     AREA_85 = 0.033
     MAX_TAX = 0.035
