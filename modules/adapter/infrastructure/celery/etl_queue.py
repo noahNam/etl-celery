@@ -1,6 +1,6 @@
 from celery import Celery
 
-from modules.adapter.infrastructure.cache.redis import redis
+from modules.adapter.infrastructure.message.broker.redis import redis
 from modules.adapter.infrastructure.fastapi.config import Config, fastapi_config
 from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.utils.log_helper import logger_
@@ -49,7 +49,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # )
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_BASIC_INFOS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_DL_SUBS_INFOS.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_SUBS_INFOS.value)
+    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_SUBS_INFOS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_REAL_ESTATES.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PRIVATE_SALES.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_DONG_TYPE_INFOS.value)

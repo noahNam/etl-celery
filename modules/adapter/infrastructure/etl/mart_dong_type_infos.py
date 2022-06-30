@@ -13,15 +13,14 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.type_i
 class TransformDongTypeInfos:
     def start_etl(
         self,
-        from_model: str,
         target_list: list[DongInfoEntity | TypeInfoEntity],
     ) -> list[DongInfoModel | TypeInfoModel] | None:
         if not target_list:
             return None
 
-        if from_model == "dong_infos":
+        if isinstance(target_list[0], DongInfoEntity):
             return self._etl_dong_infos(dong_infos=target_list)
-        elif from_model == "type_infos":
+        elif isinstance(target_list[0], TypeInfoEntity):
             return self._etl_type_infos(type_infos=target_list)
 
     def _etl_dong_infos(

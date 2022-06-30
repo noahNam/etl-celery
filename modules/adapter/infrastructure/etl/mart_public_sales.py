@@ -130,21 +130,21 @@ class TransformPublicSales:
         return return_models
 
     def start_transfer_special_supply_results(
-            self,
-            sub_details: list[SubDtToPublicDtEntity],
+        self,
+        sub_details: list[SubDtToPublicDtEntity],
     ) -> list[SpecialSupplyResultModel]:
         return_models = list()
         for sub_detail in sub_details:
             # region_percents: [해당지역, 기타경기, 기타지역]
-            region_percents: list[int] = self._get_region_percent(
-                sub_detail=sub_detail
-            )
+            region_percents: list[int] = self._get_region_percent(sub_detail=sub_detail)
 
             area = SpecialSupplyResultModel(
                 public_sale_detail_id=sub_detail.id,
                 region="해당지역",
                 region_percent=region_percents[0],
-                multi_children_vol=self._str_to_float(value=sub_detail.multi_children_vol),
+                multi_children_vol=self._str_to_float(
+                    value=sub_detail.multi_children_vol
+                ),
                 newlywed_vol=self._str_to_float(value=sub_detail.newlywed_vol),
                 old_parent_vol=self._str_to_float(value=sub_detail.old_parent_vol),
                 first_life_vol=self._str_to_float(value=sub_detail.first_life_vol),
@@ -164,7 +164,9 @@ class TransformPublicSales:
                 public_sale_detail_id=sub_detail.id,
                 region="기타지역",
                 region_percent=region_percents[2],
-                multi_children_vol=self._str_to_float(value=sub_detail.multi_children_vol_etc),
+                multi_children_vol=self._str_to_float(
+                    value=sub_detail.multi_children_vol_etc
+                ),
                 newlywed_vol=self._str_to_float(value=sub_detail.newlywed_vol_etc),
                 old_parent_vol=self._str_to_float(value=sub_detail.old_parent_vol_etc),
                 first_life_vol=self._str_to_float(value=sub_detail.first_life_vol_etc),
@@ -176,9 +178,10 @@ class TransformPublicSales:
             return_models.append(etc_area)
         return return_models
 
-    def start_transfer_general_supply_results(self,
-                                              sub_details: list[SubDtToPublicDtEntity],
-                                              ) -> list[GeneralSupplyResultModel]:
+    def start_transfer_general_supply_results(
+        self,
+        sub_details: list[SubDtToPublicDtEntity],
+    ) -> list[GeneralSupplyResultModel]:
         return_models = list()
         for sub_detail in sub_details:
             region_percents: list[int] = self._get_region_percent(sub_detail=sub_detail)
@@ -188,25 +191,35 @@ class TransformPublicSales:
                 region="해당지역",
                 region_percent=region_percents[0],
                 applicant_num=self._str_to_float(value=sub_detail.first_accept_cnt),
-                competition_rate=self._get_competition_rate(value=sub_detail.first_cmptt_rate),
+                competition_rate=self._get_competition_rate(
+                    value=sub_detail.first_cmptt_rate
+                ),
                 win_point=self._get_win_point(value=sub_detail.lowest_win_point),
-                update_needed=False
+                update_needed=False,
             )
             gyeonggi_area = GeneralSupplyResultModel(
                 public_sale_detail_id=sub_detail.id,
                 region="기타경기",
                 region_percent=region_percents[1],
-                applicant_num=self._str_to_float(value=sub_detail.first_accept_cnt_gyeonggi),
-                competition_rate=self._get_competition_rate(value=sub_detail.first_cmptt_rate_gyeonggi),
-                win_point=self._get_win_point(value=sub_detail.lowest_win_point_gyeonggi),
-                update_needed=False
+                applicant_num=self._str_to_float(
+                    value=sub_detail.first_accept_cnt_gyeonggi
+                ),
+                competition_rate=self._get_competition_rate(
+                    value=sub_detail.first_cmptt_rate_gyeonggi
+                ),
+                win_point=self._get_win_point(
+                    value=sub_detail.lowest_win_point_gyeonggi
+                ),
+                update_needed=False,
             )
             etc_area = GeneralSupplyResultModel(
                 public_sale_detail_id=sub_detail.id,
                 region="기타지역",
                 region_percent=region_percents[2],
                 applicant_num=self._str_to_float(value=sub_detail.first_accept_cnt_etc),
-                competition_rate=self._get_competition_rate(value=sub_detail.first_cmptt_rate_etc),
+                competition_rate=self._get_competition_rate(
+                    value=sub_detail.first_cmptt_rate_etc
+                ),
                 win_point=self._get_win_point(value=sub_detail.lowest_win_point_etc),
                 update_needed=False,
             )
@@ -285,20 +298,25 @@ class TransformPublicSales:
                 tax_rate = TaxEnum.PRICE_6.value
         elif 60000 < supply_price <= 90000:
             if private_area <= 85:
-                tax_rate = ((supply_price
-                            * TaxEnum.PRICE_6_AREA_85.value[0]
-                            / TaxEnum.PRICE_6_AREA_85.value[1]
-                            - TaxEnum.PRICE_6_AREA_85.value[2])
-                            * TaxEnum.PRICE_6_AREA_85.value[3]
-                            * TaxEnum.PRICE_6_AREA_85.value[4])
+                tax_rate = (
+                    (
+                        supply_price
+                        * TaxEnum.PRICE_6_AREA_85.value[0]
+                        / TaxEnum.PRICE_6_AREA_85.value[1]
+                        - TaxEnum.PRICE_6_AREA_85.value[2]
+                    )
+                    * TaxEnum.PRICE_6_AREA_85.value[3]
+                    * TaxEnum.PRICE_6_AREA_85.value[4]
+                )
             else:
-                tax_rate = ((supply_price
-                             * TaxEnum.PRICE_9.value[0]
-                             / TaxEnum.PRICE_9.value[1]
-                             - TaxEnum.PRICE_9.value[2])
-                            * TaxEnum.PRICE_9.value[3]
-                            * TaxEnum.PRICE_9.value[4]
-                            + TaxEnum.PRICE_9.value[5])
+                tax_rate = (
+                    supply_price * TaxEnum.PRICE_9.value[0] / TaxEnum.PRICE_9.value[1]
+                    - TaxEnum.PRICE_9.value[2]
+                ) * TaxEnum.PRICE_9.value[3] * TaxEnum.PRICE_9.value[
+                    4
+                ] + TaxEnum.PRICE_9.value[
+                    5
+                ]
         else:
             if private_area <= 85:
                 tax_rate = TaxEnum.AREA_85.value
@@ -351,7 +369,7 @@ class TransformPublicSales:
     def _get_competition_rate(self, value: str) -> float | None:
         if not value or value == "":
             return None
-        elif not re.search('△', value):
+        elif not re.search("△", value):
             return float(value)
         else:
             return None

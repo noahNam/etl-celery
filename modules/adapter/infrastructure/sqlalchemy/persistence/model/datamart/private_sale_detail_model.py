@@ -5,7 +5,6 @@ from sqlalchemy import (
     Integer,
     Numeric,
     ForeignKey,
-    Float,
     Boolean,
 )
 
@@ -41,3 +40,19 @@ class PrivateSaleDetailModel(datamart_base, TimestampMixin):
     trade_type = Column(String(5), nullable=False)
     is_available = Column(Boolean, nullable=False)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            private_sale_id=self.private_sale_id,
+            private_area=self.private_area,
+            supply_area=self.supply_area,
+            contract_date=self.contract_date,
+            contract_ym=self.contract_ym,
+            deposit_price=self.deposit_price,
+            rent_price=self.rent_price,
+            trade_price=self.trade_price,
+            floor=self.floor,
+            trade_type=self.trade_type,
+            is_available=self.is_available,
+        )

@@ -31,3 +31,23 @@ class RealEstateModel(datamart_base, TimestampMixin):
     back_legal_code = Column(String(5), nullable=False, index=True)
     is_available = Column(Boolean, nullable=False)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            name=self.name,
+            jibun_address=self.jibun_address,
+            road_address=self.road_address,
+            si_do=self.si_do,
+            si_gun_gu=self.si_gun_gu,
+            dong_myun=self.dong_myun,
+            ri=self.ri,
+            road_name=self.road_name,
+            road_number=self.road_number,
+            land_number=self.land_number,
+            x_vl=self.x_vl,
+            y_vl=self.y_vl,
+            front_legal_code=self.front_legal_code,
+            back_legal_code=self.back_legal_code,
+            is_available=self.is_available,
+        )
