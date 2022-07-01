@@ -1,4 +1,5 @@
 from scrapy import Spider, Request
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 class SubscriptionSpider(Spider):
@@ -13,11 +14,14 @@ class SubscriptionSpider(Spider):
     }
 
     def start_requests(self):
-        print("[SubscriptionSpider][start_requests]")
         url = "https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancListView.do"
         yield Request(url=url)
+
+    def browser_interaction_before_parsing(self, driver: WebDriver, request: Request):
+        print("[SubscriptionSpider][browser_interaction_before_parsing] - get in!!!!!!!!!!!")
 
     def parse(self, response, **kwargs):
         print("parse!!!!!!!!!!")
         print(response)
+
 
