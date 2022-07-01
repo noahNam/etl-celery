@@ -95,8 +95,10 @@ class SyncGovtBldRepository(GovtBldRepository):
             #  총괄부 표제 단지 정보
             query = (
                 select(GovtBldTopInfoModel)
-                .where(GovtBldTopInfoModel.update_needed == True)
-                .order_by(GovtBldTopInfoModel.id)
+                .where(
+                    GovtBldTopInfoModel.update_needed == True,
+                )
+                .order_by(GovtBldTopInfoModel.house_id, GovtBldTopInfoModel.new_old_regstr_gb_cd)
             )
             results = session.execute(query).scalars().all()
             if results:
@@ -111,30 +113,12 @@ class SyncGovtBldRepository(GovtBldRepository):
                 and_(
                     GovtBldMiddleInfoModel.update_needed == True,
                 )
-                & not_(
-                    or_(
-                        GovtBldAreaInfoModel.etc_purps.like("%상가%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%주차%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%경비%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%관리%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%전기%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%주민%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%가스%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%경로%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%펌프%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%기계%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%시설%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%문고%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%실%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%타워%"),
-                    )
-                )
             )
 
             query = (
                 select(GovtBldMiddleInfoModel)
                 .where(*filters)
-                .order_by(GovtBldMiddleInfoModel.id)
+                .order_by(GovtBldMiddleInfoModel.house_id)
             )
             results = session.execute(query).scalars().all()
             if results:
@@ -151,12 +135,12 @@ class SyncGovtBldRepository(GovtBldRepository):
                 )
                 & not_(
                     or_(
-                        GovtBldMiddleInfoModel.etc_purps.like("%주차장%"),
-                        GovtBldMiddleInfoModel.etc_purps.like("%관리%"),
-                        GovtBldMiddleInfoModel.etc_purps.like("%기계%"),
-                        GovtBldMiddleInfoModel.etc_purps.like("%전기%"),
-                        GovtBldMiddleInfoModel.etc_purps.like("%제어%"),
-                        GovtBldMiddleInfoModel.etc_purps.like("%경비%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%주차장%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%관리%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%기계%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%전기%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%제어%"),
+                        GovtBldAreaInfoModel.etc_purps.like("%경비%"),
                     )
                 )
             )
@@ -164,7 +148,7 @@ class SyncGovtBldRepository(GovtBldRepository):
             query = (
                 select(GovtBldAreaInfoModel)
                 .where(*filters)
-                .order_by(GovtBldAreaInfoModel.id)
+                .order_by(GovtBldAreaInfoModel.house_id)
             )
             results = session.execute(query).scalars().all()
             if results:
