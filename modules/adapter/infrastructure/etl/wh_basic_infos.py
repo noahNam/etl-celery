@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
@@ -118,7 +119,15 @@ class TransformBasic:
         self, target_list: list[GovtBldMiddleInfoEntity]
     ) -> list[DongInfoModel]:
         result = list()
+        pattern = re.compile('[\W+\d]')
+
         for target_entity in target_list:
+            if not target_entity.dong_nm :
+                continue
+
+            if pattern.sub('', target_entity.dong_nm) != "동" or pattern.sub('', target_entity.dong_nm) == '':
+                continue
+
             result.append(
                 DongInfoModel(
                     house_id=target_entity.house_id,
@@ -128,11 +137,13 @@ class TransformBasic:
                     update_needed=True,
                 )
             )
+
         return result
 
     def _etl_govt_bld_top_infos(
         self, target_list: list[GovtBldTopInfoEntity]
     ) -> list[dict]:
+        # 단지 표제부 중 같은 house_id가 2개(신대장,구대장으로 나누어져 있음)인 것들은 쿼리 order_by new_old_regstr_gb_cd 구문으로 신대장이 마지막 업데이트 되도록 처리함.
         result = list()
         for target_entity in target_list:
             result.append(
