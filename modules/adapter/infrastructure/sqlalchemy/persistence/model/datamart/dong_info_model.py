@@ -25,3 +25,12 @@ class DongInfoModel(datamart_base, TimestampMixin):
     hhld_cnt = Column(Numeric(5), nullable=True)
     grnd_flr_cnt = Column(Numeric(5), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            private_sale_id=self.private_sale_id,
+            name=self.name,
+            hhld_cnt=self.hhld_cnt,
+            grnd_flr_cnt=self.grnd_flr_cnt,
+        )

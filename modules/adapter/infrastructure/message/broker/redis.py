@@ -60,10 +60,18 @@ class RedisClient(Cache):
         except StopIteration as e:
             return None
 
+    # def set(
+    #     self, key: Any, value: Any, ex: int | timedelta | None = None
+    # ) -> bool | None:
+    #     return self._client.set(name=key, value=value, ex=ex)
+
     def set(
-        self, key: Any, value: Any, ex: int | timedelta | None = None
-    ) -> bool | None:
-        return self._client.set(name=key, value=value, ex=ex)
+        self,
+        key: Any,
+        value: Any,
+        ex: int | timedelta = None,
+    ) -> None:
+        self._client.set(name=key, value=value, ex=ex)
 
     def clear_cache(self) -> None:
         for key in self._copied_keys:
@@ -88,7 +96,7 @@ class RedisClient(Cache):
     def sismember(self, set_name: str, value: str) -> bool:
         return self._client.sismember(name=set_name, value=value)
 
-    def smembers(self, set_name: str) -> set[Any]:
+    def smembers(self, set_name: str) -> list:
         return self._client.smembers(name=set_name)
 
 

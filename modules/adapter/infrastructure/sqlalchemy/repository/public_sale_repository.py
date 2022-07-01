@@ -4,9 +4,8 @@ from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.entity.datamart.v1.public_sale_entity import (
     PublicDtUniqueEntity,
 )
-from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.subscription_entity import (
-    SubsToPublicEntity,
-    SubDtToPublicDtEntity,
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.general_supply_result_model import (
+    GeneralSupplyResultModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public_sale_detail_model import (
     PublicSaleDetailModel,
@@ -17,16 +16,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.public
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.special_supply_result_model import (
     SpecialSupplyResultModel,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.general_supply_result_model import (
-    GeneralSupplyResultModel,
-)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_detail_model import (
     SubscriptionDetailModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_model import (
     SubscriptionModel,
 )
-
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)

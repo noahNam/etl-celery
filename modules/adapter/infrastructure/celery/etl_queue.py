@@ -1,6 +1,6 @@
 from celery import Celery
 
-from modules.adapter.infrastructure.cache.redis import redis
+from modules.adapter.infrastructure.message.broker.redis import redis
 from modules.adapter.infrastructure.fastapi.config import Config, fastapi_config
 from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.utils.log_helper import logger_
@@ -65,7 +65,9 @@ def setup_periodic_tasks(sender, **kwargs):
     # )
 
     # DL 아파트 실거래가 매핑테이블
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value)  # 실거래가, kapt, kakao데이터 수집 이후
+    etl_tasks.start_worker.delay(
+        topic=TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value
+    )  # 실거래가, kapt, kakao데이터 수집 이후
 
     # DW 아파트 실거래가
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_APT_DEALS.value)  # 매핑테이블 이후, 건축물대장 업데이트 이후
@@ -76,7 +78,7 @@ def setup_periodic_tasks(sender, **kwargs):
     #
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_UPDATE_SUPPLY_AREA.value)  # 실거래가 이후, 건축물대장 이후
 
-    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PUBLIC_SALES.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PUBLIC_SALES.value)
 
 
 # celery -A modules.adapter.infrastructure.celery.etl_queue.celery flower --address=localhost --port=5555
