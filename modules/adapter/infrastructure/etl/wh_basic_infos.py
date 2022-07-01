@@ -119,13 +119,16 @@ class TransformBasic:
         self, target_list: list[GovtBldMiddleInfoEntity]
     ) -> list[DongInfoModel]:
         result = list()
-        pattern = re.compile('[\W+\d]')
+        pattern = re.compile("[\W+\d]")
 
         for target_entity in target_list:
-            if not target_entity.dong_nm :
+            if not target_entity.dong_nm:
                 continue
 
-            if pattern.sub('', target_entity.dong_nm) != "동" or pattern.sub('', target_entity.dong_nm) == '':
+            if (
+                pattern.sub("", target_entity.dong_nm) != "동"
+                or pattern.sub("", target_entity.dong_nm) == ""
+            ):
                 continue
 
             result.append(
