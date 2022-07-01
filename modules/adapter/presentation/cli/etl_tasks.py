@@ -1,4 +1,5 @@
 from modules.adapter.infrastructure.celery.etl_queue import etl_celery
+from modules.adapter.infrastructure.message.broker.redis import redis
 from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
@@ -117,6 +118,7 @@ def get_task(topic: str):
             topic=topic,
             basic_repo=SyncBasicRepository(),
             real_estate_repo=SyncRealEstateRepository(),
+            redis=redis,
         )
     elif (
         topic == TopicEnum.ETL_MART_PRIVATE_SALES.value
@@ -125,6 +127,7 @@ def get_task(topic: str):
             topic=topic,
             basic_repo=SyncBasicRepository(),
             private_sale_repo=SyncPrivateSaleRepository(),
+            redis=redis,
         )
     elif (
         topic == TopicEnum.ETL_MART_DONG_TYPE_INFOS.value
@@ -133,6 +136,7 @@ def get_task(topic: str):
             topic=topic,
             basic_repo=SyncBasicRepository(),
             private_sale_repo=SyncPrivateSaleRepository(),
+            redis=redis,
         )
     elif (
         topic == TopicEnum.ETL_MART_PRIVATE_SALE_DETAILS.value
@@ -142,6 +146,7 @@ def get_task(topic: str):
             bld_deal_repo=SyncBldDealRepository(),
             private_sale_repo=SyncPrivateSaleRepository(),
             kapt_repo=SyncKaptRepository(),
+            redis=redis,
         )
     elif topic == TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value:  # update_needed -> X
         return BldMappingResultUseCase(

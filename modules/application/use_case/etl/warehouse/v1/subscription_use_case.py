@@ -1,4 +1,3 @@
-import os
 from typing import Type
 
 from modules.adapter.infrastructure.etl.wh_subscriptions import TransformSubscription
@@ -25,30 +24,23 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repositor
     SyncSubscriptionRepository,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
+from modules.application.use_case.etl import BaseETLUseCase
 
 logger = logger_.getLogger(__name__)
 
 
-class BaseSubscriptionUseCase:
+class SubscriptionUseCase(BaseETLUseCase):
     def __init__(
         self,
-        topic: str,
         subscription_repo: SyncSubscriptionRepository,
         subs_info_repo: SyncSubscriptionInfoRepository,
+        *args,
+        **kwargs,
     ):
-        self._topic: str = topic
+        super().__init__(*args, **kwargs)
         self._subscription_repo: SyncSubscriptionRepository = subscription_repo
         self._subs_info_repo: SyncSubscriptionInfoRepository = subs_info_repo
         self._transfer: TransformSubscription = TransformSubscription()
-
-    @property
-    def client_id(self) -> str:
-        return f"{self._topic}-{os.getpid()}"
-
-
-class SubscriptionUseCase(BaseSubscriptionUseCase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def execute(self):
         # DL:subscription_infos -> WH: subscriptions, subscription_details
@@ -60,9 +52,7 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
 
         results: dict[
             str, list[SubscriptionModel] | list[SubscriptionDetailModel]
-        ] | None = self._transfer.start_etl(
-            from_model="subscription_infos", target_list=subscription_infos
-        )
+        ] | None = self._transfer.start_etl(target_list=subscription_infos)
         if results:
             self.__upsert_to_warehouse(results=results.get("subscriptions"))
             self.__upsert_to_warehouse(results=results.get("subscription_details"))
@@ -79,7 +69,6 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
         )
 
         results: dict[str, [dict]] | None = self._transfer.start_etl(
-            from_model="subscription_manual_infos",
             target_list=subscription_manual_infos,
         )
         if results:
@@ -137,6 +126,22 @@ class SubscriptionUseCase(BaseSubscriptionUseCase):
         ],
     ) -> None:
         if update_needed_target_entities:
-            self._subscription_repo.change_update_needed_status(
-                target_list=update_needed_target_entities
-            )
+            try:
+                self._subscription_repo.change_update_needed_status(
+                    target_list=update_needed_target_entities
+                )
+
+            except Exception as e:
+                logger.error(
+                    f"☠️\tSubscriptionUseCase - Failure! {update_needed_target_entities[0].id}:{e}"
+                )
+                self._save_crawling_failure(
+                    failure_value=update_needed_target_entities[0].id,
+                    ref_table="subscriptions"
+                    if isinstance(
+                        update_needed_target_entities[0], SubscriptionInfoEntity
+                    )
+                    else "subscription_details",
+                    param=update_needed_target_entities[0],
+                    reason=e,
+                )
