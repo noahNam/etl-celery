@@ -113,8 +113,9 @@ class GovtBldPipeline:
             new_model = GovtBldAreaInfoModel(**item.dict())
 
         if new_model:
-            if not self._repo.is_exists(new_model):
-                self._repo.save(new_model)
+            # 중복 제거시 사용
+            # if not self._repo.is_exists(new_model):
+            self._repo.save(new_model)
 
         return item
 

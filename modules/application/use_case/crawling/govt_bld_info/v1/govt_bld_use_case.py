@@ -36,6 +36,7 @@ class GovtBldUseCase(BaseSyncUseCase):
         kapt_basic_list: list[KaptBasicInfoEntity] = self._repo.find_all(
             find_type=KaptFindTypeEnum.KAPT_BASIC_INFOS.value
         )
+
         legal_dong_code_infos: list[
             LegalDongCodeEntity
         ] = self.__get_all_legal_code_infos()
@@ -57,22 +58,36 @@ class GovtBldUseCase(BaseSyncUseCase):
                         "".join([basic_info.sido, ".*", basic_info.dongri, ".*"])
                     )
 
-                if basic_info.sido and basic_info.sigungu:
+                if basic_info.dongri and basic_info.eubmyun:
                     patterns.append(
-                        "".join([basic_info.sido, ".*", basic_info.sigungu, ".*"])
+                        "".join(
+                            [
+                                basic_info.sido,
+                                ".*",
+                                basic_info.eubmyun,
+                                ".*",
+                                basic_info.dongri,
+                                ".*",
+                            ]
+                        )
                     )
 
                 if not patterns:
-                    logger.info("not found, keep looping")
+                    logger.info(
+                        f"not found, house_id: {basic_info.house_id} - keep looping"
+                    )
                     continue
 
                 for pattern in patterns:
+                    flag = False
                     for dong_info in legal_dong_code_infos:
                         regex = re.compile(pattern, re.DOTALL)
                         find_result = regex.search(dong_info.locatadd_nm)
 
                         if find_result:
-                            logger.info("Found entity, input success")
+                            logger.info(
+                                f"Found result: house_id-{basic_info.house_id}, {find_result}"
+                            )
                             self._spider_input_params.append(
                                 GovtBldInputEntity(
                                     house_id=basic_info.house_id,
@@ -83,7 +98,11 @@ class GovtBldUseCase(BaseSyncUseCase):
                                     bjd_code=dong_info.region_cd,
                                 )
                             )
+                            flag = True
                             break
+                    if flag:
+                        break
+
         logger.info("Setup finished")
 
     def __get_all_legal_code_infos(self) -> list[LegalDongCodeEntity]:
