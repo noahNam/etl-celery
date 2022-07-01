@@ -98,7 +98,10 @@ class SyncGovtBldRepository(GovtBldRepository):
                 .where(
                     GovtBldTopInfoModel.update_needed == True,
                 )
-                .order_by(GovtBldTopInfoModel.house_id, GovtBldTopInfoModel.new_old_regstr_gb_cd)
+                .order_by(
+                    GovtBldTopInfoModel.house_id,
+                    GovtBldTopInfoModel.new_old_regstr_gb_cd,
+                )
             )
             results = session.execute(query).scalars().all()
             if results:
