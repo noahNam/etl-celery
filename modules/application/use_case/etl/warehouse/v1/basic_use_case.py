@@ -1,4 +1,4 @@
-from typing import Type, Any
+from typing import Any
 
 from modules.adapter.infrastructure.etl.wh_basic_infos import TransformBasic
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
