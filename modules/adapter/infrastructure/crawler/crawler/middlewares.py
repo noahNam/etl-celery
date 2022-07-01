@@ -14,7 +14,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.webdriver import WebDriver
 from twisted.internet.threads import deferToThread
 
-from modules.adapter.infrastructure.crawler.crawler.spiders.subscription_spider import SubscriptionSpider
+from modules.adapter.infrastructure.crawler.crawler.spiders.subs_info_spider import SubscriptionSpider
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
@@ -144,10 +144,11 @@ class SeleniumDownloaderMiddleware:
         return deferToThread(self.process_with_selenium, request, spider)
 
     def process_with_selenium(self, request: Request, spider: SubscriptionSpider) -> HtmlResponse:
-        spider.browser_interaction_before_parsing(driver=self._driver, request=request)
-
         self._driver.get(url=request.url)
         self._driver.implicitly_wait(3)
+
+        spider.browser_interaction_before_parsing(driver=self._driver, request=request)
+
         body = to_bytes(self._driver.page_source)
 
         return HtmlResponse(url=request.url, body=body, encoding="utf-8", request=request)
@@ -176,7 +177,8 @@ class SeleniumDownloaderMiddleware:
 
     def spider_closed(self, spider: SubscriptionSpider):
         if self._driver:
-            self._driver.close()
+            self._driver.quit()
+            spider.logger.info(f"Spider closed: Web driver successfully quit")
 
     def _get_driver(self) -> WebDriver:
         options = webdriver.ChromeOptions()

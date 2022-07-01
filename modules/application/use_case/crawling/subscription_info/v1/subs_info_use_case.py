@@ -1,6 +1,6 @@
 from scrapy.crawler import Crawler
 
-from modules.adapter.infrastructure.crawler.crawler.spiders.subscription_spider import SubscriptionSpider
+from modules.adapter.infrastructure.crawler.crawler.spiders.subs_info_spider import SubscriptionSpider
 from modules.application.use_case import BaseSyncUseCase
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
