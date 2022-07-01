@@ -3,15 +3,21 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-from scrapy import signals
+from scrapy import signals, Request
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
-from scrapy.http import HtmlResponse
+from scrapy.http import HtmlResponse, Response
 from scrapy.utils.python import to_bytes
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.webdriver import WebDriver
+from twisted.internet.threads import deferToThread
+
+from modules.adapter.infrastructure.crawler.crawler.spiders.subscription_spider import SubscriptionSpider
+from modules.adapter.infrastructure.utils.log_helper import logger_
+
+logger = logger_.getLogger(__name__)
 
 
 class CrawlerSpiderMiddleware:
@@ -114,20 +120,18 @@ class SeleniumDownloaderMiddleware:
     # passed objects.
 
     def __init__(self):
-        self.driver: WebDriver | None = None
+        self._driver: WebDriver = self._get_driver()
 
     @classmethod
     def from_crawler(cls, crawler):
         # This method is used by Scrapy to create your spiders.
-        print("[SeleniumDownloaderMiddleware][from_crawler]")
         middleware = cls()
         crawler.signals.connect(middleware.spider_opened, signal=signals.spider_opened)
         crawler.signals.connect(middleware.spider_closed, signal=signals.spider_closed)
 
         return middleware
 
-    def process_request(self, request, spider):
-        print("[SeleniumDownloaderMiddleware][process_request]")
+    def process_request(self, request: Request, spider: SubscriptionSpider):
         # Called for each request that goes through the downloader
         # middleware.
 
@@ -137,13 +141,18 @@ class SeleniumDownloaderMiddleware:
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
+        return deferToThread(self.process_with_selenium, request, spider)
 
-        self.driver.get(url=request.url)
-        self.driver.implicitly_wait(3)
-        body = to_bytes(self.driver.page_source)
+    def process_with_selenium(self, request: Request, spider: SubscriptionSpider) -> HtmlResponse:
+        spider.browser_interaction_before_parsing(driver=self._driver, request=request)
+
+        self._driver.get(url=request.url)
+        self._driver.implicitly_wait(3)
+        body = to_bytes(self._driver.page_source)
+
         return HtmlResponse(url=request.url, body=body, encoding="utf-8", request=request)
 
-    def process_response(self, request, response, spider):
+    def process_response(self, request: Request, response: Response, spider: SubscriptionSpider):
         # Called with the response returned from the downloader.
         print("[SeleniumDownloaderMiddleware][process_response]")
         # Must either;
@@ -162,18 +171,26 @@ class SeleniumDownloaderMiddleware:
         # - return a Request object: stops process_exception() chain
         pass
 
-    def spider_opened(self, spider):
+    def spider_opened(self, spider: SubscriptionSpider):
         spider.logger.info("Spider opened: %s" % spider.name)
 
+    def spider_closed(self, spider: SubscriptionSpider):
+        if self._driver:
+            self._driver.close()
+
+    def _get_driver(self) -> WebDriver:
         options = webdriver.ChromeOptions()
         options.add_argument("headless")
-        # excutable_path : 절대 경로로 사용
-        self.driver = webdriver.Chrome(
-            options=options, service=Service(
-                executable_path=r"/Users/seonwoong-hwang/Documents/dev/Apartalk/"
-                                r"antgirl/modules/adapter/infrastructure/crawler/crawler/driver"
-                                r"/chromedriver")
-        )
 
-    def spider_closed(self, spider):
-        self.driver.close()
+        try:
+            # excutable_path : 절대 경로로 사용
+            self._driver = webdriver.Chrome(
+                options=options, service=Service(
+                    executable_path=r"/Users/seonwoong-hwang/Documents/dev/Apartalk/"
+                                    r"antgirl/modules/adapter/infrastructure/crawler/crawler/driver"
+                                    r"/chromedriver")
+            )
+        except Exception:
+            logger.error(f"[SeleniumDownloaderMiddleware][_get_driver] error - webdriver not found")
+            raise
+        return self._driver
