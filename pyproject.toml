@@ -21,6 +21,7 @@ scrapy-fake-useragent = "^1.4.4"
 xmltodict = "^0.13.0"
 PyPubSub = "^4.0.3"
 selenium = "^4.3.0"
+pandas = "^1.4.3"
 
 [tool.poetry.dev-dependencies]
 aiosqlite = "^0.17.0"
