@@ -29,7 +29,7 @@ class GovtBldMiddleInfoModel(datalake_base, TimestampMixin):
     house_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
     )
-    mgm_bldrgst_pk = Column(String(33), nullable=True, index=True, unique=True)
+    mgm_bldrgst_pk = Column(String(33), nullable=True, index=True)
     main_purps_cd_nm = Column(String(100), nullable=True)
     etc_purps = Column(String(500), nullable=True)
     roof_cd = Column(String(2), nullable=True)
