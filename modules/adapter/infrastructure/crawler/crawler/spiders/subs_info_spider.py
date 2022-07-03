@@ -20,6 +20,7 @@ class SubscriptionSpider(Spider):
     }
     start_ym: str = SubscriptionInfoEnum.START_YEAR_MONTH.value
     end_ym: str = SubscriptionInfoEnum.END_YEAR_MONTH.value
+    last_page: int = 0
 
     def start_requests(self):
         url = SubscriptionInfoEnum.APPLY_HOME_URL.value
@@ -34,9 +35,11 @@ class SubscriptionSpider(Spider):
             driver=driver
         )
 
+        SubscriptionSpider.last_page = self._find_last_page(driver=driver)
+
     def parse(self, response, **kwargs):
         print("parse!!!!!!!!!!")
-        print(response.text)
+        print(SubscriptionSpider.last_page)
 
     def _set_date_select_box_event(self, start_date: str, end_date: str, driver: WebDriver):
         select_start = Select(driver.find_element(By.CSS_SELECTOR, "#start_year"))
