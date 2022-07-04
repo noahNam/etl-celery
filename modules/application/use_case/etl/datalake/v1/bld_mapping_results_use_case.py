@@ -24,10 +24,12 @@ from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTyp
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     MappingGovtDetailEntity,
     MappingGovtEntity,
+
 )
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptMappingEntity,
+    KaptAddrInfoEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
@@ -64,13 +66,32 @@ class BldMappingResultUseCase(BaseETLUseCase):
         self._bld_mapping_repo: SyncBldMappingResultRepository = bld_mapping_repo
 
     def execute(self):
-        # extract
-        today = date.today()
-        dong_codes: list[LegalDongCodeEntity] = self._dong_code.find_all()
+        """
+        1. Extract
+        - legal_dong_codes
+        - kapt_basic_infos (join: kapt_addr_infos, kapt_area_infos)
+        - govt_apt_deals
+        - govt_apt_rents
+        - govt_ofctl_deals
+        - govt_ofctl_rents
+        - govt_right_lot_outs
 
-        kapt_basic_infos: list[KaptMappingEntity] = self._kapt_repo.find_all(
-            find_type=KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value
-        )
+        2. Transfer kapt_addr_infos
+        - kapt_addr_infos에 주소코드가 있으면 사용, 없으면 생성
+            - kapt_basic_infos 전처리: 주소코드, 지번 병합 및 정리
+
+        3. Load
+        - kapt_addr_infos 저장
+
+        4. Transfer
+        - 실거래가 데이터와 매핑: 주소코드, 건축년도, 지번, 아파트이름
+
+        5. Load
+        - bld_mapping_results 저장
+        """
+
+        # 1. extract
+        today = date.today()
 
         govt_apt_deals: list[
             MappingGovtDetailEntity
@@ -103,12 +124,23 @@ class BldMappingResultUseCase(BaseETLUseCase):
         #     find_type=GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value
         # )
 
-        # transfer kapt_basic_address_codes
-        basic_address_infos: list[int] = self._transfer.get_basic_address_infos(
-            kapt_basic_infos, dong_codes
+        kapt_basic_infos: list[KaptMappingEntity] = self._kapt_repo.find_all(
+            find_type=KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value
         )
 
-        self.kapt_addr_repo.save_all(kapt_basic_address_codes)
+        legal_dong_codes: list[LegalDongCodeEntity] = self._dong_code.find_all()
+
+        # 2. Transfer kapt_basic_address_codes
+        func_return: [
+            list[KaptMappingEntity], list[KaptAddrInfoEntity]
+        ] = self._transfer.transfer_kapt_addr_infos(
+            basices=kapt_basic_infos, dongs=legal_dong_codes
+        )
+        kapt_basic_infos = func_return[0]
+        kapt_address_infos = func_return[1]
+
+        # 3. Load
+        self._kapt_repo.save_update_all(models=kapt_address_infos)
 
         # transfer
         bld_mapping_result_models: list[
@@ -120,8 +152,7 @@ class BldMappingResultUseCase(BaseETLUseCase):
             govt_ofctl_rents=govt_ofctl_rents,
             govt_right_lot_outs=govt_right_lot_outs,
             basices=kapt_basic_infos,
-            kapt_basic_address_codes=kapt_basic_address_codes,
-            dongs=dong_codes,
+            dongs=legal_dong_codes,
             today=today,
         )
 

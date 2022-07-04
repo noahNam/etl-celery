@@ -8,6 +8,8 @@ from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 
 
 class KaptAddrInfoModel(datalake_base, TimestampMixin):
+    __tablename__ = "kapt_addr_infos"
+
     house_id = Column(
         BIGINT,
         nullable=False,
