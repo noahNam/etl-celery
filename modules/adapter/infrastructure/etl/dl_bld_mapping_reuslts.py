@@ -18,7 +18,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_ma
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
 )
-from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_addr_info_entity import (
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptAddrInfoEntity,
 )
 
@@ -187,31 +187,40 @@ class TransferBldMappingResults(Transfer):
         self,
         basices: list[KaptMappingEntity],
         dongs: list[LegalDongCodeEntity],
-    ) -> list[KaptAddrInfoEntity]:
-        basic_adress_codes = list()
-        basic_jibuns = list()
-        for basic_entity in basices:
-            # addr_code 10자리 주소코드
-            addr_code: str | None = self._get_basic_adress_code(
-                sido=basic_entity.sido,
-                sigungu=basic_entity.sigungu,
-                eubmyun=basic_entity.eubmyun,
-                dongri=basic_entity.dongri,
-                dong_code_entities=dongs,
-            )
-            basic_adress_codes.append(addr_code)
+    ) -> [list[KaptMappingEntity], list[KaptAddrInfoEntity]]:
 
+        kapt_address_infos = list()
+
+        for basic in basices:
+            if basic.addr_code_addr_info:
+                continue
+            elif basic.addr_code_area_info:
+                basic.addr_code_addr_info = basic.addr_code_addr_info
+            else:
+                basic.addr_code_addr_info = self._get_basic_adress_code(
+                    sido=basic.sido,
+                    sigungu=basic.sigungu,
+                    eubmyun=basic.eubmyun,
+                    dongri=basic.dongri,
+                    dong_code_entities=dongs,
+                )
             # 지번
-            basic_jibun: str | None = self._get_jibun(
-                sido=basic_entity.sido,
-                sigungu=basic_entity.sigungu,
-                eubmyun=basic_entity.eubmyun,
-                dongri=basic_entity.dongri,
-                apt_name=basic_entity.name,
-                address=basic_entity.origin_dong_address,
+            basic.jibun = self._get_jibun(
+                sido=basic.sido,
+                sigungu=basic.sigungu,
+                eubmyun=basic.eubmyun,
+                dongri=basic.dongri,
+                apt_name=basic.name,
+                address=basic.origin_dong_address,
             )
-            basic_jibuns.append(basic_jibun)
-        return []
+
+            kapt_address_info = KaptAddrInfoEntity(
+                house_id=basic.house_id,
+                addr_code=basic.addr_code_area_info,
+                jibun=basic.jibun,
+            )
+            kapt_address_infos.append(kapt_address_info)
+        return basices, kapt_address_infos
 
     def _filter_basices_by_apt_name(
         self, basic_indexes: list[int], basices: list[KaptMappingEntity], apt_name: str

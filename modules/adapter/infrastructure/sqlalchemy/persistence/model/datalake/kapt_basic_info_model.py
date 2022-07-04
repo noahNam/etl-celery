@@ -1,6 +1,9 @@
 from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Boolean
 from sqlalchemy.orm import relationship
 
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_addr_info_model import (
+    KaptAddrInfoModel,
+)
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptOpenApiInputEntity,
     KakaoApiInputEntity,
@@ -93,12 +96,12 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
         primaryjoin="KaptBasicInfoModel.house_id == foreign(KaptAddrInfoModel.house_id)",
     )
 
-    # area_info = relationship(
-    #     "KaptAreaInfoModel",
-    #     backref="kapt_basic_infos",
-    #     uselist=False,
-    #     primaryjoin="KaptBasicInfoModel.house_id == foreign(KaptAddrInfoModel.house_id)",
-    # )
+    area_info = relationship(
+        "KaptAreaInfoModel",
+        backref="kapt_basic_infos",
+        uselist=False,
+        primaryjoin="KaptBasicInfoModel.kapt_code == foreign(KaptAreaInfoModel.kapt_code)",
+    )
 
     def to_open_api_input_entity(self) -> KaptOpenApiInputEntity:
         return KaptOpenApiInputEntity(
@@ -180,6 +183,10 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
         )
 
     def to_entity_for_bld_mapping_results(self) -> KaptMappingEntity:
+        addr_code_addr_info = None if not self.addr_info else self.addr_info.addr_code
+        jibun = None if not self.addr_info else self.addr_info.jibun
+        addr_code_area_info = None if not self.area_info else self.area_info.bjd_code
+
         return KaptMappingEntity(
             house_id=self.house_id,
             sido=self.sido,
@@ -189,7 +196,7 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
             use_apr_day=self.use_apr_day,
             origin_dong_address=self.origin_dong_address,
             name=self.name,
-            addr_code=self.addr_info.addr_code,
-            # addr_code_second=self.
-            jibun=self.addr_info.jibun,
+            addr_code_addr_info=addr_code_addr_info,
+            addr_code_area_info=addr_code_area_info,
+            jibun=jibun,
         )
