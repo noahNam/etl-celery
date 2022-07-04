@@ -18,7 +18,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
     KaptLocationInfoEntity,
     KaptMgmtCostEntity,
     KaptMappingEntity,
-    KaptAddrInfoEntity
+    KaptAddrInfoEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.code_rule_model import (
