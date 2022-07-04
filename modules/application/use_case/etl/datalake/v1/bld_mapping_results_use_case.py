@@ -24,7 +24,6 @@ from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTyp
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     MappingGovtDetailEntity,
     MappingGovtEntity,
-
 )
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
@@ -132,7 +131,8 @@ class BldMappingResultUseCase(BaseETLUseCase):
 
         # 2. Transfer kapt_basic_address_codes
         func_return: [
-            list[KaptMappingEntity], list[KaptAddrInfoEntity]
+            list[KaptMappingEntity],
+            list[KaptAddrInfoEntity],
         ] = self._transfer.transfer_kapt_addr_infos(
             basices=kapt_basic_infos, dongs=legal_dong_codes
         )
