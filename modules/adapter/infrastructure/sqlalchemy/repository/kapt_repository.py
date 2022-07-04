@@ -18,6 +18,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
     KaptLocationInfoEntity,
     KaptMgmtCostEntity,
     KaptMappingEntity,
+    KaptAddrInfoEntity
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.code_rule_model import (
@@ -151,6 +152,29 @@ class SyncKaptRepository(KaptRepository):
         except exc.IntegrityError as e:
             logger.error(
                 f"[SyncKaptRepository][save] kapt_code : {kapt_orm.kapt_code} error : {e}"
+            )
+            session.rollback()
+            raise NotUniqueErrorException
+
+        return None
+
+    def save_update_all(self, models: list[KaptAddrInfoEntity]):
+        if not models:
+            return None
+
+        try:
+            # stmt = insert(KaptAreaInfoModel).values(models)
+            # stmt = stmt.on_duplicate_key_update(
+            #     addr_code=stmt.inserted.addr_code,
+            #     jibun=stmt.inserted.jibun,
+            # )
+            # session.execute(stmt)
+
+            session.merge(models)
+            session.commit()
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncKaptRepository][save_update_all] kapt_code : {models[0].house_id} error : {e}"
             )
             session.rollback()
             raise NotUniqueErrorException

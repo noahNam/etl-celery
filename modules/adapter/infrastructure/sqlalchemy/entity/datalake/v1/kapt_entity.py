@@ -181,3 +181,12 @@ class KaptMappingEntity(BaseModel):
     use_apr_day: str | None
     origin_dong_address: str | None
     name: str | None
+    addr_code_addr_info: str | None
+    addr_code_area_info: str | None
+    jibun: str | None
+
+
+class KaptAddrInfoEntity(BaseModel):
+    house_id: int
+    addr_code: str | None
+    jibun: str | None
