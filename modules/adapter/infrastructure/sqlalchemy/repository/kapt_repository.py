@@ -1,5 +1,6 @@
 from typing import Callable, AsyncContextManager, Type, List, Dict
 
+from sqlalchemy.dialects.mysql import insert
 from sqlalchemy import exc, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -59,6 +60,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_
 )
 from modules.adapter.infrastructure.sqlalchemy.repository import (
     BaseAsyncRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_addr_info_model import (
+    KaptAddrInfoModel,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
@@ -128,19 +132,65 @@ class SyncKaptRepository(KaptRepository):
     ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | list[
         KaptMappingEntity
     ]:
-        queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
-
-        if not queryset:
-            return list()
-
         if find_type == KaptFindTypeEnum.KAKAO_API_INPUT.value:
+            queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
+            if not queryset:
+                return list()
             return [query.to_kakao_api_input_entity() for query in queryset]
-        elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
-            return [result.to_entity_for_bld_mapping_results() for result in queryset]
+
         elif find_type == KaptFindTypeEnum.KAPT_BASIC_INFOS.value:
+            queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
+            if not queryset:
+                return list()
             return [query.to_kapt_basic_info_entity() for query in queryset]
 
-        return [query.to_open_api_input_entity() for query in queryset]
+        elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
+            query = session.query(
+                KaptBasicInfoModel
+            ).with_entities(
+                KaptBasicInfoModel.house_id,
+                KaptBasicInfoModel.sido,
+                KaptBasicInfoModel.sigungu,
+                KaptBasicInfoModel.eubmyun,
+                KaptBasicInfoModel.dongri,
+                KaptBasicInfoModel.use_apr_day,
+                KaptBasicInfoModel.origin_dong_address,
+                KaptBasicInfoModel.name,
+                KaptAddrInfoModel.addr_code.label('addr_code_addr_info'),
+                KaptAddrInfoModel.jibun,
+                KaptAreaInfoModel.bjd_code.label('addr_code_area_info'),
+            ).join(
+                KaptAddrInfoModel,
+                KaptBasicInfoModel.house_id == KaptAddrInfoModel.house_id,
+                isouter=True
+            ).join(
+                KaptAreaInfoModel,
+                KaptBasicInfoModel.kapt_code == KaptAreaInfoModel.kapt_code,
+                isouter=True
+            )
+            querysets = query.all()
+
+            if not querysets:
+                return list()
+            return [self._make_kapt_mapping_entity(queryset=queryset) for queryset in querysets]
+
+        else:
+            raise Exception('[SyncKaptRepository][find_all] find_type error')
+
+    def _make_kapt_mapping_entity(self, queryset):
+        return KaptMappingEntity(
+            house_id=queryset.house_id,
+            sido=queryset.sido,
+            sigungu=queryset.sigungu,
+            eubmyun=queryset.eubmyun,
+            dongri=queryset.dongri,
+            use_apr_day=queryset.use_apr_day,
+            origin_dong_address=queryset.origin_dong_address,
+            name=queryset.name,
+            addr_code_addr_info=queryset.addr_code_addr_info,
+            addr_code_area_info=queryset.addr_code_area_info,
+            jibun=queryset.jibun,
+        )
 
     def save(self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None) -> None:
         if not kapt_orm:
@@ -163,14 +213,17 @@ class SyncKaptRepository(KaptRepository):
             return None
 
         try:
-            # stmt = insert(KaptAreaInfoModel).values(models)
-            # stmt = stmt.on_duplicate_key_update(
-            #     addr_code=stmt.inserted.addr_code,
-            #     jibun=stmt.inserted.jibun,
-            # )
-            # session.execute(stmt)
+            dic = [{'house_id': model.house_id,
+                    'addr_code': model.addr_code,
+                    'jibun': model.jibun
+                    } for model in models]
 
-            session.merge(models)
+            stmt = insert(KaptAddrInfoModel).values()
+            stmt = stmt.on_duplicate_key_update(
+                addr_code=stmt.inserted.addr_code,
+                jibun=stmt.inserted.jibun,
+            )
+            session.execute(stmt, dic)
             session.commit()
         except exc.IntegrityError as e:
             logger.error(

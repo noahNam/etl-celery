@@ -88,6 +88,8 @@ class BldMappingResultUseCase(BaseETLUseCase):
         5. Load
         - bld_mapping_results 저장
         """
+        import time
+        start_time = time.time()
 
         # 1. extract
         today = date.today()
