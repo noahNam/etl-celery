@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_bld_entity import (
@@ -60,22 +61,24 @@ class TransformBasic:
     def _etl_govt_bld_area_infos(
         self, target_list: list[GovtBldAreaInfoEntity]
     ) -> list[TypeInfoModel]:
+        """
+        내려받은 데이터로 공급면적 계산시 일관성이 보이지 않음
+        예를 들어 main_atch_gb_cd(주/부건축물) = 0 인것만 포함시키는 아파트가 있고, 1인데도 포함시키거나
+        main_purps_cd = '02001' 인것만 포함시키는데도 있고, 아닌곳도 있고, 네이밍으로 제거하려해도 각 아파트다마 경우가 달라서 정규화가 어려움.
+
+        따라서 큰 가닥에서 잡기는 했으나 세부사항 조정이 필요해보임
+        """
         result = list()
         private_area = 0
         supply_area = 0
+        dong_id = None
         bld_nm = None
         dong_nm = None
         ho_nm = None
 
         for target_entity in target_list:
-            rnum = target_entity.rnum  # 1부터 시작
-            if rnum == 1:
-                # 변수 초기화
-                bld_nm = target_entity.bld_nm
-                dong_nm = target_entity.dong_nm
-                ho_nm = target_entity.ho_nm
-                private_area = 0
-                supply_area = 0
+            if not target_entity.dong_id:
+                continue
 
             # 같은 건물, 동, 호인지 체크
             if (
@@ -83,10 +86,35 @@ class TransformBasic:
                 or dong_nm != target_entity.dong_nm
                 or ho_nm != target_entity.ho_nm
             ):
-                continue
+                if target_entity.rnum != 1 and private_area:
+                    supply_area = supply_area + private_area
+                    result.append(
+                        TypeInfoModel(
+                            dong_id=dong_id,
+                            private_area=MathHelper().round(private_area, 2)
+                            if private_area
+                            else None,
+                            supply_area=MathHelper().round(supply_area, 2)
+                            if supply_area
+                            else None,
+                            update_needed=True,
+                        )
+                    )
+
+                dong_id = target_entity.dong_id
+                bld_nm = target_entity.bld_nm
+                dong_nm = target_entity.dong_nm
+                ho_nm = target_entity.ho_nm
+                private_area = 0
+                supply_area = 0
 
             # 아파트인 경우는 주건축물만 취급
             if target_entity.main_atch_gb_cd != "0":  # 0(주건축물), 1(부건축물)
+                continue
+
+            if (
+                target_entity.main_purps_cd == "02002"
+            ):  # 연립주택은 제외, 다세대주택등은 포함. 둘다 아파트 타입이 아니지만 연립주택 타입은 공급면적에서 빠지는 아파트들이 꽤 보임
                 continue
 
             if target_entity.expos_pubuse_gb_cd_nm == "전유":
@@ -100,25 +128,24 @@ class TransformBasic:
                 # 공용부의 경우
                 supply_area += target_entity.area
 
-            result.append(
-                TypeInfoModel(
-                    dong_id=target_entity.dong_id,
-                    private_area=MathHelper().round(private_area, 2)
-                    if private_area
-                    else None,
-                    supply_area=MathHelper().round(supply_area, 2)
-                    if supply_area
-                    else None,
-                    update_needed=True,
-                )
-            )
         return result
 
     def _etl_govt_bld_middle_infos(
         self, target_list: list[GovtBldMiddleInfoEntity]
     ) -> list[DongInfoModel]:
         result = list()
+        pattern = re.compile("[\W+\d]")
+
         for target_entity in target_list:
+            if not target_entity.dong_nm:
+                continue
+
+            if (
+                pattern.sub("", target_entity.dong_nm) != "동"
+                or pattern.sub("", target_entity.dong_nm) == ""
+            ):
+                continue
+
             result.append(
                 DongInfoModel(
                     house_id=target_entity.house_id,
@@ -128,11 +155,13 @@ class TransformBasic:
                     update_needed=True,
                 )
             )
+
         return result
 
     def _etl_govt_bld_top_infos(
         self, target_list: list[GovtBldTopInfoEntity]
     ) -> list[dict]:
+        # 단지 표제부 중 같은 house_id가 2개(신대장,구대장으로 나누어져 있음)인 것들은 쿼리 order_by new_old_regstr_gb_cd 구문으로 신대장이 마지막 업데이트 되도록 처리함.
         result = list()
         for target_entity in target_list:
             result.append(

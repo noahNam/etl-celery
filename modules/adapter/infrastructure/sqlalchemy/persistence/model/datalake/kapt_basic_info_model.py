@@ -89,12 +89,12 @@ class KaptBasicInfoModel(datalake_base, TimestampMixin):
         primaryjoin="KaptBasicInfoModel.kapt_code == foreign(KaptMgmtCostModel.kapt_code)",
     )
 
-    addr_info = relationship(
-        "KaptAddrInfoModel",
-        backref="kapt_basic_infos",
-        uselist=False,
-        primaryjoin="KaptBasicInfoModel.house_id == foreign(KaptAddrInfoModel.house_id)",
-    )
+    # addr_info = relationship(
+    #     "KaptAddrInfoModel",
+    #     backref="kapt_basic_infos",
+    #     uselist=False,
+    #     primaryjoin="KaptBasicInfoModel.house_id == foreign(KaptAddrInfoModel.house_id)",
+    # )
 
     area_info = relationship(
         "KaptAreaInfoModel",
