@@ -1,6 +1,6 @@
 from typing import Type
 
-from sqlalchemy import select, exc, and_, not_, or_
+from sqlalchemy import select, exc, and_
 
 from core.domain.datalake.govt_bld_info.interface.govt_bld_info_repository import (
     GovtBldRepository,
@@ -136,22 +136,23 @@ class SyncGovtBldRepository(GovtBldRepository):
                 and_(
                     GovtBldAreaInfoModel.update_needed == True,
                 )
-                & not_(
-                    or_(
-                        GovtBldAreaInfoModel.etc_purps.like("%주차장%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%관리%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%기계%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%전기%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%제어%"),
-                        GovtBldAreaInfoModel.etc_purps.like("%경비%"),
-                    )
-                )
+                # 관련 쿼리 넣을지 확정 안됨.
+                # & not_(
+                #     or_(
+                #         GovtBldAreaInfoModel.etc_purps.like("%주차장%"),
+                #         GovtBldAreaInfoModel.etc_purps.like("%관리%"),
+                #         GovtBldAreaInfoModel.etc_purps.like("%기계%"),
+                #         GovtBldAreaInfoModel.etc_purps.like("%전기%"),
+                #         GovtBldAreaInfoModel.etc_purps.like("%제어%"),
+                #         GovtBldAreaInfoModel.etc_purps.like("%경비%"),
+                #     )
+                # )
             )
 
             query = (
                 select(GovtBldAreaInfoModel)
                 .where(*filters)
-                .order_by(GovtBldAreaInfoModel.house_id)
+                .order_by(GovtBldAreaInfoModel.house_id, GovtBldAreaInfoModel.rnum)
             )
             results = session.execute(query).scalars().all()
             if results:
