@@ -60,8 +60,8 @@ class TransferBldMappingResults(Transfer):
         BldMappingResultsEntity's columns:  house_id, regional_cd, jibun, dong, bld_name, created_at, updated_at
         """
         # 1. basics 전처리
-        basic_adress_codes = list()
-        basic_jibuns = list()
+        basic_adress_codes = [basic.addr_code_addr_info for basic in basices]
+        basic_jibuns = [basic.jibun for basic in basices]
 
         # 2. govts 전처리
         govts = list()
@@ -195,7 +195,7 @@ class TransferBldMappingResults(Transfer):
             if basic.addr_code_addr_info:
                 continue
             elif basic.addr_code_area_info:
-                basic.addr_code_addr_info = basic.addr_code_addr_info
+                basic.addr_code_addr_info = basic.addr_code_area_info
             else:
                 basic.addr_code_addr_info = self._get_basic_adress_code(
                     sido=basic.sido,
@@ -216,7 +216,7 @@ class TransferBldMappingResults(Transfer):
 
             kapt_address_info = KaptAddrInfoEntity(
                 house_id=basic.house_id,
-                addr_code=basic.addr_code_area_info,
+                addr_code=basic.addr_code_addr_info,
                 jibun=basic.jibun,
             )
             kapt_address_infos.append(kapt_address_info)
@@ -236,6 +236,7 @@ class TransferBldMappingResults(Transfer):
     def _filter_basices_by_jibun(
         self, basic_indexes: list[int], basic_jibuns: list[str], jibun: str
     ) -> list[int]:
+        # 실거래가에 지번이 없을 시, 필터링 하지 않음
         if jibun is None:
             return basic_indexes
 
@@ -245,7 +246,9 @@ class TransferBldMappingResults(Transfer):
                 new_basic_indexes.append(idx)
             else:
                 pass
-        if new_basic_indexes:
+
+        # 필터링 결과 아무것도 없을시, 필터링하지 않음
+        if not new_basic_indexes:
             return basic_indexes
         else:
             return new_basic_indexes
@@ -256,16 +259,25 @@ class TransferBldMappingResults(Transfer):
         basices: list[KaptMappingEntity],
         build_year: str | None,
     ) -> list[int]:
+        # 실거래가에 건축년도가 없을 시, 필터링 하지 않음
         if not build_year:
             return basic_indexes
 
         new_basic_indexes = list()
         for idx in basic_indexes:
+            if len(str(basices[idx].use_apr_day)) < 4:
+                continue
             if int(build_year) == int(str(basices[idx].use_apr_day)[0:4]):
                 new_basic_indexes.append(idx)
             else:
                 pass
-        return new_basic_indexes
+
+        # 필터링 결과 아무것도 없을시, 필터링하지 않음
+        if not new_basic_indexes:
+            return basic_indexes
+        else:
+            return new_basic_indexes
+
 
     def _filter_basices_by_addr_code(
         self, addr_code: str, basic_addr_codes: list[str]
