@@ -124,6 +124,10 @@ class SyncKaptRepository(KaptRepository):
 
         if find_type == KaptFindTypeEnum.KAKAO_API_INPUT.value:
             return kapt_basic_info.to_kakao_api_input_entity()
+        elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
+            return kapt_basic_info.to_entity_for_bld_mapping_results()
+        elif find_type == KaptFindTypeEnum.KAPT_BASIC_INFOS.value:
+            return kapt_basic_info.to_kapt_basic_info_entity()
 
         return kapt_basic_info.to_open_api_input_entity()
 
@@ -378,7 +382,7 @@ class SyncKaptRepository(KaptRepository):
         value: Dict,
     ):
         try:
-            if isinstance(target_model, KaptLocationInfoEntity):
+            if target_model == KaptLocationInfoEntity:
                 session.execute(
                     update(KaptLocationInfoModel)
                     .where(KaptLocationInfoModel.kapt_code == value.get("kapt_code"))
@@ -386,7 +390,7 @@ class SyncKaptRepository(KaptRepository):
                         update_needed=False,
                     )
                 )
-            elif isinstance(target_model, KaptAreaInfoEntity):
+            elif target_model == KaptAreaInfoEntity:
                 session.execute(
                     update(KaptAreaInfoModel)
                     .where(KaptAreaInfoModel.kapt_code == value.get("kapt_code"))
@@ -394,10 +398,10 @@ class SyncKaptRepository(KaptRepository):
                         update_needed=False,
                     )
                 )
-            elif isinstance(target_model, GovtBldTopInfoEntity):
+            elif target_model == GovtBldTopInfoEntity:
                 session.execute(
                     update(GovtBldTopInfoModel)
-                    .where(GovtBldTopInfoModel.house_id == value.get("house_id"))
+                    .where(GovtBldTopInfoModel.house_id == value.get("key"))
                     .values(
                         update_needed=False,
                     )
@@ -417,18 +421,22 @@ class SyncKaptRepository(KaptRepository):
         value: List[DongInfoModel | TypeInfoModel],
     ):
         try:
-            if isinstance(value, DongInfoModel):
+            if isinstance(value[0], DongInfoModel):
                 session.execute(
                     update(GovtBldMiddleInfoModel)
-                    .where(update_needed=True)
+                    .where(
+                        GovtBldMiddleInfoModel.update_needed == True,
+                    )
                     .values(
                         update_needed=False,
                     )
                 )
-            elif isinstance(value, TypeInfoModel):
+            elif isinstance(value[0], TypeInfoModel):
                 session.execute(
                     update(GovtBldAreaInfoModel)
-                    .where(update_needed=True)
+                    .where(
+                        GovtBldAreaInfoModel.update_needed == True,
+                    )
                     .values(
                         update_needed=False,
                     )

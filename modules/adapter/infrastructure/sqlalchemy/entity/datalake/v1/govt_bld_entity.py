@@ -31,6 +31,7 @@ class GovtBldAreaInfoEntity(BaseModel):
     flr_no_nm: str | None
     main_atch_gb_cd: str | None
     main_atch_gb_cd_nm: str | None
+    main_purps_cd: str | None
     etc_purps: str | None
     expos_pubuse_gb_cd_nm: str | None
     rnum: int | None
