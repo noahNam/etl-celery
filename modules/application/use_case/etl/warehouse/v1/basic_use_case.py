@@ -187,6 +187,18 @@ class BasicUseCase(BaseETLUseCase):
             GovtBldAreaInfoEntity
         ] | None = self._govt_bld_repo.find_to_update(target_model=GovtBldAreaInfoModel)
 
+        if govt_bld_area_infos:
+            for govt_bld_area_info in govt_bld_area_infos:
+                if not govt_bld_area_info.dong_nm:
+                    continue
+
+                dong_id: int | None = self._basic_repo.find_id_by_dong_nm(
+                    house_id=govt_bld_area_info.house_id,
+                    dong_nm=govt_bld_area_info.dong_nm,
+                )
+
+                govt_bld_area_info.dong_id = dong_id
+
         bld_area_infos: list[TypeInfoModel] | None = self._transfer.start_etl(
             target_list=govt_bld_area_infos
         )
