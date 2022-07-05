@@ -202,7 +202,6 @@ class SyncBasicRepository(BasicRepository):
                 .where(
                     TypeInfoModel.dong_id == value.dong_id,
                     TypeInfoModel.private_area == value.private_area,
-                    TypeInfoModel.supply_area == value.supply_area,
                 )
                 .limit(1)
             )
@@ -361,3 +360,19 @@ class SyncBasicRepository(BasicRepository):
             return None
 
         return [supply_area.to_supply_area_entity() for supply_area in supply_areas]
+
+    def find_id_by_dong_nm(self, house_id: int, dong_nm: str) -> int | None:
+        query = (
+            select(DongInfoModel.id)
+            .where(
+                DongInfoModel.house_id == house_id,
+                DongInfoModel.name == dong_nm,
+            )
+            .limit(1)
+        )
+        dong_id = session.execute(query).scalars().first()
+
+        if not dong_id:
+            return None
+
+        return dong_id
