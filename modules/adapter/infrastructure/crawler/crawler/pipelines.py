@@ -146,7 +146,7 @@ class GovtHouseDealPipeline:
             new_model = GovtRightLotOutModel(**item.dict())
 
         if new_model:
-            if not self._repo.is_exists(new_model):
-                self._repo.save(new_model)
+            # if not self._repo.is_exists(new_model):
+            self._repo.save(new_model)
 
         return item
