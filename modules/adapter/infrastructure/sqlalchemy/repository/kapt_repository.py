@@ -18,6 +18,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
     KaptLocationInfoEntity,
     KaptMgmtCostEntity,
     KaptMappingEntity,
+    KaptAddrInfoEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.code_rule_model import (
@@ -155,6 +156,29 @@ class SyncKaptRepository(KaptRepository):
         except exc.IntegrityError as e:
             logger.error(
                 f"[SyncKaptRepository][save] kapt_code : {kapt_orm.kapt_code} error : {e}"
+            )
+            session.rollback()
+            raise NotUniqueErrorException
+
+        return None
+
+    def save_update_all(self, models: list[KaptAddrInfoEntity]):
+        if not models:
+            return None
+
+        try:
+            # stmt = insert(KaptAreaInfoModel).values(models)
+            # stmt = stmt.on_duplicate_key_update(
+            #     addr_code=stmt.inserted.addr_code,
+            #     jibun=stmt.inserted.jibun,
+            # )
+            # session.execute(stmt)
+
+            session.merge(models)
+            session.commit()
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncKaptRepository][save_update_all] kapt_code : {models[0].house_id} error : {e}"
             )
             session.rollback()
             raise NotUniqueErrorException
@@ -305,7 +329,7 @@ class SyncKaptRepository(KaptRepository):
         value: Dict,
     ):
         try:
-            if isinstance(target_model, KaptLocationInfoEntity):
+            if target_model == KaptLocationInfoEntity:
                 session.execute(
                     update(KaptLocationInfoModel)
                     .where(KaptLocationInfoModel.kapt_code == value.get("kapt_code"))
@@ -313,7 +337,7 @@ class SyncKaptRepository(KaptRepository):
                         update_needed=False,
                     )
                 )
-            elif isinstance(target_model, KaptAreaInfoEntity):
+            elif target_model == KaptAreaInfoEntity:
                 session.execute(
                     update(KaptAreaInfoModel)
                     .where(KaptAreaInfoModel.kapt_code == value.get("kapt_code"))
@@ -321,10 +345,10 @@ class SyncKaptRepository(KaptRepository):
                         update_needed=False,
                     )
                 )
-            elif isinstance(target_model, GovtBldTopInfoEntity):
+            elif target_model == GovtBldTopInfoEntity:
                 session.execute(
                     update(GovtBldTopInfoModel)
-                    .where(GovtBldTopInfoModel.house_id == value.get("house_id"))
+                    .where(GovtBldTopInfoModel.house_id == value.get("key"))
                     .values(
                         update_needed=False,
                     )
@@ -344,18 +368,22 @@ class SyncKaptRepository(KaptRepository):
         value: List[DongInfoModel | TypeInfoModel],
     ):
         try:
-            if isinstance(value, DongInfoModel):
+            if isinstance(value[0], DongInfoModel):
                 session.execute(
                     update(GovtBldMiddleInfoModel)
-                    .where(update_needed=True)
+                    .where(
+                        GovtBldMiddleInfoModel.update_needed == True,
+                    )
                     .values(
                         update_needed=False,
                     )
                 )
-            elif isinstance(value, TypeInfoModel):
+            elif isinstance(value[0], TypeInfoModel):
                 session.execute(
                     update(GovtBldAreaInfoModel)
-                    .where(update_needed=True)
+                    .where(
+                        GovtBldAreaInfoModel.update_needed == True,
+                    )
                     .values(
                         update_needed=False,
                     )
