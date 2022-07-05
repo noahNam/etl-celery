@@ -156,6 +156,11 @@ class TransferBldMappingResults(Transfer):
                 basices=basices,
                 build_year=govts[i].build_year,
             )
+            print("------------------------------------------")
+            print(govts[i])
+            for idx in basic_indexes:
+                print(basices[idx])
+
             # 3. 지번으로 apt_basic 필터링
             basic_indexes = self._filter_basices_by_jibun(
                 basic_indexes=basic_indexes,
