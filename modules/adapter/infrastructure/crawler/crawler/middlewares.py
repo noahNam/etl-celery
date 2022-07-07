@@ -14,7 +14,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.webdriver import WebDriver
 from twisted.internet.threads import deferToThread
 
-from modules.adapter.infrastructure.crawler.crawler.spiders.subs_info_spider import SubscriptionSpider
+from modules.adapter.infrastructure.crawler.crawler.spiders.subs_info_spider import (
+    SubscriptionSpider,
+)
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
@@ -143,7 +145,9 @@ class SeleniumDownloaderMiddleware:
         #   installed downloader middleware will be called
         return deferToThread(self.process_with_selenium, request, spider)
 
-    def process_with_selenium(self, request: Request, spider: SubscriptionSpider) -> HtmlResponse:
+    def process_with_selenium(
+        self, request: Request, spider: SubscriptionSpider
+    ) -> HtmlResponse:
         self._driver.get(url=request.url)
         self._driver.implicitly_wait(3)
 
@@ -151,11 +155,15 @@ class SeleniumDownloaderMiddleware:
 
         body = to_bytes(self._driver.page_source)
 
-        return HtmlResponse(url=request.url, body=body, encoding="utf-8", request=request)
+        return HtmlResponse(
+            url=request.url, body=body, encoding="utf-8", request=request
+        )
 
-    def process_response(self, request: Request, response: Response, spider: SubscriptionSpider):
+    def process_response(
+        self, request: Request, response: Response, spider: SubscriptionSpider
+    ):
         # Called with the response returned from the downloader.
-        print("[SeleniumDownloaderMiddleware][process_response]")
+
         # Must either;
         # - return a Response object
         # - return a Request object
@@ -187,12 +195,16 @@ class SeleniumDownloaderMiddleware:
         try:
             # excutable_path : 절대 경로로 사용
             self._driver = webdriver.Chrome(
-                options=options, service=Service(
+                options=options,
+                service=Service(
                     executable_path=r"/Users/seonwoong-hwang/Documents/dev/Apartalk/"
-                                    r"antgirl/modules/adapter/infrastructure/crawler/crawler/driver"
-                                    r"/chromedriver")
+                    r"antgirl/modules/adapter/infrastructure/crawler/crawler/driver"
+                    r"/chromedriver"
+                ),
             )
         except Exception:
-            logger.error(f"[SeleniumDownloaderMiddleware][_get_driver] error - webdriver not found")
+            logger.error(
+                f"[SeleniumDownloaderMiddleware][_get_driver] error - webdriver not found"
+            )
             raise
         return self._driver

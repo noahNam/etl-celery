@@ -752,8 +752,8 @@ class GovtHouseDealSpider(Spider):
                 reason=f"response:{response_or_failure}",
             )
 
-        if not self.__is_exists_failure(fail_orm=fail_orm):
-            self.__save_crawling_failure(fail_orm=fail_orm)
+        # if not self.__is_exists_failure(fail_orm=fail_orm):
+        self.__save_crawling_failure(fail_orm=fail_orm)
 
     def __save_crawling_failure(self, fail_orm: CallFailureHistoryModel) -> None:
         send_message(

@@ -1,9 +1,9 @@
 from sqlalchemy import Column, BigInteger, Integer, String, SmallInteger, Boolean
 from sqlalchemy.orm import relationship
 
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_addr_info_model import (
-    KaptAddrInfoModel,
-)
+# from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_addr_info_model import (
+#     KaptAddrInfoModel,
+# )
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity import (
     KaptOpenApiInputEntity,
     KakaoApiInputEntity,

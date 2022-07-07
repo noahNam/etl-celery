@@ -7,6 +7,9 @@ class SubscriptionInfoEnum(Enum):
     - START_YEAR_MONTH ~ END_YEAR_MONTH 기간 차이 : 청약홈 제약상 최대 12개월만 가능합니다
     - ex) 2021년 08월 ~ 2022년 07월
     """
+
     START_YEAR_MONTH = "2022년 01월"
     END_YEAR_MONTH = "2022년 01월"
-    APPLY_HOME_URL = "https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancListView.do"
+    APPLY_HOME_URL = (
+        "https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancListView.do"
+    )

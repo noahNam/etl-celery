@@ -8,7 +8,9 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import
 from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
     SyncLegalDongCodeRepository,
 )
-from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository import SyncSubscriptionInfoRepository
+from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository import (
+    SyncSubscriptionInfoRepository,
+)
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.crawling.govt_bld_info.v1.govt_bld_use_case import (
     GovtBldUseCase,
@@ -25,7 +27,9 @@ from modules.application.use_case.crawling.kapt.v1.kapt_use_case import (
 from modules.application.use_case.crawling.legal_dong_code.v1.legal_code_use_case import (
     LegalCodeUseCase,
 )
-from modules.application.use_case.crawling.subscription_info.v1.subs_info_use_case import SubscriptionInfoUseCase
+from modules.application.use_case.crawling.subscription_info.v1.subs_info_use_case import (
+    SubscriptionInfoUseCase,
+)
 
 
 def get_task(topic: str):
@@ -43,7 +47,7 @@ def get_task(topic: str):
     elif topic == TopicEnum.CRAWL_GOVT_DEAL_INFOS.value:
         return GovtDealUseCase(topic=topic, repo=SyncLegalDongCodeRepository())
     elif topic == TopicEnum.CRAWL_APPLY_HOME.value:
-        return SubscriptionInfoUseCase(topic=topic, repo=SyncSubscriptionInfoRepository())
+        return SubscriptionInfoUseCase(topic=topic, repo=SyncKaptRepository())
 
 
 @crawler_celery.task
