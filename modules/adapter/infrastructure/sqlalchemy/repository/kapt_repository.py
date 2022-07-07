@@ -212,32 +212,6 @@ class SyncKaptRepository(KaptRepository):
 
         return None
 
-    def save_update_all(self, models: list[KaptAddrInfoEntity]):
-        if not models:
-            return None
-
-        try:
-            dic = [{'house_id': model.house_id,
-                    'addr_code': model.addr_code,
-                    'jibun': model.jibun
-                    } for model in models]
-
-            stmt = insert(KaptAddrInfoModel).values()
-            stmt = stmt.on_duplicate_key_update(
-                addr_code=stmt.inserted.addr_code,
-                jibun=stmt.inserted.jibun,
-            )
-            session.execute(stmt, dic)
-            session.commit()
-        except exc.IntegrityError as e:
-            logger.error(
-                f"[SyncKaptRepository][save_update_all] kapt_code : {models[0].house_id} error : {e}"
-            )
-            session.rollback()
-            raise NotUniqueErrorException
-
-        return None
-
     def is_exists_by_kapt_code(
         self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None
     ) -> bool:

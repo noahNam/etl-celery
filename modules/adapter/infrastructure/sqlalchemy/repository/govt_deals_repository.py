@@ -6,11 +6,7 @@ from core.domain.datalake.govt_deal.interface.govt_deal_repository import (
 )
 from modules.adapter.infrastructure.sqlalchemy.database import session
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
-    MappingGovtDetailEntity,
     MappingGovtEntity,
-    GovtOfctlDealsEntity,
-    GovtOfctlRentsEntity,
-    GovtRightLotOutsEntity,
     GovtAptDealsJoinKeyEntity,
     GovtAptRentsJoinKeyEntity,
     GovtOfctlDealJoinKeyEntity,
@@ -44,9 +40,15 @@ logger = logger_.getLogger(__name__)
 class SyncGovtDealRepository(GovtDealsRepository):
     def find_by_update_needed(
         self, find_type: int = 0
-    ) -> list[MappingGovtDetailEntity] | list[MappingGovtEntity] | list[
+    ) -> list[
+        MappingGovtEntity
+    ] | list[
         GovtAptDealsJoinKeyEntity
-    ] | list[GovtAptRentsJoinKeyEntity] | list[GovtOfctlDealJoinKeyEntity] | list[
+    ] | list[
+        GovtAptRentsJoinKeyEntity
+    ] | list[
+        GovtOfctlDealJoinKeyEntity
+    ] | list[
         GovtOfctlRentJoinKeyEntity
     ] | list[
         GovtRightLotOutJoinKeyEntity

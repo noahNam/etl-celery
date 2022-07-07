@@ -16,6 +16,9 @@ class BldMappingResultModel(datalake_base, TimestampMixin):
         primary_key=True,
         autoincrement=True,
     )
+    place_id = Column(
+        BigInteger().with_variant(Integer, "sqlite"), nullable=True, index=True
+    )
     house_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
     )
