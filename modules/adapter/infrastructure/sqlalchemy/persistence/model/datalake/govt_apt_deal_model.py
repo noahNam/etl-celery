@@ -7,7 +7,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 )
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
-    MappingGovtDetailEntity,
+    MappingGovtEntity,
     GovtAptDealsJoinKeyEntity,
 )
 
@@ -62,21 +62,20 @@ class GovtAptDealModel(datalake_base, TimestampMixin):
         "foreign(GovtAptDealModel.apt_name) == BldMappingResultModel.bld_name)",
     )
 
-    def to_entity_for_bld_mapping_results(self) -> MappingGovtDetailEntity:
-        return MappingGovtDetailEntity(
+    def to_entity_for_bld_mapping_results(self) -> MappingGovtEntity:
+        return MappingGovtEntity(
             id=self.id,
-            sigungu_cd=self.sigungu_cd,
-            eubmyundong_cd=self.eubmyundong_cd,
-            build_year=self.build_year,
+            mapping_id=self.bld_mapping.id if self.bld_mapping else None,
+            regional_cd=self.sigungu_cd,
+            dong=self.dong,
             jibun=self.jibun,
             apt_name=self.apt_name,
-            dong=self.dong,
         )
 
     def to_entity_for_apt_deals(self) -> GovtAptDealsJoinKeyEntity:
         return GovtAptDealsJoinKeyEntity(
             id=self.id,
-            house_id=self.bld_mapping.house_id,
+            house_id=self.bld_mapping.house_id if self.bld_mapping else None,
             dong=self.dong,
             apt_name=self.apt_name,
             deal_amount=self.deal_amount,

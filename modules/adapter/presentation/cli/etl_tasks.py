@@ -151,7 +151,7 @@ def get_task(topic: str):
     elif topic == TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value:  # update_needed -> X
         return BldMappingResultUseCase(
             topic=topic,
-            kapt_repo=SyncKaptRepository(),
+            kakao_api_repo=SyncKakaoApiRepository(),
             govt_repo=SyncGovtDealRepository(),
             dong_code_repo=SyncLegalDongCodeRepository(),
             bld_mapping_repo=SyncBldMappingResultRepository(),

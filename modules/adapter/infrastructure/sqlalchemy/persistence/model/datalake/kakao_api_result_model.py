@@ -1,5 +1,5 @@
 from sqlalchemy import Column, BigInteger, Integer, String, Numeric
-
+from sqlalchemy.orm import relationship
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kakao_api_result_entity import (
     KakaoApiResultEntity,
 )
@@ -7,7 +7,9 @@ from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
     TimestampMixin,
 )
-
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kakao_api_result_entity import (
+    KakaoApiAddrEntity,
+)
 
 class KakaoApiResultModel(datalake_base, TimestampMixin):
     __tablename__ = "kakao_api_results"
