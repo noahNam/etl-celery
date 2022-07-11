@@ -16,10 +16,11 @@ from selenium.webdriver.support.wait import WebDriverWait
 from modules.adapter.infrastructure.crawler.crawler.enum.subs_info_enum import (
     SubscriptionInfoEnum,
 )
-from modules.adapter.infrastructure.sqlalchemy.database import session
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_info_model import (
-    SubscriptionInfoModel,
+from modules.adapter.infrastructure.pypubsub.enum.subs_info_enum import (
+    SubsInfoTopicEnum,
 )
+from modules.adapter.infrastructure.pypubsub.event_listener import event_listener_dict
+from modules.adapter.infrastructure.pypubsub.event_observer import send_message
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
@@ -42,7 +43,7 @@ class SubscriptionSpider(Spider):
         url = SubscriptionInfoEnum.APPLY_HOME_URL.value
         yield Request(url=url)
 
-    def browser_interaction_before_parsing(self, driver: WebDriver, request: Request):
+    def browser_interaction_before_parsing(self, driver: WebDriver):
         self._set_date_select_box_event(
             start_date=SubscriptionSpider.start_ym,
             end_date=SubscriptionSpider.end_ym,
@@ -941,12 +942,14 @@ class SubscriptionSpider(Spider):
         return df
 
     def _save_dataframe(self, subs_infos: list[dict]):
-        orm_list = list()
-        for elm in subs_infos:
-            orm_list.append(SubscriptionInfoModel(**elm))
-        try:
-            session.bulk_save_objects(objects=orm_list, update_changed_only=False)
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            logger.error(f"[SubscriptionSpider][_save_dataframe] error : {e}")
+        if subs_infos:
+            self.__save_subs_infos(create_list=subs_infos)
+
+    def __save_subs_infos(self, create_list: list[dict]) -> list | None:
+        send_message(
+            topic_name=SubsInfoTopicEnum.BULK_SAVE_SUBSCRIPTION_INFOS.value,
+            create_list=create_list,
+        )
+        return event_listener_dict.get(
+            f"{SubsInfoTopicEnum.BULK_SAVE_SUBSCRIPTION_INFOS.value}"
+        )
