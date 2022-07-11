@@ -44,6 +44,12 @@ class GovtBldSpider(Spider):
             GovtBldEnum.GOVT_BLD_AREA_URL.value,
         ]
 
+        if not self.params:
+            raise CloseSpider(
+                reason=f"[GovtBldSpider][parse_bld_top_info]: "
+                f"Not found target, close spider without requests"
+            )
+
         # 번지 추출
         input_params: list[GovtBldInputInfo] | None = self.get_input_infos(
             bld_info_list=self.params
@@ -51,68 +57,68 @@ class GovtBldSpider(Spider):
 
         if input_params:
             for param in input_params:
-                yield Request(
-                    url=urls[0] + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
-                    f"&sigunguCd={param.sigungu_code}"
-                    f"&bjdongCd={param.bjdong_code}"
-                    f"&platGbCd=0"
-                    f"&bun={param.bun if param.bun else '0000'}"
-                    f"&ji={param.ji if param.ji else '0000'}"
-                    f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
-                    f"&pageNo=1",
-                    callback=self.parse_bld_top_info,
-                    errback=self.error_callback_bld_top_info,
-                    meta={
-                        "house_id": param.house_id,
-                        "kapt_code": param.kapt_code,
-                        "name": param.name,
-                        "origin_dong_address": param.origin_dong_address,
-                        "new_dong_address": param.new_dong_address,
-                        "bjd_code": param.origin_bjd_code,
-                        "bun:": param.bun if param.bun else "0000",
-                        "ji:": param.ji if param.ji else "0000",
-                        "url": urls[0]
-                        + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
-                        f"&sigunguCd={param.sigungu_code}"
-                        f"&bjdongCd={param.bjdong_code}"
-                        f"&platGbCd=0"
-                        f"&bun={param.bun if param.bun else '0000'}"
-                        f"&ji={param.ji if param.ji else '0000'}"
-                        f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
-                        f"&pageNo=1",
-                    },
-                )
-                yield Request(
-                    url=urls[1] + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
-                    f"&sigunguCd={param.sigungu_code}"
-                    f"&bjdongCd={param.bjdong_code}"
-                    f"&platGbCd=0"
-                    f"&bun={param.bun if param.bun else '0000'}"
-                    f"&ji={param.ji if param.ji else '0000'}"
-                    f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
-                    f"&pageNo=1",
-                    callback=self.parse_bld_mid_info,
-                    errback=self.error_callback_bld_mid_info,
-                    meta={
-                        "house_id": param.house_id,
-                        "kapt_code": param.kapt_code,
-                        "name": param.name,
-                        "origin_dong_address": param.origin_dong_address,
-                        "new_dong_address": param.new_dong_address,
-                        "bjd_code": param.origin_bjd_code,
-                        "bun:": param.bun if param.bun else "0000",
-                        "ji:": param.ji if param.ji else "0000",
-                        "url": urls[1]
-                        + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
-                        f"&sigunguCd={param.sigungu_code}"
-                        f"&bjdongCd={param.bjdong_code}"
-                        f"&platGbCd=0"
-                        f"&bun={param.bun if param.bun else '0000'}"
-                        f"&ji={param.ji if param.ji else '0000'}"
-                        f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
-                        f"&pageNo=1",
-                    },
-                )
+                # yield Request(
+                #     url=urls[0] + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
+                #     f"&sigunguCd={param.sigungu_code}"
+                #     f"&bjdongCd={param.bjdong_code}"
+                #     f"&platGbCd=0"
+                #     f"&bun={param.bun if param.bun else '0000'}"
+                #     f"&ji={param.ji if param.ji else '0000'}"
+                #     f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
+                #     f"&pageNo=1",
+                #     callback=self.parse_bld_top_info,
+                #     errback=self.error_callback_bld_top_info,
+                #     meta={
+                #         "house_id": param.house_id,
+                #         "kapt_code": param.kapt_code,
+                #         "name": param.name,
+                #         "origin_dong_address": param.origin_dong_address,
+                #         "new_dong_address": param.new_dong_address,
+                #         "bjd_code": param.origin_bjd_code,
+                #         "bun:": param.bun if param.bun else "0000",
+                #         "ji:": param.ji if param.ji else "0000",
+                #         "url": urls[0]
+                #         + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
+                #         f"&sigunguCd={param.sigungu_code}"
+                #         f"&bjdongCd={param.bjdong_code}"
+                #         f"&platGbCd=0"
+                #         f"&bun={param.bun if param.bun else '0000'}"
+                #         f"&ji={param.ji if param.ji else '0000'}"
+                #         f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
+                #         f"&pageNo=1",
+                #     },
+                # )
+                # yield Request(
+                #     url=urls[1] + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
+                #     f"&sigunguCd={param.sigungu_code}"
+                #     f"&bjdongCd={param.bjdong_code}"
+                #     f"&platGbCd=0"
+                #     f"&bun={param.bun if param.bun else '0000'}"
+                #     f"&ji={param.ji if param.ji else '0000'}"
+                #     f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
+                #     f"&pageNo=1",
+                #     callback=self.parse_bld_mid_info,
+                #     errback=self.error_callback_bld_mid_info,
+                #     meta={
+                #         "house_id": param.house_id,
+                #         "kapt_code": param.kapt_code,
+                #         "name": param.name,
+                #         "origin_dong_address": param.origin_dong_address,
+                #         "new_dong_address": param.new_dong_address,
+                #         "bjd_code": param.origin_bjd_code,
+                #         "bun:": param.bun if param.bun else "0000",
+                #         "ji:": param.ji if param.ji else "0000",
+                #         "url": urls[1]
+                #         + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
+                #         f"&sigunguCd={param.sigungu_code}"
+                #         f"&bjdongCd={param.bjdong_code}"
+                #         f"&platGbCd=0"
+                #         f"&bun={param.bun if param.bun else '0000'}"
+                #         f"&ji={param.ji if param.ji else '0000'}"
+                #         f"&numOfRows={GovtBldEnum.NUMBER_OF_ROWS.value}"
+                #         f"&pageNo=1",
+                #     },
+                # )
                 yield Request(
                     url=urls[2] + f"?ServiceKey={GovtBldSpider.open_api_service_key}"
                     f"&sigunguCd={param.sigungu_code}"
