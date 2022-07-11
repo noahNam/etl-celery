@@ -36,7 +36,7 @@ class TransferBldMappingResults(Transfer):
         govt_ofctl_rents: list[MappingGovtEntity],
         govt_right_lot_outs: list[MappingGovtEntity],
         kakao_api_results: list[KakaoApiAddrEntity],
-        dongs: list[LegalDongCodeEntity]
+        dongs: list[LegalDongCodeEntity],
     ) -> [list[BldMappingResultModel], list[AptDealKakaoHistoryModel]]:
         """
         2.1. 실거래가 데이터 & bld_mapping_results : 검색어 중복 검사 (검색어 중복 [jibun, dong, bld_name, regoinal_cd])

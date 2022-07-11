@@ -1,4 +1,4 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy import select
 
 from core.domain.datalake.govt_deal.interface.govt_deal_repository import (
@@ -39,7 +39,12 @@ logger = logger_.getLogger(__name__)
 
 class SyncGovtDealRepository(GovtDealsRepository):
     def find_by_update_needed(
-        self, find_type: int = 0
+        self,
+        find_type: int,
+        start_year: str,
+        start_month: str,
+        end_year: str,
+        end_month: str,
     ) -> list[
         MappingGovtEntity
     ] | list[
@@ -55,7 +60,22 @@ class SyncGovtDealRepository(GovtDealsRepository):
     ] | None:
         if find_type == GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value:
             query = select(GovtAptDealModel).where(
-                GovtAptDealModel.update_needed == True
+                and_(
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == start_year,
+                            GovtAptDealModel.deal_month >= start_month,
+                        ),
+                        GovtAptDealModel.deal_year > start_year
+                    ),
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == end_year,
+                            GovtAptDealModel.deal_month <= end_month,
+                        ),
+                        GovtAptDealModel.deal_year < end_year
+                    )
+                )
             )
             govt_apt_deals = session.execute(query).scalars().all()
 
@@ -69,7 +89,22 @@ class SyncGovtDealRepository(GovtDealsRepository):
 
         elif find_type == GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value:
             query = select(GovtAptRentModel).where(
-                GovtAptRentModel.update_needed == True
+                and_(
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == start_year,
+                            GovtAptDealModel.deal_month >= start_month,
+                        ),
+                        GovtAptDealModel.deal_year > start_year
+                    ),
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == end_year,
+                            GovtAptDealModel.deal_month <= end_month,
+                        ),
+                        GovtAptDealModel.deal_year < end_year
+                    )
+                )
             )
             govt_apt_rents = session.execute(query).scalars().all()
 
@@ -83,7 +118,22 @@ class SyncGovtDealRepository(GovtDealsRepository):
 
         elif find_type == GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value:
             query = select(GovtOfctlDealModel).where(
-                GovtOfctlDealModel.update_needed == True
+                and_(
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == start_year,
+                            GovtAptDealModel.deal_month >= start_month,
+                        ),
+                        GovtAptDealModel.deal_year > start_year
+                    ),
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == end_year,
+                            GovtAptDealModel.deal_month <= end_month,
+                        ),
+                        GovtAptDealModel.deal_year < end_year
+                    )
+                )
             )
             govt_ofctl_deals = session.execute(query).scalars().all()
             if not govt_ofctl_deals:
@@ -96,7 +146,22 @@ class SyncGovtDealRepository(GovtDealsRepository):
 
         elif find_type == GovtFindTypeEnum.GOV_OFCTL_RENT_MAPPING.value:
             query = select(GovtOfctlRentModel).where(
-                GovtOfctlRentModel.update_needed == True
+                and_(
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == start_year,
+                            GovtAptDealModel.deal_month >= start_month,
+                        ),
+                        GovtAptDealModel.deal_year > start_year
+                    ),
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == end_year,
+                            GovtAptDealModel.deal_month <= end_month,
+                        ),
+                        GovtAptDealModel.deal_year < end_year
+                    )
+                )
             )
             govt_ofctl_rents = session.execute(query).scalars().all()
             if not govt_ofctl_rents:
@@ -109,7 +174,22 @@ class SyncGovtDealRepository(GovtDealsRepository):
 
         elif find_type == GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value:
             query = select(GovtRightLotOutModel).where(
-                GovtRightLotOutModel.update_needed == True
+                and_(
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == start_year,
+                            GovtAptDealModel.deal_month >= start_month,
+                        ),
+                        GovtAptDealModel.deal_year > start_year
+                    ),
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == end_year,
+                            GovtAptDealModel.deal_month <= end_month,
+                        ),
+                        GovtAptDealModel.deal_year < end_year
+                    )
+                )
             )
             govt_right_lot_outs = session.execute(query).scalars().all()
             if not govt_right_lot_outs:
