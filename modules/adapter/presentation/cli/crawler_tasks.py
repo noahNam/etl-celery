@@ -8,9 +8,6 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kapt_repository import
 from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
     SyncLegalDongCodeRepository,
 )
-from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository import (
-    SyncSubscriptionInfoRepository,
-)
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.crawling.govt_bld_info.v1.govt_bld_use_case import (
     GovtBldUseCase,

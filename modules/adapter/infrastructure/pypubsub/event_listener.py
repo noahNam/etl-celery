@@ -10,6 +10,9 @@ from modules.adapter.infrastructure.pypubsub.enum.kakao_api_enum import (
 from modules.adapter.infrastructure.pypubsub.enum.legal_dong_code_enum import (
     LegalDongCodeTopicEnum,
 )
+from modules.adapter.infrastructure.pypubsub.enum.subs_info_enum import (
+    SubsInfoTopicEnum,
+)
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
 )
@@ -28,6 +31,9 @@ from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repos
 from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
     SyncLegalDongCodeRepository,
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository import (
+    SyncSubscriptionInfoRepository,
+)
 
 event_listener_dict = {
     f"{CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value}": None,
@@ -36,6 +42,7 @@ event_listener_dict = {
     f"{ETLEnum.GET_ETL_TARGET_SCHEMAS_FROM_KAPT.value}": dict(),
     f"{CallFailureTopicEnum.IS_EXISTS.value}": False,
     f"{LegalDongCodeTopicEnum.GET_ALL_LEGAL_CODE_INFOS.value}": list(),
+    f"{SubsInfoTopicEnum.BULK_SAVE_SUBSCRIPTION_INFOS.value}": None,
 }
 
 
@@ -74,6 +81,15 @@ def get_all_legal_code_infos() -> None:
     )
 
 
+def bulk_save_subscription_infos(create_list: list[dict]) -> None:
+    SyncSubscriptionInfoRepository().bulk_save_subscription_infos(
+        create_list=create_list
+    )
+    event_listener_dict.update(
+        {f"{SubsInfoTopicEnum.BULK_SAVE_SUBSCRIPTION_INFOS.value}": create_list}
+    )
+
+
 pub.subscribe(save_crawling_failure, CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value)
 pub.subscribe(
     save_kakao_crawling_result, KakaoApiTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value
@@ -84,4 +100,7 @@ pub.subscribe(
 pub.subscribe(is_exists_failure, CallFailureTopicEnum.IS_EXISTS.value)
 pub.subscribe(
     get_all_legal_code_infos, LegalDongCodeTopicEnum.GET_ALL_LEGAL_CODE_INFOS.value
+)
+pub.subscribe(
+    bulk_save_subscription_infos, SubsInfoTopicEnum.BULK_SAVE_SUBSCRIPTION_INFOS.value
 )

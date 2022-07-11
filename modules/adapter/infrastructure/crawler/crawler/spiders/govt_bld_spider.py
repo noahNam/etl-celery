@@ -44,6 +44,12 @@ class GovtBldSpider(Spider):
             GovtBldEnum.GOVT_BLD_AREA_URL.value,
         ]
 
+        if not self.params:
+            raise CloseSpider(
+                reason=f"[GovtBldSpider][parse_bld_top_info]: "
+                f"Not found target, close spider without requests"
+            )
+
         # 번지 추출
         input_params: list[GovtBldInputInfo] | None = self.get_input_infos(
             bld_info_list=self.params

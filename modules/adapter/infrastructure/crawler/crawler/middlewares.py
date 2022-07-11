@@ -151,7 +151,7 @@ class SeleniumDownloaderMiddleware:
         self._driver.get(url=request.url)
         self._driver.implicitly_wait(3)
 
-        spider.browser_interaction_before_parsing(driver=self._driver, request=request)
+        spider.browser_interaction_before_parsing(driver=self._driver)
 
         body = to_bytes(self._driver.page_source)
 

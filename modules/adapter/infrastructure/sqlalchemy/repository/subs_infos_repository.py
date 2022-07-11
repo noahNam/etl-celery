@@ -228,3 +228,22 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository):
                 ]
 
         return result_list
+
+    def bulk_save_subscription_infos(self, create_list: list[dict]) -> None:
+        failed_pk_list = list()
+        try:
+            session.bulk_insert_mappings(
+                SubscriptionInfoModel, [create_info for create_info in create_list]
+            )
+            session.commit()
+        except exc.IntegrityError as e:
+            session.rollback()
+            logger.error(
+                f"[SyncSubscriptionInfoRepository][bulk_save_subscription_infos] error : {e}"
+            )
+            for entry in create_list:
+                failed_pk_list.append(entry["id"])
+            logger.info(
+                f"[SyncSubscriptionInfoRepository][bulk_save_subscription_infos]-failed_list: {len(failed_pk_list)}-{failed_pk_list})"
+            )
+            raise NotUniqueErrorException
