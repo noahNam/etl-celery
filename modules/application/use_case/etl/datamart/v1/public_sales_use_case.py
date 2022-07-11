@@ -80,7 +80,7 @@ class PublicSaleUseCase:
                 sub_details=sub_details
             )
 
-            sub_detail_ids: list[int] = self._transfer.get_ids(models=sub_details)
+            sub_detail_ids: list[int] = self._transfer.get_ids(sub_details=sub_details)
             self.public_repo.save_all_details(
                 public_sale_details=public_sale_details,
                 special_supply_results=special_supply_results,
