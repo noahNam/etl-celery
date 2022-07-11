@@ -381,3 +381,12 @@ class TransformPublicSales:
             return None
         else:
             return float(value)
+
+    def get_ids(
+        self,
+        sub_details: list[SubDtToPublicDtEntity],
+    ) -> list[int]:
+        sub_detail_ids = list()
+        for sub_detail in sub_details:
+            sub_detail_ids.append(sub_detail.id)
+        return sub_detail_ids
