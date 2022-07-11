@@ -1,4 +1,3 @@
-from datetime import date
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 from modules.application.use_case.etl import BaseETLUseCase
@@ -12,7 +11,9 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kakao_api_resu
 from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository import (
     SyncGovtDealRepository,
 )
-
+from modules.adapter.infrastructure.crawler.crawler.enum.govt_deal_enum import (
+    GovtHouseDealEnum,
+)
 from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
     SyncLegalDongCodeRepository,
 )
@@ -20,7 +21,6 @@ from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_reposi
 from modules.adapter.infrastructure.sqlalchemy.repository.bld_mapping_results_repository import (
     SyncBldMappingResultRepository,
 )
-
 from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTypeEnum
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
@@ -96,38 +96,56 @@ class BldMappingResultUseCase(BaseETLUseCase):
         5. Load
         - bld_mapping_results 저장
         """
-        # 1. extract
-        today = date.today()
+        start_year = GovtHouseDealEnum.MIN_YEAR_MONTH.value[:4]
+        start_month = str(int(GovtHouseDealEnum.MIN_YEAR_MONTH.value[5:]))
+        end_year = GovtHouseDealEnum.MAX_YEAR_MONTH.value[:4]
+        end_month = str(int(GovtHouseDealEnum.MAX_YEAR_MONTH.value[5:]))
 
+        # 1. extract
         # 1.1. 실거래가 데이터
-        # govt_apt_deals = []
         govt_apt_deals: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
-            find_type=GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value
+            find_type=GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
         )
 
-        govt_apt_rents = []
-        # govt_apt_rents: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
-        #     find_type=GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value
-        # )
+        govt_apt_rents: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
+            find_type=GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
+        )
 
-        govt_ofctl_deals = []
-        # govt_ofctl_deals: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
-        #     find_type=GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value
-        # )
+        govt_ofctl_deals: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
+            find_type=GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
+        )
 
-        govt_ofctl_rents = []
-        # govt_ofctl_rents: list[
-        #     MappingGovtEntity
-        # ] = self._govt_repo.find_by_update_needed(
-        #     find_type=GovtFindTypeEnum.GOV_OFCTL_RENT_MAPPING.value
-        # )
+        govt_ofctl_rents: list[
+            MappingGovtEntity
+        ] = self._govt_repo.find_by_update_needed(
+            find_type=GovtFindTypeEnum.GOV_OFCTL_RENT_MAPPING.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
+        )
 
-        govt_right_lot_outs = []
-        # govt_right_lot_outs: list[
-        #     MappingGovtEntity
-        # ] = self._govt_repo.find_by_update_needed(
-        #     find_type=GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value
-        # )
+        govt_right_lot_outs: list[
+            MappingGovtEntity
+        ] = self._govt_repo.find_by_update_needed(
+            find_type=GovtFindTypeEnum.GOV_RIGHT_LOT_MAPPING.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
+        )
 
         # kakao_api
         kakao_api_results: list[KakaoApiAddrEntity] = self._kakao_repo.find_all()
