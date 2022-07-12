@@ -7,7 +7,5 @@ class KakaoApiEnum(Enum):
     KAKAO_API_KEY = "***REMOVED***"
     KAKAO_API_KEYS = [
         "***REMOVED***",
-        "308910f9cd565c2d9e6b45091812f5ff",
-        "16f23d61ef7bef8cbdea926f63c7f78b",
-        "0ed0526c4fa4859f9adc513eed350670",
+        "***REMOVED***",
     ]
