@@ -70,15 +70,19 @@ class TransferBldMappingResults(Transfer):
         kakao_addresses = list()
         kakao_key_number: int = self._get_kakao_key_usable_number()
         for i in tqdm(range(len(new_govts)), desc="kakao_addresses", mininterval=1):
-            response = self._request_kakao_api(
-                address=govt_addresses[i], key_number=kakao_key_number
-            )
-            if response == 400:
-                kakao_key_number = self._get_kakao_key_usable_number()
+            try:
                 response = self._request_kakao_api(
                     address=govt_addresses[i], key_number=kakao_key_number
                 )
-            kakao_addresses.append(response)
+                if response == 429:
+                    kakao_key_number = self._get_kakao_key_usable_number()
+
+                    response = self._request_kakao_api(
+                        address=govt_addresses[i], key_number=kakao_key_number
+                    )
+                kakao_addresses.append(response)
+            except Exception('kakao_api key is expired') as e:
+                new_govts = new_govts[:i]
 
 
         # 1. kakao_api_results 테이블에 같은 것이 있는지 찾기
@@ -135,8 +139,6 @@ class TransferBldMappingResults(Transfer):
             apt_deal_kakao_histories.append(apt_deal_kakao_history)
         return [bld_mapping_results, apt_deal_kakao_histories]
 
-
-
     def _get_addr(self, regional_cd: str | None, dongs: list[LegalDongCodeEntity]) -> str:
         if not regional_cd:
             return ''
@@ -160,8 +162,8 @@ class TransferBldMappingResults(Transfer):
         res = requests.get(url=url, params=params, headers=headers)
 
         # kakao 응답에 문제가 있는지 확인
-        if res.status_code == 400:
-            return 400
+        if res.status_code == 429:
+            return 429
         else:
             kakao_addresses = res.json()['documents']
             if not kakao_addresses:
@@ -181,7 +183,7 @@ class TransferBldMappingResults(Transfer):
         key_idx = None
         for i in range(all_key_cnt):
             res = self._request_kakao_api(address=test_address, key_number=i)
-            if res != 400:
+            if res != 429:
                 return i
 
         if not key_idx:
