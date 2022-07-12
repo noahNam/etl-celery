@@ -50,7 +50,7 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # crawler_tasks.start_crawler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
     crawler_tasks.start_crawler.apply_async(
-        kwargs={"topic": TopicEnum.CRAWL_BUILDING_MANAGE.value}
+        kwargs={"topic": TopicEnum.CRAWL_GOVT_DEAL_INFOS.value}
     )
 
 
