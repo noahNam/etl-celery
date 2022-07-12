@@ -131,6 +131,28 @@ class SyncKaptRepository(KaptRepository):
 
         return kapt_basic_info.to_open_api_input_entity()
 
+    def find_by_id_range(
+        self, start_house_id: int, end_house_id: int, find_type: int = 0
+    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | None:
+        queryset = session.scalars(
+            select(KaptBasicInfoModel).where(
+                KaptBasicInfoModel.house_id >= start_house_id,
+                KaptBasicInfoModel.house_id <= end_house_id,
+            )
+        ).all()
+
+        if not queryset:
+            return None
+
+        if find_type == KaptFindTypeEnum.KAKAO_API_INPUT.value:
+            return [query.to_kakao_api_input_entity() for query in queryset]
+        elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
+            return [query.to_entity_for_bld_mapping_results() for query in queryset]
+        elif find_type == KaptFindTypeEnum.KAPT_BASIC_INFOS.value:
+            return [query.to_kapt_basic_info_entity() for query in queryset]
+
+        return None
+
     def find_all(
         self, find_type: int = 0
     ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | list[
