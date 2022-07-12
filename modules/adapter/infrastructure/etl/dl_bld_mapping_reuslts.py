@@ -82,7 +82,7 @@ class TransferBldMappingResults(Transfer):
                     )
                 kakao_addresses.append(response)
             except Exception('kakao_api key is expired') as e:
-                new_govts = new_govts[:i]
+                break
 
 
         # 1. kakao_api_results 테이블에 같은 것이 있는지 찾기
