@@ -26,5 +26,3 @@ class BldMappingResultModel(datalake_base, TimestampMixin):
     jibun = Column(String(10), nullable=True)
     dong = Column(String(40), nullable=True)
     bld_name = Column(String(40), nullable=True)
-    created_at = Column(TIMESTAMP, nullable=True)
-    updated_at = Column(TIMESTAMP, nullable=True)
