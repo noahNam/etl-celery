@@ -50,7 +50,7 @@ class TransferBldMappingResults(Transfer):
         )
         new_govts: list[MappingGovtEntity] = list()
         for govt in tqdm(govts, desc="new_govts", mininterval=1):
-            if not govt.mapping_id:  # mapping_id가 없는 것들만 작업
+            if not govt.mapping_id and govt.regional_cd:  # mapping_id가 없는 것들만 작업
                 new_govts.append(govt)
 
         if not new_govts:
@@ -62,7 +62,7 @@ class TransferBldMappingResults(Transfer):
             sido_ymm = self._get_addr(regional_cd=govt.regional_cd, dongs=dongs)
             dong = govt.dong if govt.dong else ''
             jibun = govt.jibun if govt.jibun else ''
-            apt_name = govt.apt_name
+            apt_name = govt.apt_name if govt.apt_name else ''
             address = ' '.join([sido_ymm, dong, jibun, apt_name])
             govt_addresses.append(address)
 
@@ -94,6 +94,8 @@ class TransferBldMappingResults(Transfer):
 
             kakao_api_results_id = mapping_ids[0]
             house_id = mapping_ids[1]
+            if not house_id:
+                continue
 
             # 2. bld_mapping_result Entity 세팅
             if kakao_api_results_id:
@@ -131,11 +133,14 @@ class TransferBldMappingResults(Transfer):
                 bld_name=bld_name,
             )
             apt_deal_kakao_histories.append(apt_deal_kakao_history)
-        return [apt_deal_kakao_histories, bld_mapping_results]
+        return [bld_mapping_results, apt_deal_kakao_histories]
 
 
 
-    def _get_addr(self, regional_cd: str, dongs: list[LegalDongCodeEntity]) -> str:
+    def _get_addr(self, regional_cd: str | None, dongs: list[LegalDongCodeEntity]) -> str:
+        if not regional_cd:
+            return ''
+
         for dong in dongs:
             if ''.join([regional_cd,'00000']) == dong.region_cd:
                 locatadd_nm = dong.locatadd_nm if dong.locatadd_nm else ''
@@ -186,7 +191,7 @@ class TransferBldMappingResults(Transfer):
             self,
             response: dict,
             kakao_api_results: list[KakaoApiAddrEntity]
-    ) -> list[int|None]:
+    ) -> list[int | None]:
         for kakao_api_result in kakao_api_results:
             if not response:
                 return [None, None]

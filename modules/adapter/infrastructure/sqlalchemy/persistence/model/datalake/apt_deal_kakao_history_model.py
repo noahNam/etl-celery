@@ -27,5 +27,3 @@ class AptDealKakaoHistoryModel(datalake_base, TimestampMixin):
     jibun_address = Column(String(200), nullable=True)
     road_address = Column(String(200), nullable=True)
     bld_name = Column(String(100), nullable=True)
-    created_at = Column(TIMESTAMP, nullable=False)
-    updated_at = Column(TIMESTAMP, nullable=False)

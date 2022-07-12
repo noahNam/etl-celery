@@ -92,17 +92,17 @@ class SyncGovtDealRepository(GovtDealsRepository):
                 and_(
                     or_(
                         and_(
-                            GovtAptDealModel.deal_year == start_year,
-                            GovtAptDealModel.deal_month >= start_month,
+                            GovtAptRentModel.deal_year == start_year,
+                            GovtAptRentModel.deal_month >= start_month,
                         ),
-                        GovtAptDealModel.deal_year > start_year
+                        GovtAptRentModel.deal_year > start_year
                     ),
                     or_(
                         and_(
-                            GovtAptDealModel.deal_year == end_year,
-                            GovtAptDealModel.deal_month <= end_month,
+                            GovtAptRentModel.deal_year == end_year,
+                            GovtAptRentModel.deal_month <= end_month,
                         ),
-                        GovtAptDealModel.deal_year < end_year
+                        GovtAptRentModel.deal_year < end_year
                     )
                 )
             )
@@ -121,17 +121,17 @@ class SyncGovtDealRepository(GovtDealsRepository):
                 and_(
                     or_(
                         and_(
-                            GovtAptDealModel.deal_year == start_year,
-                            GovtAptDealModel.deal_month >= start_month,
+                            GovtOfctlDealModel.deal_year == start_year,
+                            GovtOfctlDealModel.deal_month >= start_month,
                         ),
-                        GovtAptDealModel.deal_year > start_year
+                        GovtOfctlDealModel.deal_year > start_year
                     ),
                     or_(
                         and_(
-                            GovtAptDealModel.deal_year == end_year,
-                            GovtAptDealModel.deal_month <= end_month,
+                            GovtOfctlDealModel.deal_year == end_year,
+                            GovtOfctlDealModel.deal_month <= end_month,
                         ),
-                        GovtAptDealModel.deal_year < end_year
+                        GovtOfctlDealModel.deal_year < end_year
                     )
                 )
             )
@@ -149,17 +149,17 @@ class SyncGovtDealRepository(GovtDealsRepository):
                 and_(
                     or_(
                         and_(
-                            GovtAptDealModel.deal_year == start_year,
-                            GovtAptDealModel.deal_month >= start_month,
+                            GovtOfctlRentModel.deal_year == start_year,
+                            GovtOfctlRentModel.deal_month >= start_month,
                         ),
-                        GovtAptDealModel.deal_year > start_year
+                        GovtOfctlRentModel.deal_year > start_year
                     ),
                     or_(
                         and_(
-                            GovtAptDealModel.deal_year == end_year,
-                            GovtAptDealModel.deal_month <= end_month,
+                            GovtOfctlRentModel.deal_year == end_year,
+                            GovtOfctlRentModel.deal_month <= end_month,
                         ),
-                        GovtAptDealModel.deal_year < end_year
+                        GovtOfctlRentModel.deal_year < end_year
                     )
                 )
             )
@@ -177,17 +177,17 @@ class SyncGovtDealRepository(GovtDealsRepository):
                 and_(
                     or_(
                         and_(
-                            GovtAptDealModel.deal_year == start_year,
-                            GovtAptDealModel.deal_month >= start_month,
+                            GovtRightLotOutModel.deal_year == start_year,
+                            GovtRightLotOutModel.deal_month >= start_month,
                         ),
-                        GovtAptDealModel.deal_year > start_year
+                        GovtRightLotOutModel.deal_year > start_year
                     ),
                     or_(
                         and_(
-                            GovtAptDealModel.deal_year == end_year,
-                            GovtAptDealModel.deal_month <= end_month,
+                            GovtRightLotOutModel.deal_year == end_year,
+                            GovtRightLotOutModel.deal_month <= end_month,
                         ),
-                        GovtAptDealModel.deal_year < end_year
+                        GovtRightLotOutModel.deal_year < end_year
                     )
                 )
             )
