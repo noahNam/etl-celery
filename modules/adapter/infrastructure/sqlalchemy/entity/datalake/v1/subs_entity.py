@@ -109,6 +109,7 @@ class ApplyHomeEntity(BaseModel):
 class SubscriptionInfoEntity(BaseModel):
     id: int
     subs_id: int | None
+    place_id: int | None
     offer_date: str | None
     notice_winner_date: str | None
     name: str | None

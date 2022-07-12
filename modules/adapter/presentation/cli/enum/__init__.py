@@ -8,6 +8,7 @@ class TopicEnum(Enum):
     CRAWL_KAKAO_API = "antgirl.crawl_kakao_api.v1"
     CRAWL_LEGAL_DONG_CODE = "antgirl.crawl_legal_dong_code.v1"
     CRAWL_BUILDING_MANAGE = "antgirl.crawl_building_manage.v1"
+    CRAWL_APPLY_HOME = "antgirl.crawl_apply_home.v1"
 
     ETL_DL_SUBS_INFOS = "antgirl.etl_dl_subs_infos.v1"  # 기존 청약홈 데이터 새로운 테이블로 이관
     ETL_DL_BLD_MAPPING_RESULTS = "antgirl.elt_bld_mapping_results.v1"

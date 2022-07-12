@@ -1,4 +1,5 @@
 from scrapy import Spider, Request
+from scrapy.exceptions import CloseSpider
 from scrapy.http import TextResponse, Response
 from xmltodict import parse
 
@@ -77,8 +78,6 @@ class GovtDateCounter:
 
 
 class GovtHouseDealSpider(Spider):
-    """현재 일일 request 횟수가 1000건 제한이기 때문에, 한번에 모든 년도 크롤링 불가능"""
-
     name = "govt_house_deal_infos"
     custom_settings = {
         "ITEM_PIPELINES": {
@@ -224,6 +223,21 @@ class GovtHouseDealSpider(Spider):
         xml_to_dict: dict = parse(response.text)
         item: GovtAptDealInfoItem | None = None
 
+        if self.is_need_to_change_service_key(xml_to_dict=xml_to_dict):
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_apt_deals",
+                response_or_failure=response,
+            )
+            if not self._change_service_key():
+                raise CloseSpider(
+                    reason=f"[GovtHouseDealSpider][parse_apt_deal_info]: "
+                    f"Daily Request Exceeds and All Service_key expired, Please try again later"
+                )
+            return None
+
         try:
             if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
                 # 결과가 다수인 경우
@@ -325,11 +339,25 @@ class GovtHouseDealSpider(Spider):
                 ref_table="govt_apt_deals",
                 response_or_failure=response,
             )
-        self.count_requests()
 
     def parse_apt_rent_info(self, response):
         xml_to_dict: dict = parse(response.text)
         item: GovtAptRentInfoItem | None = None
+
+        if self.is_need_to_change_service_key(xml_to_dict=xml_to_dict):
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_apt_rents",
+                response_or_failure=response,
+            )
+            if not self._change_service_key():
+                raise CloseSpider(
+                    reason=f"[GovtHouseDealSpider][parse_apt_rent_info]: "
+                    f"Daily Request Exceeds and All Service_key expired, Please try again later"
+                )
+            return None
 
         try:
             if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
@@ -404,11 +432,25 @@ class GovtHouseDealSpider(Spider):
                 ref_table="govt_apt_rents",
                 response_or_failure=response,
             )
-        self.count_requests()
 
     def parse_ofctl_deal_info(self, response):
         xml_to_dict: dict = parse(response.text)
         item: GovtOfctlDealInfoItem | None = None
+
+        if self.is_need_to_change_service_key(xml_to_dict=xml_to_dict):
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_ofctl_deals",
+                response_or_failure=response,
+            )
+            if not self._change_service_key():
+                raise CloseSpider(
+                    reason=f"[GovtHouseDealSpider][parse_ofctl_deal_info]: "
+                    f"Daily Request Exceeds and All Service_key expired, Please try again later"
+                )
+            return None
 
         try:
             if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
@@ -487,11 +529,25 @@ class GovtHouseDealSpider(Spider):
                 ref_table="govt_ofctl_deals",
                 response_or_failure=response,
             )
-        self.count_requests()
 
     def parse_ofctl_rent_info(self, response):
         xml_to_dict: dict = parse(response.text)
         item: GovtOfctlRentInfoItem | None = None
+
+        if self.is_need_to_change_service_key(xml_to_dict=xml_to_dict):
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_ofctl_rents",
+                response_or_failure=response,
+            )
+            if not self._change_service_key():
+                raise CloseSpider(
+                    reason=f"[GovtHouseDealSpider][parse_ofctl_rent_info]: "
+                    f"Daily Request Exceeds and All Service_key expired, Please try again later"
+                )
+            return None
 
         try:
             if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
@@ -566,11 +622,26 @@ class GovtHouseDealSpider(Spider):
                 ref_table="govt_ofctl_rents",
                 response_or_failure=response,
             )
-        self.count_requests()
 
     def parse_apt_right_lot_out_info(self, response):
         xml_to_dict: dict = parse(response.text)
         item: GovtRightLotOutInfoItem | None = None
+
+        if self.is_need_to_change_service_key(xml_to_dict=xml_to_dict):
+            self.save_failure_info(
+                current_url=response.request.meta.get("url"),
+                bjd_front_code=response.request.meta.get("bjd_front_code"),
+                year_month=response.request.meta.get("year_month"),
+                ref_table="govt_right_lot_outs",
+                response_or_failure=response,
+            )
+            if not self._change_service_key():
+                raise CloseSpider(
+                    reason=f"[GovtHouseDealSpider][parse_apt_right_lot_out_info]: "
+                    f"Daily Request Exceeds and All Service_key expired, Please try again later"
+                )
+            return None
+
         try:
             if isinstance(xml_to_dict["response"]["body"]["items"]["item"], list):
                 # 결과가 다수인 경우
@@ -604,7 +675,7 @@ class GovtHouseDealSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bjd_front_code=response.request.meta.get("bjd_front_code"),
                 year_month=response.request.meta.get("year_month"),
-                ref_table="govt_ofctl_deals",
+                ref_table="govt_right_lot_outs",
                 response_or_failure=response,
             )
             return None
@@ -637,10 +708,9 @@ class GovtHouseDealSpider(Spider):
                 current_url=response.request.meta.get("url"),
                 bjd_front_code=response.request.meta.get("bjd_front_code"),
                 year_month=response.request.meta.get("year_month"),
-                ref_table="govt_ofctl_deals",
+                ref_table="govt_right_lot_outs",
                 response_or_failure=response,
             )
-        self.count_requests()
 
     def error_callback_apt_deal_info(self, failure: Response) -> None:
         self.save_failure_info(
@@ -704,28 +774,40 @@ class GovtHouseDealSpider(Spider):
 
         return result
 
-    def change_service_key(self) -> None:
+    def is_need_to_change_service_key(self, xml_to_dict: dict) -> bool:
         if (
+            "EXCEEDS" in xml_to_dict["response"]["header"].get("resultMsg")
+            or "EXPIRED" in xml_to_dict["response"]["header"].get("resultMsg")
+        ) and xml_to_dict["response"]["header"].get("resultMsg") != "NORMAL SERVICE.":
+            return True
+        return False
+
+    def _change_service_key(self) -> bool:
+        if (
+            GovtHouseDealSpider.open_api_service_key
+            == GovtHouseDealEnum.SERVICE_KEY_1.value
+        ):
+            GovtHouseDealSpider.open_api_service_key = (
+                GovtHouseDealEnum.SERVICE_KEY_2.value
+            )
+            return True
+        elif (
             GovtHouseDealSpider.open_api_service_key
             == GovtHouseDealEnum.SERVICE_KEY_2.value
         ):
             GovtHouseDealSpider.open_api_service_key = (
-                GovtHouseDealEnum.SERVICE_KEY_1.value
+                GovtHouseDealEnum.SERVICE_KEY_3.value
             )
-        else:
-            GovtHouseDealSpider.open_api_service_key = (
-                GovtHouseDealEnum.SERVICE_KEY_2.value
-            )
-
-    def count_requests(self) -> None:
-        if (
-            GovtHouseDealSpider.request_count
-            >= GovtHouseDealEnum.DAILY_REQUEST_COUNT.value
+            return True
+        elif (
+            GovtHouseDealSpider.open_api_service_key
+            == GovtHouseDealEnum.SERVICE_KEY_3.value
         ):
-            self.change_service_key()
-            GovtHouseDealSpider.request_count = 0
-        else:
-            GovtHouseDealSpider.request_count += 1
+            GovtHouseDealSpider.open_api_service_key = (
+                GovtHouseDealEnum.SERVICE_KEY_4.value
+            )
+            return True
+        return False
 
     def save_failure_info(
         self,

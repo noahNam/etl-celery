@@ -1,7 +1,7 @@
 from celery import Celery
 
-from modules.adapter.infrastructure.message.broker.redis import redis
 from modules.adapter.infrastructure.fastapi.config import Config, fastapi_config
+from modules.adapter.infrastructure.message.broker.redis import redis
 from modules.adapter.infrastructure.sqlalchemy.database import db
 from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.adapter.presentation.cli.enum import TopicEnum

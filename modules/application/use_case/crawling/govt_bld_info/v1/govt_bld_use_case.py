@@ -33,8 +33,10 @@ class GovtBldUseCase(BaseSyncUseCase):
 
     def setup(self):
         self._spider_input_params: list[GovtBldInputEntity] = list()
-        kapt_basic_list: list[KaptBasicInfoEntity] = self._repo.find_all(
-            find_type=KaptFindTypeEnum.KAPT_BASIC_INFOS.value
+        kapt_basic_list: list[KaptBasicInfoEntity] = self._repo.find_by_id_range(
+            start_house_id=58,
+            end_house_id=60,
+            find_type=KaptFindTypeEnum.KAPT_BASIC_INFOS.value,
         )
 
         legal_dong_code_infos: list[
@@ -102,7 +104,8 @@ class GovtBldUseCase(BaseSyncUseCase):
                             break
                     if flag:
                         break
-
+        else:
+            logger.error("Not found kapt_basic_list or legal_dong_code_infos")
         logger.info("Setup finished")
 
     def __get_all_legal_code_infos(self) -> list[LegalDongCodeEntity]:
