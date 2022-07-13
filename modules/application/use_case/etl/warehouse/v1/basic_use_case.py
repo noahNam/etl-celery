@@ -152,18 +152,18 @@ class BasicUseCase(BaseETLUseCase):
         #         target_model=KaptAreaInfoEntity, results=area_infos
         #     )
 
-        # todo. 총괄부는 크롤링 데이터가 없는 상태라 ETL 확인 필요함. 특히, TransformBasic._etl_govt_bld_area_infos 함수
-        # 총괄부 표제 단지 정보
-        govt_bld_top_infos: list[
-            GovtBldTopInfoEntity
-        ] | None = self._govt_bld_repo.find_to_update(target_model=GovtBldTopInfoModel)
-        bld_top_infos: list[dict] | None = self._transfer.start_etl(
-            target_list=govt_bld_top_infos
-        )
-        if bld_top_infos:
-            self.__update_to_warehouse(
-                target_model=GovtBldTopInfoEntity, results=bld_top_infos
-            )
+        # # todo. 총괄부는 크롤링 데이터가 없는 상태라 ETL 확인 필요함. 특히, TransformBasic._etl_govt_bld_area_infos 함수
+        # # 총괄부 표제 단지 정보
+        # govt_bld_top_infos: list[
+        #     GovtBldTopInfoEntity
+        # ] | None = self._govt_bld_repo.find_to_update(target_model=GovtBldTopInfoModel)
+        # bld_top_infos: list[dict] | None = self._transfer.start_etl(
+        #     target_list=govt_bld_top_infos
+        # )
+        # if bld_top_infos:
+        #     self.__update_to_warehouse(
+        #         target_model=GovtBldTopInfoEntity, results=bld_top_infos
+        #     )
 
         # 총괄부 표제 동 정보
         govt_bld_middle_infos: list[
