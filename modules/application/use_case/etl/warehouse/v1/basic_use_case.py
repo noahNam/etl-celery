@@ -84,86 +84,86 @@ class BasicUseCase(BaseETLUseCase):
         self._transfer: TransformBasic = TransformBasic()
 
     def execute(self):
-        # # 단지 기본 정보
-        # kapt_basic_infos: list[
-        #     KaptBasicInfoEntity
-        # ] | None = self._kapt_repo.find_to_update(target_model=KaptBasicInfoModel)
-        # basic_infos: list[BasicInfoModel] | None = self._transfer.start_etl(
-        #     target_list=kapt_basic_infos
-        # )
-        #
-        # if basic_infos:
-        #     # 카카오 place 좌표 맵핑
-        #     for basic_info in basic_infos:
-        #         if not basic_info.place_id:
-        #             continue
-        #
-        #         kakao_api_result: KakaoApiResultEntity | None = (
-        #             self._kakao_repo.find_by_id(id=basic_info.place_id)
-        #         )
-        #         basic_info.bld_name = kakao_api_result.bld_name
-        #         basic_info.place_dong_address = kakao_api_result.jibun_address
-        #         basic_info.place_road_address = kakao_api_result.road_address
-        #         basic_info.x_vl = kakao_api_result.x_vl
-        #         basic_info.y_vl = kakao_api_result.y_vl
-        #
-        #     self.__upsert_to_warehouse(results=basic_infos)
+        # 단지 기본 정보
+        kapt_basic_infos: list[
+            KaptBasicInfoEntity
+        ] | None = self._kapt_repo.find_to_update(target_model=KaptBasicInfoModel)
+        basic_infos: list[BasicInfoModel] | None = self._transfer.start_etl(
+            target_list=kapt_basic_infos
+        )
+
+        if basic_infos:
+            # 카카오 place 좌표 맵핑
+            for basic_info in basic_infos:
+                if not basic_info.place_id:
+                    continue
+
+                kakao_api_result: KakaoApiResultEntity | None = (
+                    self._kakao_repo.find_by_id(id=basic_info.place_id)
+                )
+                basic_info.bld_name = kakao_api_result.bld_name
+                basic_info.place_dong_address = kakao_api_result.jibun_address
+                basic_info.place_road_address = kakao_api_result.road_address
+                basic_info.x_vl = kakao_api_result.x_vl
+                basic_info.y_vl = kakao_api_result.y_vl
+
+            self.__upsert_to_warehouse(results=basic_infos)
 
         # 단지 관리비 정보
-        # kapt_mgmt_costs: list[
-        #     KaptMgmtCostEntity
-        # ] | None = self._kapt_repo.find_to_update(target_model=KaptMgmtCostModel)
-        # self.__bind_house_id(target_list=kapt_mgmt_costs)
-        #
-        # mgmt_costs: list[MgmtCostModel] | None = self._transfer.start_etl(
-        #     target_list=kapt_mgmt_costs
-        # )
-        #
-        # if mgmt_costs:
-        #     self.__upsert_to_warehouse(results=mgmt_costs)
+        kapt_mgmt_costs: list[
+            KaptMgmtCostEntity
+        ] | None = self._kapt_repo.find_to_update(target_model=KaptMgmtCostModel)
+        self.__bind_house_id(target_list=kapt_mgmt_costs)
 
-        # # 단지 주변 정보
-        # kapt_location_infos: list[
-        #     KaptLocationInfoEntity
-        # ] | None = self._kapt_repo.find_to_update(target_model=KaptLocationInfoModel)
-        # self.__bind_house_id(target_list=kapt_location_infos)
-        #
-        # location_infos: list[dict] | None = self._transfer.start_etl(
-        #     target_list=kapt_location_infos
-        # )
-        #
-        # if location_infos:
-        #     self.__update_to_warehouse(
-        #         target_model=KaptLocationInfoEntity, results=location_infos
-        #     )
+        mgmt_costs: list[MgmtCostModel] | None = self._transfer.start_etl(
+            target_list=kapt_mgmt_costs
+        )
 
-        # # 단지 면적 정보
-        # kapt_area_infos: list[
-        #     KaptAreaInfoEntity
-        # ] | None = self._kapt_repo.find_to_update(target_model=KaptAreaInfoModel)
-        # self.__bind_house_id(target_list=kapt_area_infos)
-        #
-        # area_infos: list[dict] | None = self._transfer.start_etl(
-        #     target_list=kapt_area_infos
-        # )
-        #
-        # if area_infos:
-        #     self.__update_to_warehouse(
-        #         target_model=KaptAreaInfoEntity, results=area_infos
-        #     )
+        if mgmt_costs:
+            self.__upsert_to_warehouse(results=mgmt_costs)
 
-        # # todo. 총괄부는 크롤링 데이터가 없는 상태라 ETL 확인 필요함. 특히, TransformBasic._etl_govt_bld_area_infos 함수
-        # # 총괄부 표제 단지 정보
-        # govt_bld_top_infos: list[
-        #     GovtBldTopInfoEntity
-        # ] | None = self._govt_bld_repo.find_to_update(target_model=GovtBldTopInfoModel)
-        # bld_top_infos: list[dict] | None = self._transfer.start_etl(
-        #     target_list=govt_bld_top_infos
-        # )
-        # if bld_top_infos:
-        #     self.__update_to_warehouse(
-        #         target_model=GovtBldTopInfoEntity, results=bld_top_infos
-        #     )
+        # 단지 주변 정보
+        kapt_location_infos: list[
+            KaptLocationInfoEntity
+        ] | None = self._kapt_repo.find_to_update(target_model=KaptLocationInfoModel)
+        self.__bind_house_id(target_list=kapt_location_infos)
+
+        location_infos: list[dict] | None = self._transfer.start_etl(
+            target_list=kapt_location_infos
+        )
+
+        if location_infos:
+            self.__update_to_warehouse(
+                target_model=KaptLocationInfoEntity, results=location_infos
+            )
+
+        # 단지 면적 정보
+        kapt_area_infos: list[
+            KaptAreaInfoEntity
+        ] | None = self._kapt_repo.find_to_update(target_model=KaptAreaInfoModel)
+        self.__bind_house_id(target_list=kapt_area_infos)
+
+        area_infos: list[dict] | None = self._transfer.start_etl(
+            target_list=kapt_area_infos
+        )
+
+        if area_infos:
+            self.__update_to_warehouse(
+                target_model=KaptAreaInfoEntity, results=area_infos
+            )
+
+        # todo. 총괄부는 크롤링 데이터가 없는 상태라 ETL 확인 필요함. 특히, TransformBasic._etl_govt_bld_area_infos 함수
+        # 총괄부 표제 단지 정보
+        govt_bld_top_infos: list[
+            GovtBldTopInfoEntity
+        ] | None = self._govt_bld_repo.find_to_update(target_model=GovtBldTopInfoModel)
+        bld_top_infos: list[dict] | None = self._transfer.start_etl(
+            target_list=govt_bld_top_infos
+        )
+        if bld_top_infos:
+            self.__update_to_warehouse(
+                target_model=GovtBldTopInfoEntity, results=bld_top_infos
+            )
 
         # 총괄부 표제 동 정보
         govt_bld_middle_infos: list[
@@ -182,32 +182,32 @@ class BasicUseCase(BaseETLUseCase):
             # GovtBldMiddleInfoModel와 GovtBldAreaInfoModel transaction 단위는 all success, all fail
             self._kapt_repo.change_update_needed_status_all(value=bld_middle_infos)
 
-        # # 총괄부 표제 타입 정보
-        # govt_bld_area_infos: list[
-        #     GovtBldAreaInfoEntity
-        # ] | None = self._govt_bld_repo.find_to_update(target_model=GovtBldAreaInfoModel)
-        #
-        # if govt_bld_area_infos:
-        #     for govt_bld_area_info in govt_bld_area_infos:
-        #         if not govt_bld_area_info.dong_nm:
-        #             continue
-        #
-        #         dong_id: int | None = self._basic_repo.find_id_by_dong_nm(
-        #             house_id=govt_bld_area_info.house_id,
-        #             dong_nm=govt_bld_area_info.dong_nm,
-        #         )
-        #
-        #         govt_bld_area_info.dong_id = dong_id
-        #
-        # bld_area_infos: list[TypeInfoModel] | None = self._transfer.start_etl(
-        #     target_list=govt_bld_area_infos
-        # )
-        #
-        # if bld_area_infos:
-        #     self.__upsert_to_warehouse(results=bld_area_infos)
-        #
-        #     # GovtBldMiddleInfoModel와 GovtBldAreaInfoModel transaction 단위는 all success, all fail
-        #     self._kapt_repo.change_update_needed_status_all(value=bld_area_infos)
+        # 총괄부 표제 타입 정보
+        govt_bld_area_infos: list[
+            GovtBldAreaInfoEntity
+        ] | None = self._govt_bld_repo.find_to_update(target_model=GovtBldAreaInfoModel)
+
+        if govt_bld_area_infos:
+            for govt_bld_area_info in govt_bld_area_infos:
+                if not govt_bld_area_info.dong_nm:
+                    continue
+
+                dong_id: int | None = self._basic_repo.find_id_by_dong_nm(
+                    house_id=govt_bld_area_info.house_id,
+                    dong_nm=govt_bld_area_info.dong_nm,
+                )
+
+                govt_bld_area_info.dong_id = dong_id
+
+        bld_area_infos: list[TypeInfoModel] | None = self._transfer.start_etl(
+            target_list=govt_bld_area_infos
+        )
+
+        if bld_area_infos:
+            self.__upsert_to_warehouse(results=bld_area_infos)
+
+            # GovtBldMiddleInfoModel와 GovtBldAreaInfoModel transaction 단위는 all success, all fail
+            self._kapt_repo.change_update_needed_status_all(value=bld_area_infos)
 
     """
     key mapping
