@@ -16,11 +16,20 @@ from modules.adapter.infrastructure.pypubsub.enum.subs_info_enum import (
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
 )
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
+    SubscriptionInfoEntity,
+)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.call_failure_history_model import (
     CallFailureHistoryModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kakao_api_result_model import (
     KakaoApiResultModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_info_model import (
+    SubscriptionInfoModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_manual_info_model import (
+    SubscriptionManualInfoModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.repository.call_failure_history_repository import (
     SyncFailureRepository,
@@ -43,6 +52,9 @@ event_listener_dict = {
     f"{CallFailureTopicEnum.IS_EXISTS.value}": False,
     f"{LegalDongCodeTopicEnum.GET_ALL_LEGAL_CODE_INFOS.value}": list(),
     f"{SubsInfoTopicEnum.BULK_SAVE_SUBSCRIPTION_INFOS.value}": None,
+    f"{SubsInfoTopicEnum.SAVE_ALL.value}": None,
+    f"{SubsInfoTopicEnum.UPDATE_TO_NEW_SCHEMA.value}": None,
+    f"{SubsInfoTopicEnum.FIND_SUBSCRIPTION_INFOS_BY_YEAR_MONTH.value}": list(),
 }
 
 
@@ -90,6 +102,33 @@ def bulk_save_subscription_infos(create_list: list[dict]) -> None:
     )
 
 
+def save_all(
+    values: list[SubscriptionInfoModel] | list[SubscriptionManualInfoModel],
+) -> None:
+    SyncSubscriptionInfoRepository().save_all(values=values)
+    event_listener_dict.update({f"{SubsInfoTopicEnum.SAVE_ALL.value}": None})
+
+
+def update_subs_info(subs_info: SubscriptionInfoModel) -> None:
+    SyncSubscriptionInfoRepository().update_to_new_schema(value=subs_info)
+    event_listener_dict.update(
+        {f"{SubsInfoTopicEnum.UPDATE_TO_NEW_SCHEMA.value}": None}
+    )
+
+
+def find_subscription_infos_by_year_month(
+    start_year_month: str, end_year_month: str
+) -> None:
+    result: list[
+        SubscriptionInfoEntity
+    ] = SyncSubscriptionInfoRepository().find_subscription_infos_by_year_month(
+        start_year_month=start_year_month, end_year_month=end_year_month
+    )
+    event_listener_dict.update(
+        {f"{SubsInfoTopicEnum.FIND_SUBSCRIPTION_INFOS_BY_YEAR_MONTH.value}": result}
+    )
+
+
 pub.subscribe(save_crawling_failure, CallFailureTopicEnum.SAVE_CRAWLING_FAILURE.value)
 pub.subscribe(
     save_kakao_crawling_result, KakaoApiTopicEnum.SAVE_KAKAO_CRAWLING_RESULT.value
@@ -103,4 +142,10 @@ pub.subscribe(
 )
 pub.subscribe(
     bulk_save_subscription_infos, SubsInfoTopicEnum.BULK_SAVE_SUBSCRIPTION_INFOS.value
+)
+pub.subscribe(save_all, SubsInfoTopicEnum.SAVE_ALL.value)
+pub.subscribe(update_subs_info, SubsInfoTopicEnum.UPDATE_TO_NEW_SCHEMA.value)
+pub.subscribe(
+    find_subscription_infos_by_year_month,
+    SubsInfoTopicEnum.FIND_SUBSCRIPTION_INFOS_BY_YEAR_MONTH.value,
 )
