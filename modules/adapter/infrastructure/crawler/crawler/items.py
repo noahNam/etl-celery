@@ -64,7 +64,7 @@ class GovtBldInputInfo(BaseModel):
 
 class GovtBldTopInfoItem(BaseModel):
     house_id: int
-    mgm_bldrgst_pk: str
+    mgm_bldrgst_pk: str | None
     itg_bld_grade: str | None
     itg_bld_cert: str | None
     crtn_day: str | None
@@ -133,7 +133,7 @@ class GovtBldTopInfoItem(BaseModel):
 
 class GovtBldMidInfoItem(BaseModel):
     house_id: int
-    mgm_bldrgst_pk: str
+    mgm_bldrgst_pk: str | None
     main_purps_cd_nm: str | None
     etc_purps: str | None
     roof_cd: str | None
@@ -215,7 +215,7 @@ class GovtBldMidInfoItem(BaseModel):
 
 class GovtBldAreaInfoItem(BaseModel):
     house_id: int
-    mgm_bldrgst_pk: str
+    mgm_bldrgst_pk: str | None
     regstr_gb_cd: str | None
     regstr_gb_cd_nm: str | None
     regstr_kind_cd: str | None
