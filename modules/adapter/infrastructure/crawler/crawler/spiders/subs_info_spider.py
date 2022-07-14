@@ -7,6 +7,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from pandas import DataFrame
 from scrapy import Spider, Request
+from scrapy.exceptions import CloseSpider
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
@@ -21,6 +22,12 @@ from modules.adapter.infrastructure.pypubsub.enum.subs_info_enum import (
 )
 from modules.adapter.infrastructure.pypubsub.event_listener import event_listener_dict
 from modules.adapter.infrastructure.pypubsub.event_observer import send_message
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
+    SubscriptionInfoEntity,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_info_model import (
+    SubscriptionInfoModel,
+)
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
 logger = logger_.getLogger(__name__)
@@ -210,9 +217,44 @@ class SubscriptionSpider(Spider):
         ].str.replace("'", "")
 
     def parse(self, response, **kwargs):
-        subs_infos: list[dict] = self.convert_result_to_list()
+        subs_info_dicts: list[dict] = self.convert_result_to_list()
+        parsed_subs_info_models: list[SubscriptionInfoModel] = list()
+        create_list: list[SubscriptionInfoModel] = list()
+        update_list: list[SubscriptionInfoModel] = list()
 
-        self._save_dataframe(subs_infos)
+        for subs_info_dict in subs_info_dicts:
+            parsed_subs_info_models.append(SubscriptionInfoModel(**subs_info_dict))
+
+        subs_infos_from_current_db: list[
+            SubscriptionInfoEntity
+        ] = self.__find_subs_infos_by_year_month()
+
+        if subs_infos_from_current_db:
+            for parsed_info in parsed_subs_info_models:
+                for subs_info in subs_infos_from_current_db:
+                    if (
+                        parsed_info.name == subs_info.name
+                        and parsed_info.offer_date == subs_info.offer_date
+                        and parsed_info.rent_type == subs_info.rent_type
+                        and parsed_info.area_type == subs_info.area_type
+                        and parsed_info.supply_price == subs_info.supply_price
+                    ):
+                        update_list.append(parsed_info)
+                    else:
+                        create_list.append(parsed_info)
+        else:
+            for parsed_info in parsed_subs_info_models:
+                create_list.append(parsed_info)
+
+        if create_list:
+            self._save_subs_infos(subs_infos=create_list)
+        else:
+            self._save_subs_infos(subs_infos=parsed_subs_info_models)
+
+        if update_list:
+            for elm in update_list:
+                self._update(elm)
+
         self.repo.update_id_to_code_rules(
             key_div="subs_id", last_id=SubscriptionSpider.subs_info_last_id_seq
         )
@@ -338,6 +380,10 @@ class SubscriptionSpider(Spider):
                     df_apply = pd.concat([df_apply, df_temp])
 
                 driver.find_element(By.CLASS_NAME, "ui-button").click()
+            else:
+                df_apply["subs_id"] = SubscriptionSpider.subs_info_last_id_seq
+                print("@@@")
+                print(df_apply["subs_id"])
 
         if len(df_apply) == 0:
             return None
@@ -941,15 +987,44 @@ class SubscriptionSpider(Spider):
         df = df[result_columns]
         return df
 
-    def _save_dataframe(self, subs_infos: list[dict]):
+    def _save_subs_infos(self, subs_infos: list[SubscriptionInfoModel]):
         if subs_infos:
-            self.__save_subs_infos(create_list=subs_infos)
+            self.__save_all(subs_infos=subs_infos)
 
-    def __save_subs_infos(self, create_list: list[dict]) -> list | None:
+    def _update(self, subs_info: SubscriptionInfoModel):
+        if subs_info:
+            self.__update_subs_info(subs_info=subs_info)
+
+    def _trans_date_format(self, year_month: str):
+        return year_month.replace("년 ", "-").replace("월", "")
+
+    def __save_all(self, subs_infos: list[SubscriptionInfoModel]) -> None:
         send_message(
-            topic_name=SubsInfoTopicEnum.BULK_SAVE_SUBSCRIPTION_INFOS.value,
-            create_list=create_list,
+            topic_name=SubsInfoTopicEnum.SAVE_ALL.value,
+            values=subs_infos,
+        )
+        return event_listener_dict.get(f"{SubsInfoTopicEnum.SAVE_ALL.value}")
+
+    def __update_subs_info(self, subs_info: SubscriptionInfoModel) -> None:
+        send_message(
+            topic_name=SubsInfoTopicEnum.UPDATE_TO_NEW_SCHEMA.value,
+            subs_info=subs_info,
         )
         return event_listener_dict.get(
-            f"{SubsInfoTopicEnum.BULK_SAVE_SUBSCRIPTION_INFOS.value}"
+            f"{SubsInfoTopicEnum.UPDATE_TO_NEW_SCHEMA.value}"
+        )
+
+    def __find_subs_infos_by_year_month(self) -> list[SubscriptionInfoEntity]:
+        start_year_month = self._trans_date_format(
+            year_month=SubscriptionSpider.start_ym
+        )
+        end_year_month = self._trans_date_format(year_month=SubscriptionSpider.end_ym)
+
+        send_message(
+            topic_name=SubsInfoTopicEnum.FIND_SUBSCRIPTION_INFOS_BY_YEAR_MONTH.value,
+            start_year_month=start_year_month,
+            end_year_month=end_year_month,
+        )
+        return event_listener_dict.get(
+            f"{SubsInfoTopicEnum.FIND_SUBSCRIPTION_INFOS_BY_YEAR_MONTH.value}"
         )

@@ -1,6 +1,6 @@
 from typing import Type
 
-from sqlalchemy import exc, select, desc, update
+from sqlalchemy import exc, select, desc, update, and_
 
 from core.domain.datalake.subscription_info.interface.subscription_info_repository import (
     SubscriptionInfoRepository,
@@ -246,4 +246,47 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository):
             logger.info(
                 f"[SyncSubscriptionInfoRepository][bulk_save_subscription_infos]-failed_list: {len(failed_pk_list)}-{failed_pk_list})"
             )
+            raise NotUniqueErrorException
+
+    def find_subscription_infos_by_year_month(
+        self, start_year_month: str, end_year_month: str
+    ) -> list[SubscriptionInfoEntity]:
+        """year_month format: 2022-07"""
+        if start_year_month == end_year_month:
+            month = end_year_month[-2:]
+            if month == "12":
+                end_year_month = end_year_month.replace(
+                    end_year_month[-2], "01"
+                ).replace(end_year_month[3], str(int(end_year_month[3]) + 1))
+            elif month == "11":
+                end_year_month = end_year_month.replace(end_year_month[-1], "2")
+            else:
+                end_year_month = end_year_month.replace(
+                    end_year_month[-2], "0" + str(int(month) + 1)
+                )
+
+        query = select(SubscriptionInfoModel).where(
+            and_(
+                SubscriptionInfoModel.offer_date >= start_year_month,
+                SubscriptionInfoModel.offer_date <= end_year_month,
+            )
+        )
+        queryset = session.execute(query).scalars().all()
+
+        if not queryset:
+            return list()
+
+        return [query.to_subs_info_entity() for query in queryset]
+
+    def save_all(
+        self, values: list[SubscriptionInfoModel] | list[SubscriptionManualInfoModel]
+    ) -> None:
+        try:
+            session.add_all(values)
+            session.commit()
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncSubscriptionInfoRepository][save_all] target_model : error : {e}"
+            )
+            session.rollback()
             raise NotUniqueErrorException
