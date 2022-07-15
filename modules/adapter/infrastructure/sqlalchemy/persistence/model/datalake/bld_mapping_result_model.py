@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer
+from sqlalchemy import Column, String, BigInteger, Integer, UniqueConstraint
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
@@ -8,6 +8,15 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestam
 
 class BldMappingResultModel(datalake_base, TimestampMixin):
     __tablename__ = "bld_mapping_results"
+    __table_args__ = (
+        UniqueConstraint(
+            'regional_cd',
+            'jibun',
+            'dong',
+            'bld_name',
+            name='bld_mapping_results_unique'
+        ),
+    )
 
     id = Column(
         BigInteger().with_variant(Integer, "sqlite"),

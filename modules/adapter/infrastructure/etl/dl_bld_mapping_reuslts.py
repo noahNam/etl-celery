@@ -29,14 +29,14 @@ logger.addHandler(TqdmLoggingHandler())
 
 class TransferBldMappingResults(Transfer):
     def start_transfer(
-        self,
-        govt_apt_deals: list[MappingGovtEntity],
-        govt_apt_rents: list[MappingGovtEntity],
-        govt_ofctl_deals: list[MappingGovtEntity],
-        govt_ofctl_rents: list[MappingGovtEntity],
-        govt_right_lot_outs: list[MappingGovtEntity],
-        kakao_api_results: list[KakaoApiAddrEntity],
-        dongs: list[LegalDongCodeEntity],
+            self,
+            govt_apt_deals: list[MappingGovtEntity],
+            govt_apt_rents: list[MappingGovtEntity],
+            govt_ofctl_deals: list[MappingGovtEntity],
+            govt_ofctl_rents: list[MappingGovtEntity],
+            govt_right_lot_outs: list[MappingGovtEntity],
+            kakao_api_results: list[KakaoApiAddrEntity],
+            dongs: list[LegalDongCodeEntity],
     ) -> [list[BldMappingResultModel], list[AptDealKakaoHistoryModel]]:
         """
         2.1. 실거래가 데이터 & bld_mapping_results : 검색어 중복 검사 (검색어 중복 [jibun, dong, bld_name, regoinal_cd])
@@ -48,14 +48,32 @@ class TransferBldMappingResults(Transfer):
         govts: list[MappingGovtEntity] = (
                 govt_apt_deals + govt_apt_rents + govt_ofctl_deals + govt_ofctl_rents + govt_right_lot_outs
         )
-        new_govts: list[MappingGovtEntity] = list()
-        for govt in tqdm(govts, desc="new_govts", mininterval=1):
-            if not govt.mapping_id and govt.regional_cd and govt.apt_name:  # mapping_id가 없는 것들만 작업
-                new_govts.append(govt)
+
+        # mapping_id가 없는 것들만 작업
+        filtered_govts: list[MappingGovtEntity] = list()
+        for govt in tqdm(govts, desc="filtered_govts", mininterval=1):
+            if not govt.mapping_id and govt.regional_cd:
+                filtered_govts.append(govt)
+
+        # 중복 제거
+        new_govts = list()
+        for i in tqdm(range(len(filtered_govts)), desc="new_govts", mininterval=1):
+            is_append = True
+            for j in range(i):
+                if (filtered_govts[i].regional_cd == filtered_govts[j].regional_cd
+                        and filtered_govts[i].jibun == filtered_govts[j].jibun
+                        and filtered_govts[i].dong == filtered_govts[j].dong
+                        and filtered_govts[i].apt_name == filtered_govts[j].apt_name
+                ):
+                    is_append = False
+                    break
+            if is_append:
+                new_govts.append(filtered_govts[i])
+
 
         if not new_govts:
             return [[], []]
-        # new_govts = new_govts[:2]
+
         # kakao api에 보낼 주소 전처리
         govt_addresses: list[str] = list()
         for govt in tqdm(new_govts, desc="govt_addresses", mininterval=1):
@@ -83,7 +101,6 @@ class TransferBldMappingResults(Transfer):
                 kakao_addresses.append(response)
             except Exception as e:
                 break
-
 
         # 1. kakao_api_results 테이블에 같은 것이 있는지 찾기
         # 2. 같은것이 있으면 bld_mapping_reuslts 에 쌓기
@@ -144,7 +161,7 @@ class TransferBldMappingResults(Transfer):
             return ''
 
         for dong in dongs:
-            if ''.join([regional_cd,'00000']) == dong.region_cd:
+            if ''.join([regional_cd, '00000']) == dong.region_cd:
                 locatadd_nm = dong.locatadd_nm if dong.locatadd_nm else ''
                 return locatadd_nm
         return ''
