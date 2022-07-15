@@ -203,17 +203,24 @@ class SyncGovtDealRepository(GovtDealsRepository):
         elif find_type == GovtFindTypeEnum.APT_DEALS_INPUT.value:
             query = (
                 select(GovtAptDealModel)
-                .join(
-                    BldMappingResultModel,
+                .where(
                     and_(
-                        BldMappingResultModel.regional_cd
-                        == GovtAptDealModel.regional_cd,
-                        BldMappingResultModel.jibun == GovtAptDealModel.jibun,
-                        BldMappingResultModel.dong == GovtAptDealModel.dong,
-                        BldMappingResultModel.bld_name == GovtAptDealModel.apt_name,
-                    ),
+                        or_(
+                            and_(
+                                GovtAptDealModel.deal_year == start_year,
+                                GovtAptDealModel.deal_month >= start_month,
+                            ),
+                            GovtAptDealModel.deal_year > start_year
+                        ),
+                        or_(
+                            and_(
+                                GovtAptDealModel.deal_year == end_year,
+                                GovtAptDealModel.deal_month <= end_month,
+                            ),
+                            GovtAptDealModel.deal_year < end_year
+                        )
+                    )
                 )
-                .where(GovtAptDealModel.update_needed == True)
             )
             govt_apt_deals = session.execute(query).scalars().all()
 
@@ -227,19 +234,28 @@ class SyncGovtDealRepository(GovtDealsRepository):
 
         elif find_type == GovtFindTypeEnum.APT_RENTS_INPUT.value:
             query = (
-                select(GovtAptRentModel)
-                .join(
-                    BldMappingResultModel,
+                select(
+                    GovtAptRentModel
+                ).where(
                     and_(
-                        BldMappingResultModel.regional_cd
-                        == GovtAptRentModel.regional_cd,
-                        BldMappingResultModel.jibun == GovtAptRentModel.jibun,
-                        BldMappingResultModel.dong == GovtAptRentModel.dong,
-                        BldMappingResultModel.bld_name == GovtAptRentModel.apt_name,
-                    ),
+                        or_(
+                            and_(
+                                GovtAptRentModel.deal_year == start_year,
+                                GovtAptRentModel.deal_month >= start_month,
+                            ),
+                            GovtAptRentModel.deal_year > start_year
+                        ),
+                        or_(
+                            and_(
+                                GovtAptRentModel.deal_year == end_year,
+                                GovtAptRentModel.deal_month <= end_month,
+                            ),
+                            GovtAptRentModel.deal_year < end_year
+                        )
+                    )
                 )
-                .where(GovtAptRentModel.update_needed == True)
             )
+            # query = select(GovtAptRentModel).where(GovtAptRentModel.id < 1000)
             govt_apt_rents = session.execute(query).scalars().all()
 
             if not govt_apt_rents:

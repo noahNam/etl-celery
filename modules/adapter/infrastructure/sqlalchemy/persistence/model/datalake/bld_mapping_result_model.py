@@ -1,5 +1,4 @@
 from sqlalchemy import Column, String, BigInteger, Integer
-from sqlalchemy.dialects.mysql import TIMESTAMP
 
 from modules.adapter.infrastructure.sqlalchemy.mapper import datalake_base
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.mixins.timestamp_mixin import (
