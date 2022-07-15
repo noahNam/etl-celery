@@ -182,32 +182,32 @@ class BasicUseCase(BaseETLUseCase):
             # GovtBldMiddleInfoModel와 GovtBldAreaInfoModel transaction 단위는 all success, all fail
             self._kapt_repo.change_update_needed_status_all(value=bld_middle_infos)
 
-        # # 총괄부 표제 타입 정보
-        # govt_bld_area_infos: list[
-        #     GovtBldAreaInfoEntity
-        # ] | None = self._govt_bld_repo.find_to_update(target_model=GovtBldAreaInfoModel)
-        #
-        # if govt_bld_area_infos:
-        #     for govt_bld_area_info in govt_bld_area_infos:
-        #         if not govt_bld_area_info.dong_nm:
-        #             continue
-        #
-        #         dong_id: int | None = self._basic_repo.find_id_by_dong_nm(
-        #             house_id=govt_bld_area_info.house_id,
-        #             dong_nm=govt_bld_area_info.dong_nm,
-        #         )
-        #
-        #         govt_bld_area_info.dong_id = dong_id
-        #
-        # bld_area_infos: list[TypeInfoModel] | None = self._transfer.start_etl(
-        #     target_list=govt_bld_area_infos
-        # )
-        #
-        # if bld_area_infos:
-        #     self.__upsert_to_warehouse(results=bld_area_infos)
-        #
-        #     # GovtBldMiddleInfoModel와 GovtBldAreaInfoModel transaction 단위는 all success, all fail
-        #     self._kapt_repo.change_update_needed_status_all(value=bld_area_infos)
+        # 총괄부 표제 타입 정보
+        govt_bld_area_infos: list[
+            GovtBldAreaInfoEntity
+        ] | None = self._govt_bld_repo.find_to_update(target_model=GovtBldAreaInfoModel)
+
+        if govt_bld_area_infos:
+            for govt_bld_area_info in govt_bld_area_infos:
+                if not govt_bld_area_info.dong_nm:
+                    continue
+
+                dong_id: int | None = self._basic_repo.find_id_by_dong_nm(
+                    house_id=govt_bld_area_info.house_id,
+                    dong_nm=govt_bld_area_info.dong_nm,
+                )
+
+                govt_bld_area_info.dong_id = dong_id
+
+        bld_area_infos: list[TypeInfoModel] | None = self._transfer.start_etl(
+            target_list=govt_bld_area_infos
+        )
+
+        if bld_area_infos:
+            self.__upsert_to_warehouse(results=bld_area_infos)
+
+            # GovtBldMiddleInfoModel와 GovtBldAreaInfoModel transaction 단위는 all success, all fail
+            self._kapt_repo.change_update_needed_status_all(value=bld_area_infos)
 
     """
     key mapping
