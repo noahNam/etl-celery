@@ -103,7 +103,6 @@ class BldMappingResultUseCase(BaseETLUseCase):
 
         # 1. extract
         # 1.1. 실거래가 데이터
-        govt_apt_deals = []
         govt_apt_deals: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
             find_type=GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value,
             start_year=start_year,
@@ -112,25 +111,22 @@ class BldMappingResultUseCase(BaseETLUseCase):
             end_month=end_month,
         )
 
-        govt_apt_rents = []
-        # govt_apt_rents: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
-        #     find_type=GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value,
-        #     start_year=start_year,
-        #     start_month=start_month,
-        #     end_year=end_year,
-        #     end_month=end_month,
-        # )
+        govt_apt_rents: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
+            find_type=GovtFindTypeEnum.GOV_APT_RENT_MAPPING.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
+        )
 
-        govt_ofctl_deals = []
-        # govt_ofctl_deals: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
-        #     find_type=GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value,
-        #     start_year=start_year,
-        #     start_month=start_month,
-        #     end_year=end_year,
-        #     end_month=end_month,
-        # )
+        govt_ofctl_deals: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
+            find_type=GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
+        )
 
-        # govt_ofctl_rents = []
         govt_ofctl_rents: list[
             MappingGovtEntity
         ] = self._govt_repo.find_by_update_needed(
@@ -141,7 +137,6 @@ class BldMappingResultUseCase(BaseETLUseCase):
             end_month=end_month,
         )
 
-        # govt_right_lot_outs = []
         govt_right_lot_outs: list[
             MappingGovtEntity
         ] = self._govt_repo.find_by_update_needed(
