@@ -127,7 +127,7 @@ class GovtAptDealsJoinKeyEntity(BaseModel):
     """
 
     id: int
-    house_id: int
+    house_id: int | None
     dong: str | None
     apt_name: str
     deal_amount: str | None
@@ -146,7 +146,7 @@ class GovtAptDealsJoinKeyEntity(BaseModel):
 
 class GovtAptRentsJoinKeyEntity(BaseModel):
     id: int
-    house_id: int
+    house_id: int | None
     dong: str | None
     apt_name: str
     monthly_amount: int | None
