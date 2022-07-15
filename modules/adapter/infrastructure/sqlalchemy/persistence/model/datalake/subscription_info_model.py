@@ -21,6 +21,12 @@ class SubscriptionInfoModel(datalake_base, TimestampMixin):
     subs_id = Column(
         BigInteger().with_variant(Integer, "sqlite"), nullable=False, index=True
     )
+    place_id = Column(
+        BigInteger().with_variant(Integer, "sqlite"),
+        nullable=True,
+        index=True,
+        default=None,
+    )
     offer_date = Column(String(10), nullable=True)
     notice_winner_date = Column(String(10), nullable=True)
     name = Column(String(100), nullable=True)
@@ -102,6 +108,7 @@ class SubscriptionInfoModel(datalake_base, TimestampMixin):
         return SubscriptionInfoEntity(
             id=self.id,
             subs_id=self.subs_id,
+            place_id=self.place_id,
             offer_date=self.offer_date,
             notice_winner_date=self.notice_winner_date,
             name=self.name,

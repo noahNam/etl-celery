@@ -1,6 +1,5 @@
 from typing import Callable, AsyncContextManager, Type, List, Dict
 
-from sqlalchemy.dialects.mysql import insert
 from sqlalchemy import exc, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -19,7 +18,6 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
     KaptLocationInfoEntity,
     KaptMgmtCostEntity,
     KaptMappingEntity,
-    KaptAddrInfoEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.code_rule_model import (
@@ -60,9 +58,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_
 )
 from modules.adapter.infrastructure.sqlalchemy.repository import (
     BaseAsyncRepository,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_addr_info_model import (
-    KaptAddrInfoModel,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
@@ -114,22 +109,27 @@ class AsyncKaptRepository(KaptRepository, BaseAsyncRepository):
 
 
 class SyncKaptRepository(KaptRepository):
-    def find_by_id(
-        self, house_id: int, find_type: int = 0
-    ) -> KaptOpenApiInputEntity | KakaoApiInputEntity | None:
-        kapt_basic_info = session.get(KaptBasicInfoModel, house_id)
+    def find_by_id_range(
+        self, start_house_id: int, end_house_id: int, find_type: int = 0
+    ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | None:
+        queryset = session.scalars(
+            select(KaptBasicInfoModel).where(
+                KaptBasicInfoModel.house_id >= start_house_id,
+                KaptBasicInfoModel.house_id <= end_house_id,
+            )
+        ).all()
 
-        if not kapt_basic_info:
+        if not queryset:
             return None
 
         if find_type == KaptFindTypeEnum.KAKAO_API_INPUT.value:
-            return kapt_basic_info.to_kakao_api_input_entity()
+            return [query.to_kakao_api_input_entity() for query in queryset]
         elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
-            return kapt_basic_info.to_entity_for_bld_mapping_results()
+            return [query.to_entity_for_bld_mapping_results() for query in queryset]
         elif find_type == KaptFindTypeEnum.KAPT_BASIC_INFOS.value:
-            return kapt_basic_info.to_kapt_basic_info_entity()
+            return [query.to_kapt_basic_info_entity() for query in queryset]
 
-        return kapt_basic_info.to_open_api_input_entity()
+        return None
 
     def find_all(
         self, find_type: int = 0
@@ -147,36 +147,6 @@ class SyncKaptRepository(KaptRepository):
             if not queryset:
                 return list()
             return [query.to_kapt_basic_info_entity() for query in queryset]
-
-        elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
-            query = session.query(
-                KaptBasicInfoModel
-            ).with_entities(
-                KaptBasicInfoModel.house_id,
-                KaptBasicInfoModel.sido,
-                KaptBasicInfoModel.sigungu,
-                KaptBasicInfoModel.eubmyun,
-                KaptBasicInfoModel.dongri,
-                KaptBasicInfoModel.use_apr_day,
-                KaptBasicInfoModel.origin_dong_address,
-                KaptBasicInfoModel.name,
-                KaptAddrInfoModel.addr_code.label('addr_code_addr_info'),
-                KaptAddrInfoModel.jibun,
-                KaptAreaInfoModel.bjd_code.label('addr_code_area_info'),
-            ).join(
-                KaptAddrInfoModel,
-                KaptBasicInfoModel.house_id == KaptAddrInfoModel.house_id,
-                isouter=True
-            ).join(
-                KaptAreaInfoModel,
-                KaptBasicInfoModel.kapt_code == KaptAreaInfoModel.kapt_code,
-                isouter=True
-            )
-            querysets = query.all()
-
-            if not querysets:
-                return list()
-            return [self._make_kapt_mapping_entity(queryset=queryset) for queryset in querysets]
 
         else:
             raise Exception('[SyncKaptRepository][find_all] find_type error')
