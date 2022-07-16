@@ -20,7 +20,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_cod
     LegalDongCodeEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.apt_deal_kakao_history_model import (
-    AptDealKakaoHistoryModel
+    AptDealKakaoHistoryModel,
 )
 
 logger = logger_.getLogger(__name__)
@@ -52,7 +52,7 @@ class TransferBldMappingResults(Transfer):
         # mapping_id가 없는 것들만 작업
         filtered_govts: list[MappingGovtEntity] = list()
         for govt in tqdm(govts, desc="filtered_govts", mininterval=1):
-            if not govt.mapping_id and govt.regional_cd:
+            if not govt.mapping_id and govt.regional_cd and govt.apt_name:
                 filtered_govts.append(govt)
 
         # 중복 제거
@@ -69,7 +69,6 @@ class TransferBldMappingResults(Transfer):
                     break
             if is_append:
                 new_govts.append(filtered_govts[i])
-
 
         if not new_govts:
             return [[], []]
