@@ -91,14 +91,14 @@ class TransferBldMappingResults(Transfer):
                 response = self._request_kakao_api(
                     address=govt_addresses[i], key_number=kakao_key_number
                 )
-                if response == 429:
+                if response in [429, 401]:
                     kakao_key_number = self._get_kakao_key_usable_number()
 
                     response = self._request_kakao_api(
                         address=govt_addresses[i], key_number=kakao_key_number
                     )
                 kakao_addresses.append(response)
-            except Exception('kakao_api key is expired') as e:
+            except Exception as e:
                 break
 
         # 1. kakao_api_results 테이블에 같은 것이 있는지 찾기
@@ -178,8 +178,8 @@ class TransferBldMappingResults(Transfer):
         res = requests.get(url=url, params=params, headers=headers)
 
         # kakao 응답에 문제가 있는지 확인
-        if res.status_code == 429:
-            return 429
+        if res.status_code in [429, 401]:
+            return res.status_code
         else:
             kakao_addresses = res.json()['documents']
             if not kakao_addresses:

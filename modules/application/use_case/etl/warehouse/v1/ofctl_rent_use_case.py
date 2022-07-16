@@ -51,8 +51,14 @@ class OfctlRentUseCase(BaseETLUseCase):
             print("govt_ofctl_rents 업데이트 필요한 데이터 없음")
             return
 
+        # house_id None filter
+        new_govts: list[GovtOfctlRentJoinKeyEntity] = list()
+        for govt_ofctl_rent in govt_ofctl_rents:
+            if govt_ofctl_rent.house_id:
+                new_govts.append(govt_ofctl_rent)
+
         house_ids = list()
-        for govt_apt_rent in govt_ofctl_rents:
+        for govt_apt_rent in new_govts:
             house_ids.append(govt_apt_rent.house_id)
 
         supply_areas: list[

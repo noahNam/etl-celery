@@ -51,9 +51,15 @@ class OfctlDealUseCase(BaseETLUseCase):
             print("govt_apt_deals 업데이트 필요한 데이터 없음")
             return
 
+        # house_id None filter
+        new_govts: list[GovtOfctlDealJoinKeyEntity] = list()
+        for govt_ofctl_deal in govt_ofctl_deals:
+            if govt_ofctl_deal.house_id:
+                new_govts.append(govt_ofctl_deal)
+
         house_ids = list()
-        for govt_apt_rent in govt_ofctl_deals:
-            house_ids.append(govt_apt_rent.house_id)
+        for new_govt in new_govts:
+            house_ids.append(new_govt.house_id)
 
         supply_areas: list[
             SupplyAreaEntity
@@ -62,7 +68,7 @@ class OfctlDealUseCase(BaseETLUseCase):
         # Transfer
         results: tuple[list[OfctlDealModel], list[int]] = self._transfer.start_transfer(
             transfer_type=GovtFindTypeEnum.OFCTL_DEAL_INPUT.value,
-            entities=govt_ofctl_deals,
+            entities=new_govts,
             supply_areas=supply_areas,
         )
         ofctl_deals: list[OfctlDealModel] = results[0]

@@ -25,7 +25,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.ofctl
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.right_lot_out_model import (
     RightLotOutModel,
 )
-
+from tqdm import tqdm
 from modules.adapter.infrastructure.utils.math_helper import MathHelper
 
 
@@ -52,7 +52,7 @@ class TransferAptDeals(Transfer):
         if transfer_type == GovtFindTypeEnum.APT_DEALS_INPUT.value:
             apt_daels = list()
             apt_dael_ids = list()
-            for govt_apt_deal in entities:
+            for govt_apt_deal in tqdm(entities, desc="govt_apt_deal", mininterval=1):
                 supply_area = self._get_supply_area(
                     supply_areas=supply_areas, govt_deal=govt_apt_deal
                 )
@@ -85,7 +85,7 @@ class TransferAptDeals(Transfer):
         elif transfer_type == GovtFindTypeEnum.APT_RENTS_INPUT.value:
             apt_rents = list()
             apt_rent_ids = list()
-            for govt_apt_rent in entities:
+            for govt_apt_rent in tqdm(entities, desc="govt_apt_rent", mininterval=1):
                 supply_area = self._get_supply_area(
                     supply_areas=supply_areas, govt_deal=govt_apt_rent
                 )
@@ -114,7 +114,7 @@ class TransferAptDeals(Transfer):
         elif transfer_type == GovtFindTypeEnum.OFCTL_DEAL_INPUT.value:
             ofctl_deals = list()
             ofctl_deal_ids = list()
-            for govt_ofctl_deal in entities:
+            for govt_ofctl_deal in tqdm(entities, desc="govt_apt_rent", mininterval=1):
                 supply_area = self._get_supply_area(
                     supply_areas=supply_areas, govt_deal=govt_ofctl_deal
                 )
@@ -145,7 +145,7 @@ class TransferAptDeals(Transfer):
         elif transfer_type == GovtFindTypeEnum.OFCTL_RENT_INPUT.value:
             ofctl_rents = list()
             ofctl_rent_ids = list()
-            for govt_ofctl_rent in entities:
+            for govt_ofctl_rent in tqdm(entities, desc="govt_apt_rent", mininterval=1):
                 supply_area = self._get_supply_area(
                     supply_areas=supply_areas, govt_deal=govt_ofctl_rent
                 )
@@ -175,7 +175,7 @@ class TransferAptDeals(Transfer):
             right_lot_outs = list()
             right_lot_out_ids = list()
 
-            for govt_right_lot_out in entities:
+            for govt_right_lot_out in tqdm(entities, desc="govt_apt_rent", mininterval=1):
                 supply_area = self._get_supply_area(
                     supply_areas=supply_areas, govt_deal=govt_right_lot_out
                 )
