@@ -331,21 +331,24 @@ class SyncBasicRepository(BasicRepository):
             session.rollback()
             raise
 
-    def find_supply_areas_by_house_ids(
+    def find_supply_areas_by_house_ids( # fixme:
         self, house_ids: list[int]
     ) -> list[SupplyAreaEntity] | None:
-        query = (
-            select(DongInfoModel)
-            .join(TypeInfoModel, TypeInfoModel.dong_id == DongInfoModel.id)
-            .where(DongInfoModel.house_id.in_(house_ids))
-        )
+        house_ids = list(set(house_ids))
 
-        supply_areas = session.execute(query).scalars().all()
+        querysets = list()
+        for i in range(0, len(house_ids), 500):
+            query = (
+                select(DongInfoModel)
+                .where(DongInfoModel.house_id.in_(house_ids))
+            )
+            supply_areas = session.execute(query).scalars().all()
+            querysets.extend(supply_areas)
 
-        if not supply_areas:
+        if not querysets:
             return None
 
-        return [supply_area.to_supply_area_entity() for supply_area in supply_areas]
+        return [queryset.to_supply_area_entity() for queryset in querysets]
 
     def find_supply_areas_by_update_needed(self) -> list[SupplyAreaEntity] | None:
         query = (

@@ -5,7 +5,6 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_en
     SupplyAreaEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.govt_enum import GovtFindTypeEnum
-
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
 )
@@ -23,6 +22,9 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.govt_a
     GovtAptRentModel,
 )
 from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
+from modules.adapter.infrastructure.crawler.crawler.enum.govt_deal_enum import (
+    GovtHouseDealEnum,
+)
 
 
 class AptRentUseCase(BaseETLUseCase):
@@ -43,18 +45,33 @@ class AptRentUseCase(BaseETLUseCase):
         self._basic_repo: SyncBasicRepository = basic_repo
 
     def execute(self):
+        start_year = GovtHouseDealEnum.MIN_YEAR_MONTH.value[:4]
+        start_month = str(int(GovtHouseDealEnum.MIN_YEAR_MONTH.value[5:]))
+        end_year = GovtHouseDealEnum.MAX_YEAR_MONTH.value[:4]
+        end_month = str(int(GovtHouseDealEnum.MAX_YEAR_MONTH.value[5:]))
+
         govt_apt_rents: list[
             GovtAptRentsJoinKeyEntity
         ] = self._govt_deal_repo.find_by_update_needed(
-            find_type=GovtFindTypeEnum.APT_RENTS_INPUT.value
+            find_type=GovtFindTypeEnum.APT_RENTS_INPUT.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
         )
         if not govt_apt_rents:
             print("govt_apt_rents 업데이트 필요한 데이터 없음")
             return
 
-        house_ids = list()
+        # house_id None filter
+        new_govts: list[GovtAptRentsJoinKeyEntity] = list()
         for govt_apt_rent in govt_apt_rents:
-            house_ids.append(govt_apt_rent.house_id)
+            if govt_apt_rent.house_id:
+                new_govts.append(govt_apt_rent)
+
+        house_ids: list[int] = list()
+        for new_govt in new_govts:
+            house_ids.append(new_govt.house_id)
 
         supply_areas: list[
             SupplyAreaEntity
@@ -63,7 +80,7 @@ class AptRentUseCase(BaseETLUseCase):
         # Transfer
         results: tuple[list[AptRentModel], list[int]] = self._transfer.start_transfer(
             transfer_type=GovtFindTypeEnum.APT_RENTS_INPUT.value,
-            entities=govt_apt_rents,
+            entities=new_govts,
             supply_areas=supply_areas,
         )
         apt_rents: list[AptRentModel] = results[0]
