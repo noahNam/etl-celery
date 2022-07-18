@@ -558,8 +558,8 @@ class GovtHouseDealSpider(Spider):
                         deal_year=elm.get("년"),
                         ofctl_name=elm.get("단지"),
                         dong=elm.get("법정동"),
-                        deposit=int(elm.get("보증금액").replace(",", ""))
-                        if elm.get("보증금액")
+                        deposit=int(elm.get("보증금").replace(",", ""))
+                        if elm.get("보증금")
                         else None,
                         sigungu=elm.get("시군구"),
                         deal_month=elm.get("월"),
@@ -595,8 +595,8 @@ class GovtHouseDealSpider(Spider):
                 deal_year=xml_to_dict.get("년"),
                 ofctl_name=xml_to_dict.get("단지"),
                 dong=xml_to_dict.get("법정동"),
-                deposit=int(xml_to_dict.get("보증금액").replace(",", ""))
-                if xml_to_dict.get("보증금액")
+                deposit=int(xml_to_dict.get("보증금").replace(",", ""))
+                if xml_to_dict.get("보증금")
                 else None,
                 sigungu=xml_to_dict.get("시군구"),
                 deal_month=xml_to_dict.get("월"),
