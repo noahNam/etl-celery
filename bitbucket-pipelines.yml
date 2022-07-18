@@ -12,7 +12,7 @@ pipelines:
           - pip
         script:
           - pip install poetry && poetry config virtualenvs.create false && poetry install
-          - FASTAPI_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+          - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
         services:
           - mysql
   pull-requests:
@@ -24,7 +24,7 @@ pipelines:
             - pip
           script:
             - pip install poetry && poetry config virtualenvs.create false && poetry install
-            - FLASK_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+            - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
           services:
             - mysql
       - step:
@@ -73,7 +73,7 @@ pipelines:
             - pip
           script:
             - pip install poetry && poetry config virtualenvs.create false && poetry install
-            - FLASK_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+            - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
           services:
             - mysql
       - step:
@@ -109,7 +109,7 @@ pipelines:
             - pip
           script:
             - pip install poetry && poetry config virtualenvs.create false && poetry install
-            - FLASK_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+            - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
           services:
             - mysql
       - step:
@@ -145,7 +145,7 @@ pipelines:
             - pip
           script:
             - pip install poetry && poetry config virtualenvs.create false && poetry install
-            - FLASK_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+            - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
           services:
             - mysql
       - step:
@@ -182,7 +182,7 @@ pipelines:
             - pip
           script:
             - pip install poetry && poetry config virtualenvs.create false && poetry install
-            - FLASK_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+            - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
           services:
             - mysql
       - step:
