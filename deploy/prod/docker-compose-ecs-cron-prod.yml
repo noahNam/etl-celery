@@ -3,8 +3,8 @@ services:
   prod-antgirl-cron:
     image: __ECR_ADDRESS__
     ports:
-      - "5000:5000"
-    command:  "celery -A celery_app.celery worker -B --loglevel=info -P threads -c 2"
+      - "8000:8000"
+    command:  "celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery worker -B --loglevel=info -P threads -c 1"
     logging:
       driver: awslogs
       options:

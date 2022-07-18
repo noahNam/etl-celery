@@ -1,5 +1,5 @@
 # `python-base` sets up all shared environment variables
-FROM python:3.8-slim-buster as python-base
+FROM python:3.10.5-slim-buster as python-base
 MAINTAINER Noah
 
     # python
@@ -14,7 +14,7 @@ ENV PYTHONUNBUFFERED=1 \
     \
     # poetry
     # https://python-poetry.org/docs/configuration/#using-environment-variables
-    POETRY_VERSION=1.1.4 \
+    POETRY_VERSION=1.1.14 \
     # make poetry install to this location
     POETRY_HOME="/opt/poetry" \
     # make poetry create the virtual environment in the project's root
@@ -62,5 +62,5 @@ COPY modules ${APP_DIR}/modules
 COPY exceptions ${APP_DIR}/exceptions
 # COPY application.py celery_app.py newrelic.ini ${APP_DIR}/
 
-EXPOSE 5000
+EXPOSE 8000
 WORKDIR ${APP_DIR}/

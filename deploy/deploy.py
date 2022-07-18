@@ -34,7 +34,7 @@ class BlueGreenDeploy:
                             "TaskDefinition": "__TASK_DEFINITION__",
                             "LoadBalancerInfo": {
                                 "ContainerName": "prod-antgirl-api",
-                                "ContainerPort": 5000,
+                                "ContainerPort": 8000,
                             },
                         },
                     }
