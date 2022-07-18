@@ -7,7 +7,7 @@ volumes:
 services:
   redis:
     image: redis:latest
-    container_name: antgirl-redis
+    container_name: redis
     volumes:
       - redis_local:/var/lib/redis
     ports:
