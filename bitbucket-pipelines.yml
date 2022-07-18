@@ -12,7 +12,7 @@ pipelines:
           - pip
         script:
           - pip install poetry && poetry config virtualenvs.create false && poetry install
-          - FASTAPI_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+          - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
         services:
           - mysql
   pull-requests:
@@ -24,9 +24,9 @@ pipelines:
             - pip
           script:
             - pip install poetry && poetry config virtualenvs.create false && poetry install
-            - FLASK_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+            - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
           services:
-            - postgres
+            - mysql
       - step:
           name: 'Build & Push to toadhome/antgirl-api-prod'
           image: 'python:3.10.5'
@@ -73,9 +73,9 @@ pipelines:
             - pip
           script:
             - pip install poetry && poetry config virtualenvs.create false && poetry install
-            - FLASK_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+            - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
           services:
-            - postgres
+            - mysql
       - step:
           name: 'Build & Push to antgirl-api-dev'
           image: 'python:3.10.5'
@@ -109,9 +109,9 @@ pipelines:
             - pip
           script:
             - pip install poetry && poetry config virtualenvs.create false && poetry install
-            - FLASK_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+            - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
           services:
-            - postgres
+            - mysql
       - step:
           name: 'Build & Push to antgirl-cron-dev'
           image: 'python:3.10.5'
@@ -145,9 +145,9 @@ pipelines:
             - pip
           script:
             - pip install poetry && poetry config virtualenvs.create false && poetry install
-            - FLASK_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+            - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
           services:
-            - postgres
+            - mysql
       - step:
           name: 'Build & Push to antgirl-cron-prod'
           image: 'python:3.10.5'
@@ -182,9 +182,9 @@ pipelines:
             - pip
           script:
             - pip install poetry && poetry config virtualenvs.create false && poetry install
-            - FLASK_CONFIG=testing python -m pytest tests/ --ignore=tests/app/http
+            - FASTAPI_ENV=testing python -m pytest tests/ --ignore=tests/app/http
           services:
-            - postgres
+            - mysql
       - step:
           name: 'Build & Push to antgirl-api-dev'
           image: 'python:3.10.5'
@@ -212,7 +212,7 @@ pipelines:
             - python deploy/update.py -e dev -s api
 definitions:
   services:
-    postgres:
+    mysql:
       image: mysql:5.7
       variables:
         MYSQL_DATABASE: 'antgirl'
