@@ -215,9 +215,9 @@ class SyncSubscriptionRepository(SubscriptionRepository):
         results = session.execute(query).scalars().all()
 
         if results:
-            if isinstance(model, SubscriptionModel):
+            if isinstance(results[0], SubscriptionModel):
                 return [result.to_entity_for_public_sales() for result in results]
-            elif isinstance(model, SubscriptionDetailModel):
+            elif isinstance(results[0], SubscriptionDetailModel):
                 return [
                     result.to_entity_for_public_sale_details() for result in results
                 ]

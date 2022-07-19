@@ -39,6 +39,7 @@ class TransformPublicSales:
             move_in_year, move_in_month = self._get_move_year_month(
                 move_in_year=subscription.move_in_date
             )
+            supply_household: int = self._string_to_int(subscription.supply_household)
 
             public_sale = PublicSaleModel(
                 id=subscription.subs_id,
@@ -49,7 +50,7 @@ class TransformPublicSales:
                 rent_type=subscription.rent_type,
                 trade_type=None,
                 construct_company=subscription.construct_company,
-                supply_household=float(subscription.supply_household),
+                supply_household=supply_household,
                 offer_date=subscription.offer_date,
                 subscription_start_date=subscription_start_date,
                 subscription_end_date=subscription_end_date,
@@ -100,23 +101,46 @@ class TransformPublicSales:
             area_type: str = self._get_area_type(raw_type=sub_detail.area_type)
             private_area: float = self._get_private_area(raw_type=sub_detail.area_type)
             acquisition_tax: int = self._calculate_house_acquisition_tax(
-                private_area=private_area, supply_price=int(sub_detail.supply_price)
+                private_area=private_area, supply_price=sub_detail.supply_price
             )
+            supply_area: float = MathHelper.round(float(sub_detail.supply_area), 2)
+            supply_price: int = (
+                int(sub_detail.supply_price) if sub_detail.supply_price else None
+            )
+            special_household: int = (
+                int(sub_detail.special_household)
+                if sub_detail.special_household
+                else None
+            )
+
+            multi_children_household: float = self._str_to_float(
+                sub_detail.multi_children_household
+            )
+            newlywed_household: float = self._str_to_float(
+                sub_detail.newlywed_household
+            )
+            old_parent_household: float = self._str_to_float(
+                sub_detail.old_parent_household
+            )
+            first_life_household: float = self._str_to_float(
+                sub_detail.first_life_household
+            )
+            general_household: float = self._str_to_float(sub_detail.general_household)
 
             public_sale_detail = PublicSaleDetailModel(
                 id=sub_detail.id,
                 public_sale_id=sub_detail.subs_id,
                 area_type=area_type,
                 private_area=private_area,
-                supply_area=MathHelper.round(float(sub_detail.supply_area), 2),
-                supply_price=int(sub_detail.supply_price),
+                supply_area=supply_area,
+                supply_price=supply_price,
                 acquisition_tax=acquisition_tax,
-                special_household=float(sub_detail.special_household),
-                multi_children_household=float(sub_detail.multi_children_household),
-                newlywed_household=float(sub_detail.newlywed_household),
-                old_parent_household=float(sub_detail.old_parent_household),
-                first_life_household=float(sub_detail.first_life_household),
-                general_household=float(sub_detail.general_household),
+                special_household=special_household,
+                multi_children_household=multi_children_household,
+                newlywed_household=newlywed_household,
+                old_parent_household=old_parent_household,
+                first_life_household=first_life_household,
+                general_household=general_household,
                 bay=sub_detail.bay,
                 pansang_tower=sub_detail.pansang_tower,
                 kitchen_window=sub_detail.kitchen_window,
@@ -256,7 +280,7 @@ class TransformPublicSales:
         return MathHelper().round(float(val[0]), 2)
 
     def _calculate_house_acquisition_tax(
-        self, private_area: float, supply_price: int
+        self, private_area: float, supply_price: str | None
     ) -> int:
         """
         부동산 정책이 매년 변경되므로 정기적으로 세율 변경 시 업데이트 필요합니다.
@@ -287,9 +311,12 @@ class TransformPublicSales:
             not private_area
             or private_area == 0
             or not supply_price
-            or supply_price == 0
+            or supply_price == "0"
+            or not supply_price
         ):
             return 0
+        else:
+            supply_price = int(supply_price)
 
         if supply_price <= 60000:
             if private_area <= 85:
@@ -364,10 +391,11 @@ class TransformPublicSales:
         if not value or value == "":
             return None
         else:
+            value = value.replace("-", "")
             return float(value)
 
     def _get_competition_rate(self, value: str) -> float | None:
-        if not value or value == "":
+        if not value or value == "" or value == "-":
             return None
         elif not re.search("△", value):
             return float(value)
@@ -381,3 +409,18 @@ class TransformPublicSales:
             return None
         else:
             return float(value)
+
+    def get_ids(
+        self,
+        sub_details: list[SubDtToPublicDtEntity],
+    ) -> list[int]:
+        sub_detail_ids = list()
+        for sub_detail in sub_details:
+            sub_detail_ids.append(sub_detail.id)
+        return sub_detail_ids
+
+    def _string_to_int(self, string: str) -> int:
+        if string:
+            return int(re.sub(r"[^0-9]", "", string))
+        else:
+            return 0
