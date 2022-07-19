@@ -34,7 +34,7 @@ class AptRentEntity(BaseModel):
     deal_day: str
     deposit: int | None
     private_area: float | None
-    supply_area: float
+    supply_area: float | None
     regional_cd: str
     floor: str | None
     is_available: bool
@@ -51,7 +51,7 @@ class OfctlDealEntity(BaseModel):
     deal_month: str
     deal_day: str
     private_area: float | None
-    supply_area: float
+    supply_area: float | None
     regional_cd: str
     floor: str | None
     cancel_deal_type: str | None
@@ -73,7 +73,7 @@ class OfctlRentEntity(BaseModel):
     deposit: int | None
     monthly_amount: int
     private_area: float | None
-    supply_area: float
+    supply_area: float | None
     regional_cd: str
     floor: str | None
     is_available: bool
@@ -91,7 +91,7 @@ class RightLotOutEntity(BaseModel):
     deal_month: str
     deal_day: str
     private_area: float | None
-    supply_area: float
+    supply_area: float | None
     regional_cd: str
     floor: str | None
     is_available: bool

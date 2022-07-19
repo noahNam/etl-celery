@@ -60,14 +60,14 @@ def setup_periodic_tasks(sender, **kwargs):
     # etl_tasks.start_worker.apply_async(
     #     kwargs={"topic": TopicEnum.CRAWL_LEGAL_DONG_CODE.value}
     # )
-    # etl_tasks.start_worker.apply_async(
-    #     kwargs={"topic": TopicEnum.ETL_WH_BASIC_INFOS.value}
-    # )
+    etl_tasks.start_worker.apply_async(
+        kwargs={"topic": TopicEnum.ETL_MART_PRIVATE_SALES.value}
+    )
 
-    # DL 아파트 실거래가 매핑테이블
-    etl_tasks.start_worker.delay(
-        topic=TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value
-    )  # 실거래가, kapt, kakao데이터 수집 이후
+    # # DL 아파트 실거래가 매핑테이블
+    # etl_tasks.start_worker.delay(
+    #     topic=TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value
+    # )  # 실거래가, kapt, kakao데이터 수집 이후
 
     # DW 아파트 실거래가
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_APT_DEALS.value)  # 매핑테이블 이후, 건축물대장 업데이트 이후

@@ -558,14 +558,14 @@ class GovtHouseDealSpider(Spider):
                         deal_year=elm.get("년"),
                         ofctl_name=elm.get("단지"),
                         dong=elm.get("법정동"),
-                        deposit=int(elm.get("보증금액").replace(",", ""))
-                        if elm.get("보증금액")
+                        deposit=int(elm.get("보증금").replace(",", ""))
+                        if elm.get("보증금")
                         else None,
                         sigungu=elm.get("시군구"),
                         deal_month=elm.get("월"),
                         deal_day=elm.get("일"),
-                        monthly_amount=int(elm.get("월세금액").replace(",", ""))
-                        if elm.get("월세금액")
+                        monthly_amount=int(elm.get("월세").replace(",", ""))
+                        if elm.get("월세")
                         else None,
                         exclusive_area=elm.get("전용면적"),
                         jibun=elm.get("지번"),
@@ -595,14 +595,14 @@ class GovtHouseDealSpider(Spider):
                 deal_year=xml_to_dict.get("년"),
                 ofctl_name=xml_to_dict.get("단지"),
                 dong=xml_to_dict.get("법정동"),
-                deposit=int(xml_to_dict.get("보증금액").replace(",", ""))
-                if xml_to_dict.get("보증금액")
+                deposit=int(xml_to_dict.get("보증금").replace(",", ""))
+                if xml_to_dict.get("보증금")
                 else None,
                 sigungu=xml_to_dict.get("시군구"),
                 deal_month=xml_to_dict.get("월"),
                 deal_day=xml_to_dict.get("일"),
-                monthly_amount=int(xml_to_dict.get("월세금액").replace(",", ""))
-                if xml_to_dict.get("월세금액")
+                monthly_amount=int(xml_to_dict.get("월세").replace(",", ""))
+                if xml_to_dict.get("월세")
                 else None,
                 exclusive_area=xml_to_dict.get("전용면적"),
                 jibun=xml_to_dict.get("지번"),
@@ -653,7 +653,7 @@ class GovtHouseDealSpider(Spider):
                         else None,
                         classification_owner_ship=elm.get("구분"),
                         deal_year=elm.get("년"),
-                        ofctl_name=elm.get("단지"),
+                        name=elm.get("단지"),
                         dong=elm.get("법정동"),
                         sigungu=elm.get("시군구"),
                         deal_month=elm.get("월"),
@@ -688,7 +688,7 @@ class GovtHouseDealSpider(Spider):
                 else None,
                 classification_owner_ship=xml_to_dict.get("구분"),
                 deal_year=xml_to_dict.get("년"),
-                ofctl_name=xml_to_dict.get("단지"),
+                name=xml_to_dict.get("단지"),
                 dong=xml_to_dict.get("법정동"),
                 sigungu=xml_to_dict.get("시군구"),
                 deal_month=xml_to_dict.get("월"),
