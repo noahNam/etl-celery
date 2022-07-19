@@ -124,9 +124,10 @@ class TransferAptDeals(Transfer):
                     dong=govt_ofctl_deal.dong,
                     bld_name=govt_ofctl_deal.ofctl_name,
                     deal_amount=govt_ofctl_deal.deal_amount,
+                    deal_year=govt_ofctl_deal.deal_year,
                     deal_month=govt_ofctl_deal.deal_month,
                     deal_day=govt_ofctl_deal.deal_day,
-                    preivate_area=MathHelper().round(
+                    private_area=MathHelper().round(
                         float(govt_ofctl_deal.exclusive_area), 2
                     ),
                     supply_area=supply_area,
@@ -162,7 +163,7 @@ class TransferAptDeals(Transfer):
                     private_area=MathHelper().round(
                         float(govt_ofctl_rent.exclusive_area), 2
                     ),
-                    supply_atra=supply_area,
+                    supply_area=supply_area,
                     regional_cd=govt_ofctl_rent.regional_cd,
                     floor=govt_ofctl_rent.floor,
                     is_available=True,
@@ -175,7 +176,9 @@ class TransferAptDeals(Transfer):
             right_lot_outs = list()
             right_lot_out_ids = list()
 
-            for govt_right_lot_out in tqdm(entities, desc="govt_apt_rent", mininterval=1):
+            for govt_right_lot_out in tqdm(
+                entities, desc="govt_right_lot_out", mininterval=1
+            ):
                 supply_area = self._get_supply_area(
                     supply_areas=supply_areas, govt_deal=govt_right_lot_out
                 )

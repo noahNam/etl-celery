@@ -2,10 +2,7 @@ import requests
 from tqdm import tqdm
 
 from modules.adapter.infrastructure.crawler.crawler.enum.kakao_enum import KakaoApiEnum
-from modules.adapter.infrastructure.utils.log_helper import (
-    logger_,
-    TqdmLoggingHandler
-)
+from modules.adapter.infrastructure.utils.log_helper import logger_, TqdmLoggingHandler
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     MappingGovtEntity,
 )
@@ -29,14 +26,14 @@ logger.addHandler(TqdmLoggingHandler())
 
 class TransferBldMappingResults(Transfer):
     def start_transfer(
-            self,
-            govt_apt_deals: list[MappingGovtEntity],
-            govt_apt_rents: list[MappingGovtEntity],
-            govt_ofctl_deals: list[MappingGovtEntity],
-            govt_ofctl_rents: list[MappingGovtEntity],
-            govt_right_lot_outs: list[MappingGovtEntity],
-            kakao_api_results: list[KakaoApiAddrEntity],
-            dongs: list[LegalDongCodeEntity],
+        self,
+        govt_apt_deals: list[MappingGovtEntity],
+        govt_apt_rents: list[MappingGovtEntity],
+        govt_ofctl_deals: list[MappingGovtEntity],
+        govt_ofctl_rents: list[MappingGovtEntity],
+        govt_right_lot_outs: list[MappingGovtEntity],
+        kakao_api_results: list[KakaoApiAddrEntity],
+        dongs: list[LegalDongCodeEntity],
     ) -> [list[BldMappingResultModel], list[AptDealKakaoHistoryModel]]:
         """
         2.1. 실거래가 데이터 & bld_mapping_results : 검색어 중복 검사 (검색어 중복 [jibun, dong, bld_name, regoinal_cd])
@@ -46,7 +43,11 @@ class TransferBldMappingResults(Transfer):
 
         # govts 전처리
         govts: list[MappingGovtEntity] = (
-                govt_apt_deals + govt_apt_rents + govt_ofctl_deals + govt_ofctl_rents + govt_right_lot_outs
+            govt_apt_deals
+            + govt_apt_rents
+            + govt_ofctl_deals
+            + govt_ofctl_rents
+            + govt_right_lot_outs
         )
 
         # mapping_id가 없는 것들만 작업
@@ -60,10 +61,11 @@ class TransferBldMappingResults(Transfer):
         for i in tqdm(range(len(filtered_govts)), desc="new_govts", mininterval=1):
             is_append = True
             for j in range(i):
-                if (filtered_govts[i].regional_cd == filtered_govts[j].regional_cd
-                        and filtered_govts[i].jibun == filtered_govts[j].jibun
-                        and filtered_govts[i].dong == filtered_govts[j].dong
-                        and filtered_govts[i].apt_name == filtered_govts[j].apt_name
+                if (
+                    filtered_govts[i].regional_cd == filtered_govts[j].regional_cd
+                    and filtered_govts[i].jibun == filtered_govts[j].jibun
+                    and filtered_govts[i].dong == filtered_govts[j].dong
+                    and filtered_govts[i].apt_name == filtered_govts[j].apt_name
                 ):
                     is_append = False
                     break
@@ -77,10 +79,10 @@ class TransferBldMappingResults(Transfer):
         govt_addresses: list[str] = list()
         for govt in tqdm(new_govts, desc="govt_addresses", mininterval=1):
             sido_ymm = self._get_addr(regional_cd=govt.regional_cd, dongs=dongs)
-            dong = govt.dong if govt.dong else ''
-            jibun = govt.jibun if govt.jibun else ''
-            apt_name = govt.apt_name if govt.apt_name else ''
-            address = ' '.join([sido_ymm, dong, jibun, apt_name])
+            dong = govt.dong if govt.dong else ""
+            jibun = govt.jibun if govt.jibun else ""
+            apt_name = govt.apt_name if govt.apt_name else ""
+            address = " ".join([sido_ymm, dong, jibun, apt_name])
             govt_addresses.append(address)
 
         # kakao api request
@@ -106,7 +108,9 @@ class TransferBldMappingResults(Transfer):
         # 3. history 데이터 정리
         apt_deal_kakao_histories = list()
         bld_mapping_results = list()
-        for i in tqdm(range(len(kakao_addresses)), desc="bld_mapping_results", mininterval=1):
+        for i in tqdm(
+            range(len(kakao_addresses)), desc="bld_mapping_results", mininterval=1
+        ):
             # 1. place_id (매핑되었을 때 값 불러옴)
             mapping_ids: list[int] = self._get_mapping_key(
                 response=kakao_addresses[i], kakao_api_results=kakao_api_results
@@ -155,39 +159,40 @@ class TransferBldMappingResults(Transfer):
             apt_deal_kakao_histories.append(apt_deal_kakao_history)
         return [bld_mapping_results, apt_deal_kakao_histories]
 
-    def _get_addr(self, regional_cd: str | None, dongs: list[LegalDongCodeEntity]) -> str:
+    def _get_addr(
+        self, regional_cd: str | None, dongs: list[LegalDongCodeEntity]
+    ) -> str:
         if not regional_cd:
-            return ''
+            return ""
 
         for dong in dongs:
-            if ''.join([regional_cd, '00000']) == dong.region_cd:
-                locatadd_nm = dong.locatadd_nm if dong.locatadd_nm else ''
+            if "".join([regional_cd, "00000"]) == dong.region_cd:
+                locatadd_nm = dong.locatadd_nm if dong.locatadd_nm else ""
                 return locatadd_nm
-        return ''
+        return ""
 
-    def _request_kakao_api(
-            self, address: str, key_number: int
-    ) -> dict | None | int:
+    def _request_kakao_api(self, address: str, key_number: int) -> dict | None | int:
         url: str = KakaoApiEnum.KAKAO_PLACE_API_URL_NO_PARAM.value
         headers: dict = {
             "Authorization": f"KakaoAK {KakaoApiEnum.KAKAO_API_KEYS.value[key_number]}"
         }
-        params = {
-            "query": "{}".format(address)
-        }
+        params = {"query": "{}".format(address)}
         res = requests.get(url=url, params=params, headers=headers)
 
         # kakao 응답에 문제가 있는지 확인
         if res.status_code in [429, 401]:
             return res.status_code
         else:
-            kakao_addresses = res.json()['documents']
+            kakao_addresses = res.json()["documents"]
             if not kakao_addresses:
                 return None
 
             kakao_address = None
             for addr in kakao_addresses:
-                if '아파트' in addr['category_name'] and '아파트상가' not in addr['category_name']:
+                if (
+                    "아파트" in addr["category_name"]
+                    and "아파트상가" not in addr["category_name"]
+                ):
                     kakao_address = addr
                     break
 
@@ -203,19 +208,19 @@ class TransferBldMappingResults(Transfer):
                 return i
 
         if not key_idx:
-            raise Exception('kakao API limit has been exceeded')
+            raise Exception("kakao API limit has been exceeded")
 
     def _get_mapping_key(
-            self,
-            response: dict,
-            kakao_api_results: list[KakaoApiAddrEntity]
+        self, response: dict, kakao_api_results: list[KakaoApiAddrEntity]
     ) -> list[int | None]:
         for kakao_api_result in kakao_api_results:
             if not response:
                 return [None, None]
 
-            if (response["address_name"] == kakao_api_result.jibun_address and
-                    response["place_name"] == kakao_api_result.bld_name):
+            if (
+                response["address_name"] == kakao_api_result.jibun_address
+                and response["place_name"] == kakao_api_result.bld_name
+            ):
                 if not response["road_address_name"]:
                     return [kakao_api_result.id, kakao_api_result.house_id]
                 elif response["road_address_name"] == kakao_api_result.road_address:

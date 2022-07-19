@@ -3,7 +3,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.bld_ma
     BldMappingResultModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.apt_deal_kakao_history_model import (
-    AptDealKakaoHistoryModel
+    AptDealKakaoHistoryModel,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 
@@ -12,9 +12,9 @@ logger = logger_.getLogger(__name__)
 
 class SyncBldMappingResultRepository:
     def save_all(
-            self,
-            bld_mapping_results: list[BldMappingResultModel] | None,
-            apt_deal_kakao_histories: list[AptDealKakaoHistoryModel]
+        self,
+        bld_mapping_results: list[BldMappingResultModel] | None,
+        apt_deal_kakao_histories: list[AptDealKakaoHistoryModel],
     ) -> None:
         if not bld_mapping_results and not apt_deal_kakao_histories:
             return None

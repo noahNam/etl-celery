@@ -27,7 +27,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entit
     MappingGovtEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.apt_deal_kakao_history_model import (
-    AptDealKakaoHistoryModel
+    AptDealKakaoHistoryModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
     LegalDongCodeEntity,
@@ -119,7 +119,9 @@ class BldMappingResultUseCase(BaseETLUseCase):
             end_month=end_month,
         )
 
-        govt_ofctl_deals: list[MappingGovtEntity] = self._govt_repo.find_by_update_needed(
+        govt_ofctl_deals: list[
+            MappingGovtEntity
+        ] = self._govt_repo.find_by_update_needed(
             find_type=GovtFindTypeEnum.GOV_OFCTL_DEAL_MAPPING.value,
             start_year=start_year,
             start_month=start_month,
@@ -153,7 +155,10 @@ class BldMappingResultUseCase(BaseETLUseCase):
         # 1.3. 법정동 코드
         legal_dong_codes: list[LegalDongCodeEntity] = self._dong_code.find_all()
 
-        transfered_data: [list[BldMappingResultModel], list[AptDealKakaoHistoryModel]] = self._transfer.start_transfer(
+        transfered_data: [
+            list[BldMappingResultModel],
+            list[AptDealKakaoHistoryModel],
+        ] = self._transfer.start_transfer(
             govt_apt_deals=govt_apt_deals,
             govt_apt_rents=govt_apt_rents,
             govt_ofctl_deals=govt_ofctl_deals,
@@ -168,5 +173,5 @@ class BldMappingResultUseCase(BaseETLUseCase):
         # Load
         self._bld_mapping_repo.save_all(
             bld_mapping_results=bld_mapping_results,
-            apt_deal_kakao_histories=apt_deal_kakao_histories
+            apt_deal_kakao_histories=apt_deal_kakao_histories,
         )

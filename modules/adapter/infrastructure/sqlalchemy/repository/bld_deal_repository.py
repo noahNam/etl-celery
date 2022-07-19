@@ -79,7 +79,7 @@ class SyncBldDealRepository(BldDealRepository):
             for i in range(0, len(insert_models), insert_cnt):
                 session.execute(
                     update(update_model)
-                    .where(update_model.id.in_(ids[i:i+insert_cnt]))
+                    .where(update_model.id.in_(ids[i : i + insert_cnt]))
                     .values(update_needed=False)
                 )
             session.commit()

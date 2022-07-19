@@ -11,6 +11,7 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kakao_api_resu
     KakaoApiAddrEntity,
 )
 
+
 class KakaoApiResultModel(datalake_base, TimestampMixin):
     __tablename__ = "kakao_api_results"
 

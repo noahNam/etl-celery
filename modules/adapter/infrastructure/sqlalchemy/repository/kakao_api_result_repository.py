@@ -81,28 +81,30 @@ class SyncKakaoApiRepository(KakaoApiRepository):
 
     def find_all(self) -> list[KakaoApiAddrEntity]:
         query = (
-            session.query(
-                KakaoApiResultModel
-            ).with_entities(
+            session.query(KakaoApiResultModel)
+            .with_entities(
                 KakaoApiResultModel.id,
                 KakaoApiResultModel.road_address,
                 KakaoApiResultModel.jibun_address,
                 KakaoApiResultModel.bld_name,
                 KaptBasicInfoModel.house_id,
-            ).join(
+            )
+            .join(
                 KaptBasicInfoModel,
                 KakaoApiResultModel.id == KaptBasicInfoModel.place_id,
                 isouter=True,
-            ).where(
-                KaptBasicInfoModel.house_id != None
             )
+            .where(KaptBasicInfoModel.house_id != None)
         )
         querysets = query.all()
 
         if not querysets:
             return list()
         else:
-            return [self._to_entity_for_bld_mapping(queryset=queryset) for queryset in querysets]
+            return [
+                self._to_entity_for_bld_mapping(queryset=queryset)
+                for queryset in querysets
+            ]
 
     def _to_entity_for_bld_mapping(self, queryset) -> KakaoApiAddrEntity:
         return KakaoApiAddrEntity(
