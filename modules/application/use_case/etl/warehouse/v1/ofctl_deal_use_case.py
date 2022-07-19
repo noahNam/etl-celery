@@ -2,6 +2,9 @@ from modules.adapter.infrastructure.etl.bld_deals import TransferAptDeals
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.govt_apt_entity import (
     GovtOfctlDealJoinKeyEntity,
 )
+from modules.adapter.infrastructure.crawler.crawler.enum.govt_deal_enum import (
+    GovtHouseDealEnum,
+)
 from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_entity import (
     SupplyAreaEntity,
 )
@@ -42,18 +45,34 @@ class OfctlDealUseCase(BaseETLUseCase):
         self._basic_repo: SyncBasicRepository = basic_repo
 
     def execute(self):
+        # Extract
+        start_year = GovtHouseDealEnum.MIN_YEAR_MONTH.value[:4]
+        start_month = str(int(GovtHouseDealEnum.MIN_YEAR_MONTH.value[5:]))
+        end_year = GovtHouseDealEnum.MAX_YEAR_MONTH.value[:4]
+        end_month = str(int(GovtHouseDealEnum.MAX_YEAR_MONTH.value[5:]))
+
         govt_ofctl_deals: list[
             GovtOfctlDealJoinKeyEntity
         ] = self._govt_deal_repo.find_by_update_needed(
-            find_type=GovtFindTypeEnum.OFCTL_DEAL_INPUT.value
+            find_type=GovtFindTypeEnum.OFCTL_DEAL_INPUT.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
         )
         if not govt_ofctl_deals:
             print("govt_apt_deals 업데이트 필요한 데이터 없음")
             return
 
+        # house_id None filter
+        new_govts: list[GovtOfctlDealJoinKeyEntity] = list()
+        for govt_ofctl_deal in govt_ofctl_deals:
+            if govt_ofctl_deal.house_id:
+                new_govts.append(govt_ofctl_deal)
+
         house_ids = list()
-        for govt_apt_rent in govt_ofctl_deals:
-            house_ids.append(govt_apt_rent.house_id)
+        for new_govt in new_govts:
+            house_ids.append(new_govt.house_id)
 
         supply_areas: list[
             SupplyAreaEntity
@@ -62,7 +81,7 @@ class OfctlDealUseCase(BaseETLUseCase):
         # Transfer
         results: tuple[list[OfctlDealModel], list[int]] = self._transfer.start_transfer(
             transfer_type=GovtFindTypeEnum.OFCTL_DEAL_INPUT.value,
-            entities=govt_ofctl_deals,
+            entities=new_govts,
             supply_areas=supply_areas,
         )
         ofctl_deals: list[OfctlDealModel] = results[0]

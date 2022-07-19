@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class SubsToPublicEntity(BaseModel):
     subs_id: int
-    place_id: int
+    place_id: int | None
     name: str
     region: str
     housing_category: str
@@ -50,13 +50,13 @@ class SubDtToPublicDtEntity(BaseModel):
     subs_id: int
     area_type: str | None
     supply_area: float | None
-    supply_price: str
-    special_household: str
-    multi_children_household: str
-    newlywed_household: str
-    old_parent_household: str
-    first_life_household: str
-    general_household: str
+    supply_price: str | None
+    special_household: str | None
+    multi_children_household: str | None
+    newlywed_household: str | None
+    old_parent_household: str | None
+    first_life_household: str | None
+    general_household: str | None
     bay: str | None
     pansang_tower: str | None
     kitchen_window: str | None
