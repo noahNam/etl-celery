@@ -177,9 +177,10 @@ def get_task(topic: str):
             basic_repo=SyncBasicRepository(),
         )
     elif (
-        topic == TopicEnum.ETL_WH_OFCTL_DEALS
+        topic == TopicEnum.ETL_WH_OFCTL_DEALS.value
     ):  # update_needed -> False - DL.GovtOfctlDealModel
         return OfctlDealUseCase(
+            topic=topic,
             govt_deal_repo=SyncGovtDealRepository(),
             bld_mapping_repo=SyncBldMappingResultRepository(),
             bld_deal_repo=SyncBldDealRepository(),
@@ -189,6 +190,7 @@ def get_task(topic: str):
         topic == TopicEnum.ETL_WH_OFCTL_RENTS.value
     ):  # update_needed -> False - DL.GovtOfctlRentModel
         return OfctlRentUseCase(
+            topic=topic,
             govt_deal_repo=SyncGovtDealRepository(),
             bld_mapping_repo=SyncBldMappingResultRepository(),
             bld_deal_repo=SyncBldDealRepository(),
@@ -198,6 +200,7 @@ def get_task(topic: str):
         topic == TopicEnum.ETL_WH_RIGHT_LOG_OUTS.value
     ):  # update_needed -> False - DL.GovtRightLotOutModel
         return RightLotOutUseCase(
+            topic=topic,
             govt_deal_repo=SyncGovtDealRepository(),
             bld_mapping_repo=SyncBldMappingResultRepository(),
             bld_deal_repo=SyncBldDealRepository(),

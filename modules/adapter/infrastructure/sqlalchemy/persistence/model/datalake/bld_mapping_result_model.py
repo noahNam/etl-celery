@@ -10,11 +10,11 @@ class BldMappingResultModel(datalake_base, TimestampMixin):
     __tablename__ = "bld_mapping_results"
     __table_args__ = (
         UniqueConstraint(
-            'regional_cd',
-            'jibun',
-            'dong',
-            'bld_name',
-            name='bld_mapping_results_unique'
+            "regional_cd",
+            "jibun",
+            "dong",
+            "bld_name",
+            name="bld_mapping_results_unique",
         ),
     )
 

@@ -22,6 +22,9 @@ from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository 
     SyncGovtDealRepository,
 )
 from modules.application.use_case.etl import BaseETLUseCase
+from modules.adapter.infrastructure.crawler.crawler.enum.govt_deal_enum import (
+    GovtHouseDealEnum,
+)
 
 
 class OfctlRentUseCase(BaseETLUseCase):
@@ -42,11 +45,22 @@ class OfctlRentUseCase(BaseETLUseCase):
         self._basic_repo: SyncBasicRepository = basic_repo
 
     def execute(self):
+        # Extract
+        start_year = GovtHouseDealEnum.MIN_YEAR_MONTH.value[:4]
+        start_month = str(int(GovtHouseDealEnum.MIN_YEAR_MONTH.value[5:]))
+        end_year = GovtHouseDealEnum.MAX_YEAR_MONTH.value[:4]
+        end_month = str(int(GovtHouseDealEnum.MAX_YEAR_MONTH.value[5:]))
+
         govt_ofctl_rents: list[
             GovtOfctlRentJoinKeyEntity
         ] = self._govt_deal_repo.find_by_update_needed(
-            find_type=GovtFindTypeEnum.OFCTL_RENT_INPUT.value
+            find_type=GovtFindTypeEnum.OFCTL_RENT_INPUT.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
         )
+
         if not govt_ofctl_rents:
             print("govt_ofctl_rents 업데이트 필요한 데이터 없음")
             return
@@ -68,7 +82,7 @@ class OfctlRentUseCase(BaseETLUseCase):
         # Transfer
         results: tuple[list[OfctlRentModel], list[int]] = self._transfer.start_transfer(
             transfer_type=GovtFindTypeEnum.OFCTL_RENT_INPUT.value,
-            entities=govt_ofctl_rents,
+            entities=new_govts,
             supply_areas=supply_areas,
         )
         ofctl_rents: list[OfctlRentModel] = results[0]

@@ -59,6 +59,7 @@ class GovtRightLotOutModel(datalake_base, TimestampMixin):
 
     def to_entity_for_right_lot_outs(self) -> GovtRightLotOutJoinKeyEntity:
         return GovtRightLotOutJoinKeyEntity(
+            id=self.id,
             house_id=self.bld_mapping.house_id if self.bld_mapping else None,
             dong=self.dong,
             name=self.name,

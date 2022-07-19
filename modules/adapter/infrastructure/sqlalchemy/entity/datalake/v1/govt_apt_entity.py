@@ -193,17 +193,19 @@ class GovtOfctlRentJoinKeyEntity(BaseModel):
 
 
 class GovtRightLotOutJoinKeyEntity(BaseModel):
+    id: int
     house_id: int
     dong: str | None
     name: str
     deal_amount: int
-    classification_owner_ship: str
+    classification_owner_ship: str | None
     deal_year: str
     deal_month: str
     deal_day: str
     exclusive_area: str | None
     regional_cd: str
     floor: str | None
+
 
 class BldMappingResultEntity(BaseModel):
     house_id: int | None

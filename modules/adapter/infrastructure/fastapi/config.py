@@ -32,7 +32,10 @@ class Config(BaseSettings):
     JWT_ALGORITHM = os.environ.get("JWT_ALGORITHMS") or "HS256"
 
     # Celery
-    BACKEND_RESULT = os.environ.get("BACKEND_RESULT") or "db+mysql+pymysql://antgirl:1234@localhost:3306/antgirl"
+    BACKEND_RESULT = (
+        os.environ.get("BACKEND_RESULT")
+        or "db+mysql+pymysql://antgirl:1234@localhost:3306/antgirl"
+    )
     TIMEZONE = "Asia/Seoul"
     CELERY_ENABLE_UTC = False
 

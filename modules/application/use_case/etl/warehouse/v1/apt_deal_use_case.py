@@ -64,6 +64,7 @@ class AptDealUseCase(BaseETLUseCase):
             print("govt_apt_deals 업데이트 필요한 데이터 없음")
             return
 
+        # house_id None filter
         new_govts: list[GovtAptDealsJoinKeyEntity] = list()
         for govt_apt_deal in govt_apt_deals:
             if govt_apt_deal.house_id:
@@ -84,11 +85,9 @@ class AptDealUseCase(BaseETLUseCase):
             supply_areas=supply_areas,
         )
         apt_daels: list[AptDealModel] = results[0]
-        new_govts: list[int] = results[1]
+        new_govts_ids: list[int] = results[1]
 
         # Load
         self._bld_deal_reop.save_all(
-            insert_models=apt_daels,
-            ids=new_govts,
-            update_model=GovtAptDealModel
+            insert_models=apt_daels, ids=new_govts_ids, update_model=GovtAptDealModel
         )

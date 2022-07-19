@@ -45,17 +45,9 @@ class SyncGovtDealRepository(GovtDealsRepository):
         start_month: str,
         end_year: str,
         end_month: str,
-    ) -> list[
-        MappingGovtEntity
-    ] | list[
-        GovtAptDealsJoinKeyEntity
-    ] | list[
+    ) -> list[MappingGovtEntity] | list[GovtAptDealsJoinKeyEntity] | list[
         GovtAptRentsJoinKeyEntity
-    ] | list[
-        GovtOfctlDealJoinKeyEntity
-    ] | list[
-        GovtOfctlRentJoinKeyEntity
-    ] | list[
+    ] | list[GovtOfctlDealJoinKeyEntity] | list[GovtOfctlRentJoinKeyEntity] | list[
         GovtRightLotOutJoinKeyEntity
     ] | None:
         if find_type == GovtFindTypeEnum.GOV_APT_DEAL_MAPPING.value:
@@ -66,15 +58,15 @@ class SyncGovtDealRepository(GovtDealsRepository):
                             GovtAptDealModel.deal_year == start_year,
                             GovtAptDealModel.deal_month >= start_month,
                         ),
-                        GovtAptDealModel.deal_year > start_year
+                        GovtAptDealModel.deal_year > start_year,
                     ),
                     or_(
                         and_(
                             GovtAptDealModel.deal_year == end_year,
                             GovtAptDealModel.deal_month <= end_month,
                         ),
-                        GovtAptDealModel.deal_year < end_year
-                    )
+                        GovtAptDealModel.deal_year < end_year,
+                    ),
                 )
             )
             govt_apt_deals = session.execute(query).scalars().all()
@@ -95,15 +87,15 @@ class SyncGovtDealRepository(GovtDealsRepository):
                             GovtAptRentModel.deal_year == start_year,
                             GovtAptRentModel.deal_month >= start_month,
                         ),
-                        GovtAptRentModel.deal_year > start_year
+                        GovtAptRentModel.deal_year > start_year,
                     ),
                     or_(
                         and_(
                             GovtAptRentModel.deal_year == end_year,
                             GovtAptRentModel.deal_month <= end_month,
                         ),
-                        GovtAptRentModel.deal_year < end_year
-                    )
+                        GovtAptRentModel.deal_year < end_year,
+                    ),
                 )
             )
             govt_apt_rents = session.execute(query).scalars().all()
@@ -124,15 +116,15 @@ class SyncGovtDealRepository(GovtDealsRepository):
                             GovtOfctlDealModel.deal_year == start_year,
                             GovtOfctlDealModel.deal_month >= start_month,
                         ),
-                        GovtOfctlDealModel.deal_year > start_year
+                        GovtOfctlDealModel.deal_year > start_year,
                     ),
                     or_(
                         and_(
                             GovtOfctlDealModel.deal_year == end_year,
                             GovtOfctlDealModel.deal_month <= end_month,
                         ),
-                        GovtOfctlDealModel.deal_year < end_year
-                    )
+                        GovtOfctlDealModel.deal_year < end_year,
+                    ),
                 )
             )
             govt_ofctl_deals = session.execute(query).scalars().all()
@@ -152,15 +144,15 @@ class SyncGovtDealRepository(GovtDealsRepository):
                             GovtOfctlRentModel.deal_year == start_year,
                             GovtOfctlRentModel.deal_month >= start_month,
                         ),
-                        GovtOfctlRentModel.deal_year > start_year
+                        GovtOfctlRentModel.deal_year > start_year,
                     ),
                     or_(
                         and_(
                             GovtOfctlRentModel.deal_year == end_year,
                             GovtOfctlRentModel.deal_month <= end_month,
                         ),
-                        GovtOfctlRentModel.deal_year < end_year
-                    )
+                        GovtOfctlRentModel.deal_year < end_year,
+                    ),
                 )
             )
             govt_ofctl_rents = session.execute(query).scalars().all()
@@ -180,15 +172,15 @@ class SyncGovtDealRepository(GovtDealsRepository):
                             GovtRightLotOutModel.deal_year == start_year,
                             GovtRightLotOutModel.deal_month >= start_month,
                         ),
-                        GovtRightLotOutModel.deal_year > start_year
+                        GovtRightLotOutModel.deal_year > start_year,
                     ),
                     or_(
                         and_(
                             GovtRightLotOutModel.deal_year == end_year,
                             GovtRightLotOutModel.deal_month <= end_month,
                         ),
-                        GovtRightLotOutModel.deal_year < end_year
-                    )
+                        GovtRightLotOutModel.deal_year < end_year,
+                    ),
                 )
             )
             govt_right_lot_outs = session.execute(query).scalars().all()
@@ -201,25 +193,22 @@ class SyncGovtDealRepository(GovtDealsRepository):
                 ]
 
         elif find_type == GovtFindTypeEnum.APT_DEALS_INPUT.value:
-            query = (
-                select(GovtAptDealModel)
-                .where(
-                    and_(
-                        or_(
-                            and_(
-                                GovtAptDealModel.deal_year == start_year,
-                                GovtAptDealModel.deal_month >= start_month,
-                            ),
-                            GovtAptDealModel.deal_year > start_year
+            query = select(GovtAptDealModel).where(
+                and_(
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == start_year,
+                            GovtAptDealModel.deal_month >= start_month,
                         ),
-                        or_(
-                            and_(
-                                GovtAptDealModel.deal_year == end_year,
-                                GovtAptDealModel.deal_month <= end_month,
-                            ),
-                            GovtAptDealModel.deal_year < end_year
-                        )
-                    )
+                        GovtAptDealModel.deal_year > start_year,
+                    ),
+                    or_(
+                        and_(
+                            GovtAptDealModel.deal_year == end_year,
+                            GovtAptDealModel.deal_month <= end_month,
+                        ),
+                        GovtAptDealModel.deal_year < end_year,
+                    ),
                 )
             )
             govt_apt_deals = session.execute(query).scalars().all()
@@ -233,26 +222,22 @@ class SyncGovtDealRepository(GovtDealsRepository):
                 ]
 
         elif find_type == GovtFindTypeEnum.APT_RENTS_INPUT.value:
-            query = (
-                select(
-                    GovtAptRentModel
-                ).where(
-                    and_(
-                        or_(
-                            and_(
-                                GovtAptRentModel.deal_year == start_year,
-                                GovtAptRentModel.deal_month >= start_month,
-                            ),
-                            GovtAptRentModel.deal_year > start_year
+            query = select(GovtAptRentModel).where(
+                and_(
+                    or_(
+                        and_(
+                            GovtAptRentModel.deal_year == start_year,
+                            GovtAptRentModel.deal_month >= start_month,
                         ),
-                        or_(
-                            and_(
-                                GovtAptRentModel.deal_year == end_year,
-                                GovtAptRentModel.deal_month <= end_month,
-                            ),
-                            GovtAptRentModel.deal_year < end_year
-                        )
-                    )
+                        GovtAptRentModel.deal_year > start_year,
+                    ),
+                    or_(
+                        and_(
+                            GovtAptRentModel.deal_year == end_year,
+                            GovtAptRentModel.deal_month <= end_month,
+                        ),
+                        GovtAptRentModel.deal_year < end_year,
+                    ),
                 )
             )
             # query = select(GovtAptRentModel).where(GovtAptRentModel.id < 1000)
@@ -279,7 +264,24 @@ class SyncGovtDealRepository(GovtDealsRepository):
                         BldMappingResultModel.bld_name == GovtOfctlDealModel.ofctl_name,
                     ),
                 )
-                .where(GovtOfctlDealModel.update_needed == True)
+                .where(
+                    and_(
+                        or_(
+                            and_(
+                                GovtOfctlDealModel.deal_year == start_year,
+                                GovtOfctlDealModel.deal_month >= start_month,
+                            ),
+                            GovtOfctlDealModel.deal_year > start_year,
+                        ),
+                        or_(
+                            and_(
+                                GovtOfctlDealModel.deal_year == end_year,
+                                GovtOfctlDealModel.deal_month <= end_month,
+                            ),
+                            GovtOfctlDealModel.deal_year < end_year,
+                        ),
+                    )
+                )
             )
             govt_ofctl_deals = session.execute(query).scalars().all()
 
@@ -304,7 +306,24 @@ class SyncGovtDealRepository(GovtDealsRepository):
                         BldMappingResultModel.bld_name == GovtOfctlRentModel.ofctl_name,
                     ),
                 )
-                .where(GovtOfctlRentModel.update_needed == True)
+                .where(
+                    and_(
+                        or_(
+                            and_(
+                                GovtOfctlRentModel.deal_year == start_year,
+                                GovtOfctlRentModel.deal_month >= start_month,
+                            ),
+                            GovtOfctlRentModel.deal_year > start_year,
+                        ),
+                        or_(
+                            and_(
+                                GovtOfctlRentModel.deal_year == end_year,
+                                GovtOfctlRentModel.deal_month <= end_month,
+                            ),
+                            GovtOfctlRentModel.deal_year < end_year,
+                        ),
+                    )
+                )
             )
             govt_ofctl_rents = session.execute(query).scalars().all()
 
@@ -329,7 +348,24 @@ class SyncGovtDealRepository(GovtDealsRepository):
                         BldMappingResultModel.bld_name == GovtRightLotOutModel.name,
                     ),
                 )
-                .where(GovtRightLotOutModel.update_needed == True)
+                .where(
+                    and_(
+                        or_(
+                            and_(
+                                GovtRightLotOutModel.deal_year == start_year,
+                                GovtRightLotOutModel.deal_month >= start_month,
+                            ),
+                            GovtRightLotOutModel.deal_year > start_year,
+                        ),
+                        or_(
+                            and_(
+                                GovtRightLotOutModel.deal_year == end_year,
+                                GovtRightLotOutModel.deal_month <= end_month,
+                            ),
+                            GovtRightLotOutModel.deal_year < end_year,
+                        ),
+                    )
+                )
             )
             govt_right_lot_outs = session.execute(query).scalars().all()
 

@@ -149,7 +149,7 @@ class SyncKaptRepository(KaptRepository):
             return [query.to_kapt_basic_info_entity() for query in queryset]
 
         else:
-            raise Exception('[SyncKaptRepository][find_all] find_type error')
+            raise Exception("[SyncKaptRepository][find_all] find_type error")
 
     def _make_kapt_mapping_entity(self, queryset):
         return KaptMappingEntity(
