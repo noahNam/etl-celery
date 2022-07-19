@@ -61,7 +61,7 @@ def setup_periodic_tasks(sender, **kwargs):
     #     kwargs={"topic": TopicEnum.CRAWL_LEGAL_DONG_CODE.value}
     # )
     etl_tasks.start_worker.apply_async(
-        kwargs={"topic": TopicEnum.ETL_MART_PRIVATE_SALES.value}
+        kwargs={"topic": TopicEnum.ETL_MART_DONG_TYPE_INFOS.value}
     )
 
     # # DL 아파트 실거래가 매핑테이블
