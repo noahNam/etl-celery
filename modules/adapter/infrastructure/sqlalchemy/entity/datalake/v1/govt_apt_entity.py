@@ -112,35 +112,12 @@ class GovtRightLotOutsEntity(BaseModel):
     updated_at: datetime
 
 
-class MappingGovtDetailEntity(BaseModel):
-    id: int
-    sigungu_cd: str
-    eubmyundong_cd: str | None
-    build_year: str | None
-    jibun: str | None
-    apt_name: str
-    dong: str | None
-
-
 class MappingGovtEntity(BaseModel):
     id: int
+    mapping_id: int | None
     regional_cd: str
     dong: str | None
-    build_year: str | None
     jibun: str | None
-    apt_name: str
-
-
-class GovtTransferEntity(BaseModel):
-    """
-    매핑테이블 전처리를 위한 임시 Entity
-    TransferBldMappingResults 에서 사용.
-    """
-
-    addr_code: str | None
-    build_year: str | None
-    jibun: str | None
-    dong: str | None
     apt_name: str | None
 
 
@@ -150,7 +127,7 @@ class GovtAptDealsJoinKeyEntity(BaseModel):
     """
 
     id: int
-    house_id: int
+    house_id: int | None
     dong: str | None
     apt_name: str
     deal_amount: str | None
@@ -169,7 +146,7 @@ class GovtAptDealsJoinKeyEntity(BaseModel):
 
 class GovtAptRentsJoinKeyEntity(BaseModel):
     id: int
-    house_id: int
+    house_id: int | None
     dong: str | None
     apt_name: str
     monthly_amount: int | None
@@ -216,14 +193,25 @@ class GovtOfctlRentJoinKeyEntity(BaseModel):
 
 
 class GovtRightLotOutJoinKeyEntity(BaseModel):
+    id: int
     house_id: int
     dong: str | None
     name: str
     deal_amount: int
-    classification_owner_ship: str
+    classification_owner_ship: str | None
     deal_year: str
     deal_month: str
     deal_day: str
     exclusive_area: str | None
     regional_cd: str
     floor: str | None
+
+
+class BldMappingResultEntity(BaseModel):
+    house_id: int | None
+    place_id: int | None
+    house_id: int | None
+    regional_cd: str | None
+    jibun: str
+    dong: str
+    bld_name: str | None

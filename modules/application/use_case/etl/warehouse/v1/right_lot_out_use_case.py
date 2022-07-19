@@ -22,6 +22,9 @@ from modules.adapter.infrastructure.sqlalchemy.repository.govt_deals_repository 
     SyncGovtDealRepository,
 )
 from modules.application.use_case.etl import BaseETLUseCase
+from modules.adapter.infrastructure.crawler.crawler.enum.govt_deal_enum import (
+    GovtHouseDealEnum,
+)
 
 
 class RightLotOutUseCase(BaseETLUseCase):
@@ -42,18 +45,34 @@ class RightLotOutUseCase(BaseETLUseCase):
         self._basic_repo: SyncBasicRepository = basic_repo
 
     def execute(self):
+        # Extract
+        start_year = GovtHouseDealEnum.MIN_YEAR_MONTH.value[:4]
+        start_month = str(int(GovtHouseDealEnum.MIN_YEAR_MONTH.value[5:]))
+        end_year = GovtHouseDealEnum.MAX_YEAR_MONTH.value[:4]
+        end_month = str(int(GovtHouseDealEnum.MAX_YEAR_MONTH.value[5:]))
+
         govt_right_lot_outs: list[
             GovtRightLotOutJoinKeyEntity
         ] = self._govt_deal_repo.find_by_update_needed(
-            find_type=GovtFindTypeEnum.RIGHT_LOT_OUT_INPUT.value
+            find_type=GovtFindTypeEnum.RIGHT_LOT_OUT_INPUT.value,
+            start_year=start_year,
+            start_month=start_month,
+            end_year=end_year,
+            end_month=end_month,
         )
         if not govt_right_lot_outs:
             print("govt_right_lot_outs 업데이트 필요한 데이터 없음")
             return
 
+        # house_id None filter
+        new_govts: list[GovtRightLotOutJoinKeyEntity] = list()
+        for govt_right_lot_out in govt_right_lot_outs:
+            if govt_right_lot_out.house_id:
+                new_govts.append(govt_right_lot_out)
+
         house_ids = list()
-        for govt_apt_rent in govt_right_lot_outs:
-            house_ids.append(govt_apt_rent.house_id)
+        for new_govt in new_govts:
+            house_ids.append(new_govt.house_id)
 
         supply_areas: list[
             SupplyAreaEntity
@@ -64,7 +83,7 @@ class RightLotOutUseCase(BaseETLUseCase):
             list[RightLotOutModel], list[int]
         ] = self._transfer.start_transfer(
             transfer_type=GovtFindTypeEnum.RIGHT_LOT_OUT_INPUT.value,
-            entities=govt_right_lot_outs,
+            entities=new_govts,
             supply_areas=supply_areas,
         )
 

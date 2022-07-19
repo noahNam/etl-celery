@@ -18,7 +18,6 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kapt_entity im
     KaptLocationInfoEntity,
     KaptMgmtCostEntity,
     KaptMappingEntity,
-    KaptAddrInfoEntity,
 )
 from modules.adapter.infrastructure.sqlalchemy.enum.kapt_enum import KaptFindTypeEnum
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.code_rule_model import (
@@ -110,23 +109,6 @@ class AsyncKaptRepository(KaptRepository, BaseAsyncRepository):
 
 
 class SyncKaptRepository(KaptRepository):
-    def find_by_id(
-        self, house_id: int, find_type: int = 0
-    ) -> KaptOpenApiInputEntity | KakaoApiInputEntity | None:
-        kapt_basic_info = session.get(KaptBasicInfoModel, house_id)
-
-        if not kapt_basic_info:
-            return None
-
-        if find_type == KaptFindTypeEnum.KAKAO_API_INPUT.value:
-            return kapt_basic_info.to_kakao_api_input_entity()
-        elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
-            return kapt_basic_info.to_entity_for_bld_mapping_results()
-        elif find_type == KaptFindTypeEnum.KAPT_BASIC_INFOS.value:
-            return kapt_basic_info.to_kapt_basic_info_entity()
-
-        return kapt_basic_info.to_open_api_input_entity()
-
     def find_by_id_range(
         self, start_house_id: int, end_house_id: int, find_type: int = 0
     ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | None:
@@ -154,19 +136,35 @@ class SyncKaptRepository(KaptRepository):
     ) -> list[KaptOpenApiInputEntity] | list[KakaoApiInputEntity] | list[
         KaptMappingEntity
     ]:
-        queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
-
-        if not queryset:
-            return list()
-
         if find_type == KaptFindTypeEnum.KAKAO_API_INPUT.value:
+            queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
+            if not queryset:
+                return list()
             return [query.to_kakao_api_input_entity() for query in queryset]
-        elif find_type == KaptFindTypeEnum.BLD_MAPPING_RESULTS_INPUT.value:
-            return [result.to_entity_for_bld_mapping_results() for result in queryset]
+
         elif find_type == KaptFindTypeEnum.KAPT_BASIC_INFOS.value:
+            queryset = session.execute(select(KaptBasicInfoModel)).scalars().all()
+            if not queryset:
+                return list()
             return [query.to_kapt_basic_info_entity() for query in queryset]
 
-        return [query.to_open_api_input_entity() for query in queryset]
+        else:
+            raise Exception("[SyncKaptRepository][find_all] find_type error")
+
+    def _make_kapt_mapping_entity(self, queryset):
+        return KaptMappingEntity(
+            house_id=queryset.house_id,
+            sido=queryset.sido,
+            sigungu=queryset.sigungu,
+            eubmyun=queryset.eubmyun,
+            dongri=queryset.dongri,
+            use_apr_day=queryset.use_apr_day,
+            origin_dong_address=queryset.origin_dong_address,
+            name=queryset.name,
+            addr_code_addr_info=queryset.addr_code_addr_info,
+            addr_code_area_info=queryset.addr_code_area_info,
+            jibun=queryset.jibun,
+        )
 
     def save(self, kapt_orm: KaptAreaInfoModel | KaptLocationInfoModel | None) -> None:
         if not kapt_orm:
@@ -178,29 +176,6 @@ class SyncKaptRepository(KaptRepository):
         except exc.IntegrityError as e:
             logger.error(
                 f"[SyncKaptRepository][save] kapt_code : {kapt_orm.kapt_code} error : {e}"
-            )
-            session.rollback()
-            raise NotUniqueErrorException
-
-        return None
-
-    def save_update_all(self, models: list[KaptAddrInfoEntity]):
-        if not models:
-            return None
-
-        try:
-            # stmt = insert(KaptAreaInfoModel).values(models)
-            # stmt = stmt.on_duplicate_key_update(
-            #     addr_code=stmt.inserted.addr_code,
-            #     jibun=stmt.inserted.jibun,
-            # )
-            # session.execute(stmt)
-
-            session.merge(models)
-            session.commit()
-        except exc.IntegrityError as e:
-            logger.error(
-                f"[SyncKaptRepository][save_update_all] kapt_code : {models[0].house_id} error : {e}"
             )
             session.rollback()
             raise NotUniqueErrorException
