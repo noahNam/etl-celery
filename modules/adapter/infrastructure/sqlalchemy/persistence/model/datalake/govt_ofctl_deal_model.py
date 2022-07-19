@@ -51,9 +51,9 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
     def to_entity_for_bld_mapping_results(self) -> MappingGovtEntity:
         return MappingGovtEntity(
             id=self.id,
+            mapping_id=self.bld_mapping.id if self.bld_mapping else None,
             regional_cd=self.regional_cd,
             dong=self.dong,
-            build_year=None,
             jibun=self.jibun,
             apt_name=self.ofctl_name,
         )
@@ -61,7 +61,7 @@ class GovtOfctlDealModel(datalake_base, TimestampMixin):
     def to_entity_for_ofctl_deals(self) -> GovtOfctlDealJoinKeyEntity:
         return GovtOfctlDealJoinKeyEntity(
             id=self.id,
-            house_id=self.bld_mapping.house_id,
+            house_id=self.bld_mapping.house_id if self.bld_mapping else None,
             dong=self.dong,
             ofctl_name=self.ofctl_name,
             deal_amount=self.deal_amount,

@@ -28,11 +28,12 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.genera
     GeneralSupplyResultModel,
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
+from modules.application.use_case.etl import BaseETLUseCase
 
 logger = logger_.getLogger(__name__)
 
 
-class PublicSaleUseCase:
+class PublicSaleUseCase(BaseETLUseCase):
     def __init__(self, subscription_repo, public_repo, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._subscription_repo: SyncSubscriptionRepository = subscription_repo
@@ -44,16 +45,19 @@ class PublicSaleUseCase:
         subscriptions: list[
             SubsToPublicEntity
         ] = self._subscription_repo.find_by_update_needed(model=SubscriptionModel)
+
         if not subscriptions:
             logger.info(
                 "[PublicSalesUseCase] There is nothing to update in subscriptions"
             )
+            public_sales = list()
+            sub_ids = list()
         else:
             public_sales: list[
                 PublicSaleModel
             ] = self._transfer.start_transfer_public_sales(subscriptions=subscriptions)
             sub_ids: list[int] = self._transfer._get_sub_ids(sub_details=subscriptions)
-            self.public_repo.save_all(models=public_sales, sub_ids=sub_ids)
+            # self.public_repo.save_all(models=public_sales, sub_ids=sub_ids)
 
         # extract subscription_details
         sub_details: list[
@@ -80,8 +84,10 @@ class PublicSaleUseCase:
                 sub_details=sub_details
             )
 
-            sub_detail_ids: list[int] = self._transfer.get_ids(models=sub_details)
+            sub_detail_ids: list[int] = self._transfer.get_ids(sub_details=sub_details)
             self.public_repo.save_all_details(
+                public_sales=public_sales,
+                sub_ids=sub_ids,
                 public_sale_details=public_sale_details,
                 special_supply_results=special_supply_results,
                 general_supply_results=general_supply_results,
