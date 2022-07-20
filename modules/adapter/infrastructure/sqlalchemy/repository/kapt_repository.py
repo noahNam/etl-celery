@@ -329,7 +329,7 @@ class SyncKaptRepository(KaptRepository):
             if target_model == KaptLocationInfoEntity:
                 session.execute(
                     update(KaptLocationInfoModel)
-                    .where(KaptLocationInfoModel.kapt_code == value.get("kapt_code"))
+                    .where(KaptLocationInfoModel.kapt_code == value["items"].get("kapt_code"))
                     .values(
                         update_needed=False,
                     )
@@ -337,7 +337,7 @@ class SyncKaptRepository(KaptRepository):
             elif target_model == KaptAreaInfoEntity:
                 session.execute(
                     update(KaptAreaInfoModel)
-                    .where(KaptAreaInfoModel.kapt_code == value.get("kapt_code"))
+                    .where(KaptAreaInfoModel.kapt_code == value["items"].get("kapt_code"))
                     .values(
                         update_needed=False,
                     )
