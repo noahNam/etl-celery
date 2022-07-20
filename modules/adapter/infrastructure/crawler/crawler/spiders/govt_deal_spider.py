@@ -477,7 +477,8 @@ class GovtHouseDealSpider(Spider):
                         req_gbn=elm.get("거래유형"),
                         rdealer_lawdnm=elm.get("중개사소재지"),
                     )
-
+                    if not item.deal_amount:
+                        continue
                     yield item
                 return None
 
@@ -519,7 +520,7 @@ class GovtHouseDealSpider(Spider):
         except KeyError:
             pass
 
-        if item:
+        if item and item.deal_amount:
             yield item
         else:
             self.save_failure_info(
