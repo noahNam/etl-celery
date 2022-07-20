@@ -13,11 +13,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_l
 
 
 class KaptRepository(ABC):
-    @abstractmethod
-    def find_by_id(
-        self, house_id: int, find_type: int
-    ) -> KaptOpenApiInputEntity | KakaoApiInputEntity | None:
-        pass
 
     @abstractmethod
     def find_all(
