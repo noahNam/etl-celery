@@ -59,3 +59,27 @@ class PublicSaleDetailModel(datamart_base, TimestampMixin):
             area_type=self.area_type,
             private_area=self.private_area,
         )
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            public_sale_id=self.public_sale_id,
+            area_type=self.area_type,
+            private_area=self.private_area,
+            supply_area=self.supply_area,
+            supply_price=self.supply_price,
+            acquisition_tax=self.acquisition_tax,
+            special_household=self.special_household,
+            multi_children_household=self.multi_children_household,
+            newlywed_household=self.newlywed_household,
+            old_parent_household=self.old_parent_household,
+            first_life_household=self.first_life_household,
+            general_household=self.general_household,
+            bay=self.bay,
+            pansang_tower=self.pansang_tower,
+            kitchen_window=self.kitchen_window,
+            direct_window=self.direct_window,
+            alpha_room=self.alpha_room,
+            cyber_model_house_link=self.cyber_model_house_link,
+            update_needed=self.update_needed,
+        )
