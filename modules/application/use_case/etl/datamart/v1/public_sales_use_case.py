@@ -102,14 +102,14 @@ class PublicSaleUseCase(BaseETLUseCase):
                 sub_detail_ids=sub_detail_ids,
             )
 
-            # for public_sale in public_sales:
-            #     self.redis_set(model=public_sale)
-            # for public_sale_detail in public_sale_details:
-            #     self.redis_set(model=public_sale_detail)
-            # for special_supply_result in special_supply_results:
-            #     self.redis_set(model=special_supply_result)
-            # for general_supply_result in general_supply_results:
-            #     self.redis_set(model=general_supply_result)
+            for public_sale in public_sales:
+                self.redis_set(model=public_sale)
+            for public_sale_detail in public_sale_details:
+                self.redis_set(model=public_sale_detail)
+            for special_supply_result in special_supply_results:
+                self.redis_set(model=special_supply_result)
+            for general_supply_result in general_supply_results:
+                self.redis_set(model=general_supply_result)
 
     def redis_set(
         self,
