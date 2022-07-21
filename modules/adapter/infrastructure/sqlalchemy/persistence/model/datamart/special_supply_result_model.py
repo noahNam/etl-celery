@@ -28,3 +28,16 @@ class SpecialSupplyResultModel(datamart_base, TimestampMixin):
     old_parent_vol = Column(Numeric(5), nullable=True)
     first_life_vol = Column(Numeric(5), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            public_sale_detail_id=self.public_sale_detail_id,
+            region=self.region,
+            region_percent=self.region_percent,
+            multi_children_vol=self.multi_children_vol,
+            newlywed_vol=self.newlywed_vol,
+            old_parent_vol=self.old_parent_vol,
+            first_life_vol=self.first_life_vol,
+            update_needed=self.update_needed,
+        )
