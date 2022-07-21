@@ -219,6 +219,7 @@ def get_task(topic: str):
             topic=topic,
             subscription_repo=SyncSubscriptionRepository(),
             public_repo=SyncPublicSaleRepository(),
+            redis=redis,
         )
 
 

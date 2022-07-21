@@ -1,3 +1,4 @@
+import json
 from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repository import (
     SyncSubscriptionRepository,
 )
@@ -29,19 +30,27 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.genera
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.application.use_case.etl import BaseETLUseCase
+from modules.adapter.infrastructure.message.broker.redis import RedisClient
 
 logger = logger_.getLogger(__name__)
 
 
 class PublicSaleUseCase(BaseETLUseCase):
-    def __init__(self, subscription_repo, public_repo, *args, **kwargs):
+    def __init__(
+        self,
+        subscription_repo: SyncSubscriptionRepository,
+        public_repo: SyncPublicSaleRepository,
+        redis: RedisClient,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self._subscription_repo: SyncSubscriptionRepository = subscription_repo
         self._transfer: TransformPublicSales = TransformPublicSales()
         self.public_repo: SyncPublicSaleRepository = public_repo
+        self._redis: RedisClient = redis
 
     def execute(self):
-        # extract subscriptions
         subscriptions: list[
             SubsToPublicEntity
         ] = self._subscription_repo.find_by_update_needed(model=SubscriptionModel)
@@ -57,7 +66,6 @@ class PublicSaleUseCase(BaseETLUseCase):
                 PublicSaleModel
             ] = self._transfer.start_transfer_public_sales(subscriptions=subscriptions)
             sub_ids: list[int] = self._transfer._get_sub_ids(sub_details=subscriptions)
-            # self.public_repo.save_all(models=public_sales, sub_ids=sub_ids)
 
         # extract subscription_details
         sub_details: list[
@@ -85,7 +93,7 @@ class PublicSaleUseCase(BaseETLUseCase):
             )
 
             sub_detail_ids: list[int] = self._transfer.get_ids(sub_details=sub_details)
-            self.public_repo.save_all_details(
+            self.public_repo.save_public_sales(
                 public_sales=public_sales,
                 sub_ids=sub_ids,
                 public_sale_details=public_sale_details,
@@ -93,3 +101,36 @@ class PublicSaleUseCase(BaseETLUseCase):
                 general_supply_results=general_supply_results,
                 sub_detail_ids=sub_detail_ids,
             )
+
+            for public_sale in public_sales:
+                self.redis_set(model=public_sale)
+            for public_sale_detail in public_sale_details:
+                self.redis_set(model=public_sale_detail)
+            for special_supply_result in special_supply_results:
+                self.redis_set(model=special_supply_result)
+            for general_supply_result in general_supply_results:
+                self.redis_set(model=general_supply_result)
+
+    def redis_set(
+        self,
+        model: PublicSaleModel
+        | PublicSaleDetailModel
+        | SpecialSupplyResultModel
+        | GeneralSupplyResultModel,
+    ) -> None:
+        # message publish to redis
+        if isinstance(model, PublicSaleModel):
+            ref_table = "public_sales"
+        elif isinstance(model, PublicSaleDetailModel):
+            ref_table = "public_sale_details"
+        elif isinstance(model, SpecialSupplyResultModel):
+            ref_table = "special_supply_results"
+        elif isinstance(model, GeneralSupplyResultModel):
+            ref_table = "general_supply_results"
+        else:
+            return None
+
+        self._redis.set(
+            key=f"sync:{ref_table}:{model.id}",
+            value=json.dumps(model.to_dict(), ensure_ascii=False).encode("utf-8"),
+        )
