@@ -27,3 +27,15 @@ class GeneralSupplyResultModel(datamart_base, TimestampMixin):
     competition_rate = Column(Numeric(3), nullable=True)
     win_point = Column(Numeric(3), nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            public_sale_detail_id=self.public_sale_detail_id,
+            region=self.region,
+            region_percent=self.region_percent,
+            applicant_num=self.applicant_num,
+            competition_rate=self.competition_rate,
+            win_point=self.win_point,
+            update_needed=self.update_needed,
+        )
