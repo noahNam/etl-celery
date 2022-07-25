@@ -1,6 +1,6 @@
 version: "3"
 services:
-  prod-tanos-api:
+  prod-antgirl-api:
     image: __ECR_ADDRESS__
     ports:
       - "8000:8000"
