@@ -24,6 +24,7 @@ selenium = "^4.3.0"
 pandas = "^1.4.3"
 beautifulsoup4 = "^4.11.1"
 tqdm = "^4.64.0"
+webdriver-manager = "^3.8.2"
 
 [tool.poetry.dev-dependencies]
 aiosqlite = "^0.17.0"
