@@ -13,6 +13,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.webdriver import WebDriver
 from twisted.internet.threads import deferToThread
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 from modules.adapter.infrastructure.crawler.crawler.spiders.subs_info_spider import (
     SubscriptionSpider,
@@ -196,11 +199,7 @@ class SeleniumDownloaderMiddleware:
             # excutable_path : 절대 경로로 사용
             self._driver = webdriver.Chrome(
                 options=options,
-                service=Service(
-                    executable_path=r"/Users/seonwoong-hwang/Documents/dev/Apartalk/"
-                    r"antgirl/modules/adapter/infrastructure/crawler/crawler/driver"
-                    r"/chromedriver"
-                ),
+                service=ChromeService(ChromeDriverManager().install())
             )
         except Exception:
             logger.error(
