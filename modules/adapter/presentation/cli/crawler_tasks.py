@@ -44,8 +44,6 @@ def get_task(topic: str):
     elif topic == TopicEnum.CRAWL_GOVT_DEAL_INFOS.value:
         return GovtDealUseCase(topic=topic, repo=SyncLegalDongCodeRepository())
     elif topic == TopicEnum.CRAWL_APPLY_HOME.value:
-        # chromedriver app required : modules/adapter/infrastructure/crawler/crawler/driver
-        # fix executable_path on [_get_driver func] in modules/adapter/infrastructure/crawler/crawler/middlewares.py
         return SubscriptionInfoUseCase(topic=topic, repo=SyncKaptRepository())
 
 
