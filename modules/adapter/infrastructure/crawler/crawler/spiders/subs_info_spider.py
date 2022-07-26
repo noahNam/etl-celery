@@ -237,19 +237,24 @@ class SubscriptionSpider(Spider):
                         and parsed_info.offer_date == subs_info.offer_date
                         and parsed_info.rent_type == subs_info.rent_type
                         and parsed_info.area_type == subs_info.area_type
-                        and parsed_info.supply_price == subs_info.supply_price
+                        and str(int(parsed_info.supply_price)) == subs_info.supply_price
                     ):
+                        parsed_info.id = subs_info.id
                         update_list.append(parsed_info)
-                    else:
+
+            if update_list:
+                for parsed_info in parsed_subs_info_models:
+                    if parsed_info not in update_list:
                         create_list.append(parsed_info)
+            else:
+                for parsed_info in parsed_subs_info_models:
+                    create_list.append(parsed_info)
         else:
             for parsed_info in parsed_subs_info_models:
                 create_list.append(parsed_info)
 
         if create_list:
             self._save_subs_infos(subs_infos=create_list)
-        else:
-            self._save_subs_infos(subs_infos=parsed_subs_info_models)
 
         if update_list:
             for elm in update_list:
