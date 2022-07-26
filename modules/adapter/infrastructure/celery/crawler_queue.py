@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.schedules import crontab
 
 from modules.adapter.infrastructure.fastapi.config import Config, fastapi_config
 from modules.adapter.infrastructure.message.broker.redis import redis
@@ -49,10 +50,10 @@ def setup_periodic_tasks(sender, **kwargs):
     # )
 
     # crawler_tasks.start_crawler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
-    crawler_tasks.start_crawler.apply_async(
-        kwargs={"topic": TopicEnum.CRAWL_APPLY_HOME.value}
+    sender.add_periodic_task(
+        crontab(hour=18, minute=30),
+        kwargs={"topic": TopicEnum.CRAWL_APPLY_HOME.value},
     )
-
 
 # celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery flower --address=localhost --port=5555
 # celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery worker -B --loglevel=info -P threads -c 3
