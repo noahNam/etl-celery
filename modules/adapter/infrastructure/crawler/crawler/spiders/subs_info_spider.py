@@ -22,6 +22,7 @@ from modules.adapter.infrastructure.pypubsub.enum.subs_info_enum import (
 )
 from modules.adapter.infrastructure.pypubsub.event_listener import event_listener_dict
 from modules.adapter.infrastructure.pypubsub.event_observer import send_message
+from modules.adapter.infrastructure.slack.slack_mixin import SlackMixin
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
     SubscriptionInfoEntity,
 )
@@ -33,7 +34,7 @@ from modules.adapter.infrastructure.utils.log_helper import logger_
 logger = logger_.getLogger(__name__)
 
 
-class SubscriptionSpider(Spider):
+class SubscriptionSpider(Spider, SlackMixin):
     name: str = "subscription_infos"
     custom_settings: dict = {
         "DOWNLOADER_MIDDLEWARES": {
@@ -48,6 +49,15 @@ class SubscriptionSpider(Spider):
     def start_requests(self):
         SubscriptionSpider.subs_info_last_id_seq = self.subs_info_last_id_seq
         url = SubscriptionInfoEnum.APPLY_HOME_URL.value
+
+        emoji = "🚀"
+        self.send_slack_message(
+            title=f"{emoji} [SubscriptionSpider] >>> 청약홈 크롤러 수집 Task",
+            message=f"start_ym : {SubscriptionSpider.start_ym} \n "
+            f"end_ym : {SubscriptionSpider.end_ym} \n "
+            f"Crawler Start to {SubscriptionSpider.name}\n ",
+        )
+
         yield Request(url=url)
 
     def browser_interaction_before_parsing(self, driver: WebDriver):
@@ -217,52 +227,67 @@ class SubscriptionSpider(Spider):
         ].str.replace("'", "")
 
     def parse(self, response, **kwargs):
-        subs_info_dicts: list[dict] = self.convert_result_to_list()
-        parsed_subs_info_models: list[SubscriptionInfoModel] = list()
-        create_list: list[SubscriptionInfoModel] = list()
-        update_list: list[SubscriptionInfoModel] = list()
+        try:
+            subs_info_dicts: list[dict] = self.convert_result_to_list()
+            parsed_subs_info_models: list[SubscriptionInfoModel] = list()
+            create_list: list[SubscriptionInfoModel] = list()
+            update_list: list[SubscriptionInfoModel] = list()
 
-        for subs_info_dict in subs_info_dicts:
-            parsed_subs_info_models.append(SubscriptionInfoModel(**subs_info_dict))
+            for subs_info_dict in subs_info_dicts:
+                parsed_subs_info_models.append(SubscriptionInfoModel(**subs_info_dict))
 
-        subs_infos_from_current_db: list[
-            SubscriptionInfoEntity
-        ] = self.__find_subs_infos_by_year_month()
+            subs_infos_from_current_db: list[
+                SubscriptionInfoEntity
+            ] = self.__find_subs_infos_by_year_month()
 
-        if subs_infos_from_current_db:
-            for parsed_info in parsed_subs_info_models:
-                for subs_info in subs_infos_from_current_db:
-                    if (
-                        parsed_info.name == subs_info.name
-                        and parsed_info.offer_date == subs_info.offer_date
-                        and parsed_info.rent_type == subs_info.rent_type
-                        and parsed_info.area_type == subs_info.area_type
-                        and str(int(parsed_info.supply_price)) == subs_info.supply_price
-                    ):
-                        parsed_info.id = subs_info.id
-                        update_list.append(parsed_info)
-
-            if update_list:
+            if subs_infos_from_current_db:
                 for parsed_info in parsed_subs_info_models:
-                    if parsed_info not in update_list:
+                    for subs_info in subs_infos_from_current_db:
+                        if (
+                            parsed_info.name == subs_info.name
+                            and parsed_info.offer_date == subs_info.offer_date
+                            and parsed_info.rent_type == subs_info.rent_type
+                            and parsed_info.area_type == subs_info.area_type
+                            and str(int(parsed_info.supply_price))
+                            == subs_info.supply_price
+                        ):
+                            parsed_info.id = subs_info.id
+                            update_list.append(parsed_info)
+
+                if update_list:
+                    for parsed_info in parsed_subs_info_models:
+                        if parsed_info not in update_list:
+                            create_list.append(parsed_info)
+                else:
+                    for parsed_info in parsed_subs_info_models:
                         create_list.append(parsed_info)
             else:
                 for parsed_info in parsed_subs_info_models:
                     create_list.append(parsed_info)
-        else:
-            for parsed_info in parsed_subs_info_models:
-                create_list.append(parsed_info)
 
-        if create_list:
-            self._save_subs_infos(subs_infos=create_list)
+            if create_list:
+                self._save_subs_infos(subs_infos=create_list)
 
-        if update_list:
-            for elm in update_list:
-                self._update(elm)
+            if update_list:
+                for elm in update_list:
+                    self._update(elm)
 
-        self.repo.update_id_to_code_rules(
-            key_div="subs_id", last_id=SubscriptionSpider.subs_info_last_id_seq
-        )
+            self.repo.update_id_to_code_rules(
+                key_div="subs_id", last_id=SubscriptionSpider.subs_info_last_id_seq
+            )
+
+            emoji = "🚀"
+            self.send_slack_message(
+                title=f"{emoji} [SubscriptionSpider] >>> 청약홈 크롤러 수집 Finished",
+                message=f"create_list : {len(create_list) if create_list else 0} \n "
+                f"update_list : {len(update_list) if update_list else 0} \n ",
+            )
+        except Exception as e:
+            emoji = "☠️"
+            self.send_slack_message(
+                title=f"{emoji} [SubscriptionSpider] >>> 청약홈 크롤러 수집 Finished",
+                message=f"error - {e} \n ",
+            )
 
     def convert_result_to_list(self) -> list[dict]:
         result_to_list: list = list()
