@@ -49,15 +49,6 @@ class SubscriptionSpider(Spider, SlackMixin):
     def start_requests(self):
         SubscriptionSpider.subs_info_last_id_seq = self.subs_info_last_id_seq
         url = SubscriptionInfoEnum.APPLY_HOME_URL.value
-
-        emoji = "🚀"
-        self.send_slack_message(
-            title=f"{emoji} [SubscriptionSpider] >>> 청약홈 크롤러 수집 Task",
-            message=f"start_ym : {SubscriptionSpider.start_ym} \n "
-            f"end_ym : {SubscriptionSpider.end_ym} \n "
-            f"Crawler Start to {SubscriptionSpider.name}\n ",
-        )
-
         yield Request(url=url)
 
     def browser_interaction_before_parsing(self, driver: WebDriver):
@@ -278,15 +269,17 @@ class SubscriptionSpider(Spider, SlackMixin):
 
             emoji = "🚀"
             self.send_slack_message(
-                title=f"{emoji} [SubscriptionSpider] >>> 청약홈 크롤러 수집 Finished",
-                message=f"create_list : {len(create_list) if create_list else 0} \n "
-                f"update_list : {len(update_list) if update_list else 0} \n ",
+                title=f"{emoji} [SubscriptionSpider] >>> 청약홈 크롤러 수집 Task",
+                message=f"range : {SubscriptionSpider.start_ym} ~ {SubscriptionSpider.end_ym} \n "
+                        f"create_list : {len(create_list) if create_list else 0} \n "
+                        f"update_list : {len(update_list) if update_list else 0} \n ",
             )
         except Exception as e:
             emoji = "☠️"
             self.send_slack_message(
-                title=f"{emoji} [SubscriptionSpider] >>> 청약홈 크롤러 수집 Finished",
-                message=f"error - {e} \n ",
+                title=f"{emoji} [SubscriptionSpider] >>> 청약홈 크롤러 수집 Task",
+                message=f"range : {SubscriptionSpider.start_ym} ~ {SubscriptionSpider.end_ym} \n "
+                        f"error - {e} \n ",
             )
 
     def convert_result_to_list(self) -> list[dict]:
