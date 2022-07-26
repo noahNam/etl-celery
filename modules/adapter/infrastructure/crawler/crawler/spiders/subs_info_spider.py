@@ -347,9 +347,6 @@ class SubscriptionSpider(Spider):
         for i in range(len(rows)):
             try:
                 body = rows[i].find_elements(By.TAG_NAME, "td")
-                SubscriptionSpider.subs_info_last_id_seq = (
-                    SubscriptionSpider.subs_info_last_id_seq + 1
-                )
             except Exception:
                 time.sleep(1)
                 driver.find_element(By.CLASS_NAME, "ui-button").click()
@@ -372,26 +369,18 @@ class SubscriptionSpider(Spider):
 
                 df_temp["index"] = int(i) + (page - 1) * 10
 
-                df_temp["subs_id"] = SubscriptionSpider.subs_info_last_id_seq
-
                 if len(df_apply) == 0:
                     df_apply = df_temp.copy()
                 else:
                     df_apply = pd.concat([df_apply, df_temp])
 
                 driver.find_element(By.CLASS_NAME, "ui-button").click()
-            else:
-                df_apply["subs_id"] = SubscriptionSpider.subs_info_last_id_seq
-                print("@@@")
-                print(df_apply["subs_id"])
 
         if len(df_apply) == 0:
             return None
 
         df_apply = df_apply.sort_values("index")
         df_apply.columns = df_apply.columns.droplevel()
-
-        df_apply.columns.values[-1] = "subs_id"
 
         columns = {
             "공급 세대수": "특별공급_공급세대수",
@@ -408,7 +397,7 @@ class SubscriptionSpider(Spider):
             df_apply,
             columns="지역",
             values=["다자녀_가구", "신혼_부부", "생애최초", "노부모_부양", "기관_추천"],
-            index=["index", "주택형", "특별공급_공급세대수", "subs_id"],
+            index=["index", "주택형", "특별공급_공급세대수"],
         )
 
         columns_level0 = list(df_apply.columns.droplevel(0))
@@ -569,6 +558,9 @@ class SubscriptionSpider(Spider):
         for i in range(len(rows)):
             try:
                 body = rows[i].find_elements(By.TAG_NAME, "td")
+                SubscriptionSpider.subs_info_last_id_seq = (
+                    SubscriptionSpider.subs_info_last_id_seq + 1
+                )
             except Exception:
                 time.sleep(1)
                 try:
@@ -597,7 +589,7 @@ class SubscriptionSpider(Spider):
 
             driver.find_element(By.CLASS_NAME, "ui-button").click()
             df_temp["index"] = int(i) + (page - 1) * 10
-
+            df_temp["subs_id"] = SubscriptionSpider.subs_info_last_id_seq
             if len(df) == 0:
                 df = df_temp.copy()
             else:
