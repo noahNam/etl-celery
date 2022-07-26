@@ -13,7 +13,6 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kapt_l
 
 
 class KaptRepository(ABC):
-
     @abstractmethod
     def find_all(
         self, find_type: int
