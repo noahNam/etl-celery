@@ -4,7 +4,7 @@ services:
     image: __ECR_ADDRESS__
     ports:
       - "8000:8000"
-    command: "celery -A modules.adapter.infrastructure.celery.etl_queue.etl_celery worker -B --loglevel=info -P threads -c 1"
+    command: "celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery beat"
     logging:
       driver: awslogs
       options:
