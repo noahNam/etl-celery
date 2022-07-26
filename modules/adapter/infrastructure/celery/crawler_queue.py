@@ -51,7 +51,7 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # crawler_tasks.start_crawler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
     sender.add_periodic_task(
-        crontab(hour=18, minute=30),
+        crontab(hour=19, minute=00),
         kwargs={"topic": TopicEnum.CRAWL_APPLY_HOME.value},
     )
 
