@@ -8,8 +8,8 @@ class SubscriptionInfoEnum(Enum):
     - ex) 2021년 08월 ~ 2022년 07월
     """
 
-    START_YEAR_MONTH = "2022년 06월"
-    END_YEAR_MONTH = "2022년 06월"
+    START_YEAR_MONTH = "2022년 07월"
+    END_YEAR_MONTH = "2022년 07월"
     APPLY_HOME_URL = (
         "https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancListView.do"
     )
