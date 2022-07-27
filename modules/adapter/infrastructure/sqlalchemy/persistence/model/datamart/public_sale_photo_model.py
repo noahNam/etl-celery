@@ -36,3 +36,16 @@ class PublicSalePhotoModel(datamart_base, TimestampMixin):
     seq = Column(SmallInteger, nullable=True)
     is_available = Column(Boolean, nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            public_sale_id=self.public_sale_id,
+            file_name=self.file_name,
+            path=self.path,
+            extension=self.extension,
+            is_thumbnail=self.is_thumbnail,
+            seq=self.seq,
+            is_available=self.is_available,
+            update_needed=self.update_needed,
+        )

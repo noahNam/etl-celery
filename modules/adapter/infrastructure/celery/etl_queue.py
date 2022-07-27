@@ -60,9 +60,9 @@ def setup_periodic_tasks(sender, **kwargs):
     # etl_tasks.start_worker.apply_async(
     #     kwargs={"topic": TopicEnum.CRAWL_LEGAL_DONG_CODE.value}
     # )
-    etl_tasks.start_worker.apply_async(
-        kwargs={"topic": TopicEnum.ETL_WH_BASIC_INFOS.value}
-    )
+    # etl_tasks.start_worker.apply_async(
+    #     kwargs={"topic": TopicEnum.ETL_WH_BASIC_INFOS.value}
+    # )
 
     # # DL 아파트 실거래가 매핑테이블
     # etl_tasks.start_worker.delay(
@@ -79,6 +79,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_UPDATE_SUPPLY_AREA.value)  # 실거래가 이후, 건축물대장 이후
 
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PUBLIC_SALES.value)
+    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_PUBLIC_SALE_PHOTOS.value)
 
 
 # celery -A modules.adapter.infrastructure.celery.etl_queue.celery flower --address=localhost --port=5555

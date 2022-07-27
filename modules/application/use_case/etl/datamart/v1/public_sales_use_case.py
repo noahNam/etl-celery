@@ -121,16 +121,27 @@ class PublicSaleUseCase(BaseETLUseCase):
         # message publish to redis
         if isinstance(model, PublicSaleModel):
             ref_table = "public_sales"
+            self._redis.set(
+                key=f"sync:{ref_table}:{model.id}",
+                value=json.dumps(model.to_dict(), ensure_ascii=False).encode("utf-8"),
+            )
         elif isinstance(model, PublicSaleDetailModel):
             ref_table = "public_sale_details"
+            self._redis.set(
+                key=f"sync:{ref_table}:{model.id}",
+                value=json.dumps(model.to_dict(), ensure_ascii=False).encode("utf-8"),
+            )
         elif isinstance(model, SpecialSupplyResultModel):
             ref_table = "special_supply_results"
+            self._redis.set(
+                key=f"sync:{ref_table}:{model.public_sale_detail_id}:{model.region}",
+                value=json.dumps(model.to_dict(), ensure_ascii=False).encode("utf-8"),
+            )
         elif isinstance(model, GeneralSupplyResultModel):
             ref_table = "general_supply_results"
+            self._redis.set(
+                key=f"sync:{ref_table}:{model.public_sale_detail_id}:{model.region}",
+                value=json.dumps(model.to_dict(), ensure_ascii=False).encode("utf-8"),
+            )
         else:
             return None
-
-        self._redis.set(
-            key=f"sync:{ref_table}:{model.id}",
-            value=json.dumps(model.to_dict(), ensure_ascii=False).encode("utf-8"),
-        )
