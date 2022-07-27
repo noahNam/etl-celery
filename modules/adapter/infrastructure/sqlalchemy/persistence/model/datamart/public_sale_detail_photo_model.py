@@ -30,3 +30,14 @@ class PublicSaleDetailPhotoModel(datamart_base, TimestampMixin):
     extension = Column(String(4), nullable=True)
     is_available = Column(Boolean, nullable=True)
     update_needed = Column(Boolean, nullable=False, default=True)
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            public_sale_detail_id=self.public_sale_detail_id,
+            file_name=self.file_name,
+            path=self.path,
+            extension=self.extension,
+            is_available=self.is_available,
+            update_needed=self.update_needed,
+        )

@@ -29,15 +29,6 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncPublicSaleRepository:
-    def find_to_detail_ids_by_sub_ids(
-        self, sub_ids: list[int]
-    ) -> list[PublicDtUniqueEntity]:
-        query = select(PublicSaleDetailModel).where(
-            PublicSaleDetailModel.public_sale_id.in_(sub_ids)
-        )
-        results = session.execute(query).scalars().all()
-        return [result.to_unique_entity() for result in results]
-
     def save_public_sales(
         self,
         public_sales: list[PublicSaleModel],

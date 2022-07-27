@@ -1,26 +1,22 @@
 from abc import ABC, abstractmethod
+from typing import Type
 
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.house_photo_model import (
-    HousePhotoModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.house_type_photo_model import (
-    HouseTypePhotoModel,
-)
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.public_sale_detail_photo_model import (
     PublicSaleDetailPhotoModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.public_sale_photo_model import (
     PublicSalePhotoModel,
 )
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.photo_entity import (
+    PublicSalePhotoEntity,
+    PublicSaleDtPhotoEntity,
+)
 
 
 class PhotoRepository(ABC):
     @abstractmethod
-    def save(
-        self,
-        model: HousePhotoModel
-        | HouseTypePhotoModel
-        | PublicSalePhotoModel
-        | PublicSaleDetailPhotoModel,
-    ) -> None:
+    def find_all(
+            self,
+            model: Type[PublicSalePhotoModel | PublicSaleDetailPhotoModel]
+    ) -> list[PublicSalePhotoEntity | PublicSaleDtPhotoEntity]:
         pass
