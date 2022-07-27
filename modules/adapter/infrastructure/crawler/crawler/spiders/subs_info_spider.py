@@ -271,15 +271,15 @@ class SubscriptionSpider(Spider, SlackMixin):
             self.send_slack_message(
                 title=f"{emoji} [SubscriptionSpider] >>> 청약홈 크롤러 수집 Task",
                 message=f"range : {SubscriptionSpider.start_ym} ~ {SubscriptionSpider.end_ym} \n "
-                        f"create_list : {len(create_list) if create_list else 0} \n "
-                        f"update_list : {len(update_list) if update_list else 0} \n ",
+                f"create_list : {len(create_list) if create_list else 0} \n "
+                f"update_list : {len(update_list) if update_list else 0} \n ",
             )
         except Exception as e:
             emoji = "☠️"
             self.send_slack_message(
                 title=f"{emoji} [SubscriptionSpider] >>> 청약홈 크롤러 수집 Task",
                 message=f"range : {SubscriptionSpider.start_ym} ~ {SubscriptionSpider.end_ym} \n "
-                        f"error - {e} \n ",
+                f"error - {e} \n ",
             )
 
     def convert_result_to_list(self) -> list[dict]:

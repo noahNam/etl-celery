@@ -16,7 +16,6 @@ from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.photo_entity i
 class PhotoRepository(ABC):
     @abstractmethod
     def find_all(
-            self,
-            model: Type[PublicSalePhotoModel | PublicSaleDetailPhotoModel]
+        self, model: Type[PublicSalePhotoModel | PublicSaleDetailPhotoModel]
     ) -> list[PublicSalePhotoEntity | PublicSaleDtPhotoEntity]:
         pass

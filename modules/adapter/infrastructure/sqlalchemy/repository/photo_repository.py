@@ -12,7 +12,7 @@ from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.public
     PublicSaleDetailPhotoModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.subscription_info_model import (
-    SubscriptionInfoModel
+    SubscriptionInfoModel,
 )
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.photo_entity import (
     PublicSalePhotoEntity,
@@ -24,42 +24,34 @@ logger = logger_.getLogger(__name__)
 
 class SyncPhotoRepository(PhotoRepository):
     def find_all(
-            self,
-            model: Type[PublicSalePhotoModel | PublicSaleDetailPhotoModel]
+        self, model: Type[PublicSalePhotoModel | PublicSaleDetailPhotoModel]
     ) -> list[PublicSalePhotoEntity | PublicSaleDtPhotoEntity]:
 
         if model == PublicSalePhotoModel:
-            query = (
-                select(
-                    model
-                ).where(
-                    model.update_needed == True
-                )
-            )
+            query = select(model).where(model.update_needed == True)
             results = session.execute(query).scalars().all()
             if results:
-                result_list = [
-                    result.to_entity() for result in results
-                ]
+                result_list = [result.to_entity() for result in results]
                 return result_list
             else:
                 return list()
 
         elif model == PublicSaleDetailPhotoModel:
             query = (
-                session.query(model).with_entities(
+                session.query(model)
+                .with_entities(
                     model.id,
                     model.file_name,
                     model.path,
                     model.extension,
-                    SubscriptionInfoModel.id.label('public_sale_detail_id'),
-                ).where(
-                    model.update_needed == True
-                ).join(
+                    SubscriptionInfoModel.id.label("public_sale_detail_id"),
+                )
+                .where(model.update_needed == True)
+                .join(
                     SubscriptionInfoModel,
                     and_(
                         model.subs_id == SubscriptionInfoModel.subs_id,
-                        model.area_type == SubscriptionInfoModel.area_type
+                        model.area_type == SubscriptionInfoModel.area_type,
                     ),
                     isouter=True,
                 )
