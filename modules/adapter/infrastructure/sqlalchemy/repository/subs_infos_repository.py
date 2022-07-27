@@ -256,13 +256,13 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository):
             month = end_year_month[-2:]
             if month == "12":
                 end_year_month = end_year_month.replace(
-                    end_year_month[-2], "01"
+                    end_year_month[-2:], "01"
                 ).replace(end_year_month[3], str(int(end_year_month[3]) + 1))
             elif month == "11":
                 end_year_month = end_year_month.replace(end_year_month[-1], "2")
             else:
                 end_year_month = end_year_month.replace(
-                    end_year_month[-2], "0" + str(int(month) + 1)
+                    end_year_month[-2:], "0" + str(int(month) + 1)
                 )
 
         query = select(SubscriptionInfoModel).where(

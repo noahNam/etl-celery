@@ -196,10 +196,9 @@ class SeleniumDownloaderMiddleware:
         options.add_argument("headless")
 
         try:
-            # excutable_path : 절대 경로로 사용
             self._driver = webdriver.Chrome(
                 options=options,
-                service=ChromeService(ChromeDriverManager().install())
+                service=ChromeService(ChromeDriverManager().install()),
             )
         except Exception:
             logger.error(
