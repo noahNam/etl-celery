@@ -40,6 +40,12 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subs_infos_repository 
 from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repository import (
     SyncSubscriptionRepository,
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.photo_repository import (
+    SyncPhotoRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.dm_photo_repository import (
+    SyncDMPhotoRepository,
+)
 from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.adapter.presentation.cli.enum import TopicEnum
 from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case import (
@@ -47,6 +53,9 @@ from modules.application.use_case.etl.datalake.v1.bld_mapping_results_use_case i
 )
 from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
+)
+from modules.application.use_case.etl.datamart.v1.public_sale_photo_use_case import (
+    PublicSalePhotoUseCase,
 )
 from modules.application.use_case.etl.datamart.v1.dong_type_use_case import (
     DongTypeUseCase,
@@ -219,6 +228,14 @@ def get_task(topic: str):
             topic=topic,
             subscription_repo=SyncSubscriptionRepository(),
             public_repo=SyncPublicSaleRepository(),
+            redis=redis,
+        )
+
+    elif topic == TopicEnum.ETL_PUBLIC_SALE_PHOTOS.value:
+        return PublicSalePhotoUseCase(
+            topic=topic,
+            photo_repo=SyncPhotoRepository(),
+            dm_photo_repo=SyncDMPhotoRepository(),
             redis=redis,
         )
 
