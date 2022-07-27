@@ -2,8 +2,12 @@ import json
 
 from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.application.use_case.etl import BaseETLUseCase
-from modules.adapter.infrastructure.sqlalchemy.repository.photo_repository import SyncPhotoRepository
-from modules.adapter.infrastructure.sqlalchemy.repository.dm_photo_repository import SyncDMPhotoRepository
+from modules.adapter.infrastructure.sqlalchemy.repository.photo_repository import (
+    SyncPhotoRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.dm_photo_repository import (
+    SyncDMPhotoRepository,
+)
 from modules.adapter.infrastructure.message.broker.redis import RedisClient
 from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.public_sale_photo_model import (
     PublicSalePhotoModel,
@@ -44,35 +48,33 @@ class PublicSalePhotoUseCase(BaseETLUseCase):
         self._transfer = TransformPhotos()
 
     def execute(self):
-        public_sale_photos: list[
-            PublicSalePhotoEntity
-        ] = self._photo_repo.find_all(model=PublicSalePhotoModel)
+        public_sale_photos: list[PublicSalePhotoEntity] = self._photo_repo.find_all(
+            model=PublicSalePhotoModel
+        )
 
         public_sale_detail_photos: list[
             PublicSaleDtPhotoEntity
         ] = self._photo_repo.find_all(model=PublicSaleDetailPhotoModel)
 
-        public_sale_photo_models: list[MartPublicSalePhotoModel] = self._transfer.start_etl(
-            target_list=public_sale_photos
-        )
+        public_sale_photo_models: list[
+            MartPublicSalePhotoModel
+        ] = self._transfer.start_etl(target_list=public_sale_photos)
 
-        public_sale_detail_photo_models: list[MartPublicSaleDetailPhotoModel] = self._transfer.start_etl(
-            target_list=public_sale_detail_photos
-        )
+        public_sale_detail_photo_models: list[
+            MartPublicSaleDetailPhotoModel
+        ] = self._transfer.start_etl(target_list=public_sale_detail_photos)
 
         self._dm_photo_repo.save_public_sale_photos(
-            public_sale_photo_models,
-            public_sale_detail_photo_models)
+            public_sale_photo_models, public_sale_detail_photo_models
+        )
 
         for public_sale_photo in public_sale_photo_models:
             self.redis_set(model=public_sale_photo)
         for public_sale_detail_photo in public_sale_detail_photo_models:
             self.redis_set(model=public_sale_detail_photo)
 
-
     def redis_set(
-        self,
-        model: MartPublicSalePhotoModel | MartPublicSaleDetailPhotoModel
+        self, model: MartPublicSalePhotoModel | MartPublicSaleDetailPhotoModel
     ) -> None:
         # message publish to redis
         if isinstance(model, MartPublicSalePhotoModel):
@@ -89,4 +91,3 @@ class PublicSalePhotoUseCase(BaseETLUseCase):
             )
         else:
             return None
-

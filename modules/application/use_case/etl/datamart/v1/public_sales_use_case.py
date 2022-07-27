@@ -145,5 +145,3 @@ class PublicSaleUseCase(BaseETLUseCase):
             )
         else:
             return None
-
-

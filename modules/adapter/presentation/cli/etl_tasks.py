@@ -55,7 +55,7 @@ from modules.application.use_case.etl.datalake.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
 )
 from modules.application.use_case.etl.datamart.v1.public_sale_photo_use_case import (
-    PublicSalePhotoUseCase
+    PublicSalePhotoUseCase,
 )
 from modules.application.use_case.etl.datamart.v1.dong_type_use_case import (
     DongTypeUseCase,
@@ -231,9 +231,7 @@ def get_task(topic: str):
             redis=redis,
         )
 
-    elif (
-            topic == TopicEnum.ETL_PUBLIC_SALE_PHOTOS.value
-    ):
+    elif topic == TopicEnum.ETL_PUBLIC_SALE_PHOTOS.value:
         return PublicSalePhotoUseCase(
             topic=topic,
             photo_repo=SyncPhotoRepository(),
