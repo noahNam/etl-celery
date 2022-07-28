@@ -41,6 +41,7 @@ class SyncSubscriptionRepository(SubscriptionRepository):
                 update(SubscriptionModel)
                 .where(SubscriptionModel.subs_id == value.subs_id)
                 .values(
+                    place_id=value.place_id,
                     offer_date=value.offer_date,
                     notice_winner_date=value.notice_winner_date,
                     name=value.name,

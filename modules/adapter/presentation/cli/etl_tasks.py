@@ -121,6 +121,7 @@ def get_task(topic: str):
             topic=topic,
             subscription_repo=SyncSubscriptionRepository(),
             subs_info_repo=SyncSubscriptionInfoRepository(),
+            kakao_repo=SyncKakaoApiRepository(),
         )
     elif topic == TopicEnum.ETL_MART_REAL_ESTATES.value:  # update_needed -> X
         return RealEstateUseCase(
