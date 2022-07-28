@@ -73,6 +73,5 @@ def setup_periodic_tasks(sender, **kwargs):
         queue="etl"
     )
 
-
 # celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery flower --address=localhost --port=5555
 # celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery worker -B --loglevel=info -P threads -c 3
