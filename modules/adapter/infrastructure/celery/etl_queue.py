@@ -49,7 +49,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # )
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_BASIC_INFOS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_DL_SUBS_INFOS.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_SUBS_INFOS.value)
+    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_SUBS_INFOS.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_REAL_ESTATES.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PRIVATE_SALES.value)
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_DONG_TYPE_INFOS.value)
@@ -79,7 +79,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_UPDATE_SUPPLY_AREA.value)  # 실거래가 이후, 건축물대장 이후
 
     # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PUBLIC_SALES.value)
-    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_PUBLIC_SALE_PHOTOS.value)
+    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_PUBLIC_SALE_PHOTOS.value)
 
 
 # celery -A modules.adapter.infrastructure.celery.etl_queue.celery flower --address=localhost --port=5555

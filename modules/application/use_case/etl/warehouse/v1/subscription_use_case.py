@@ -25,6 +25,13 @@ from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repositor
 )
 from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.application.use_case.etl import BaseETLUseCase
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kakao_api_result_model import (
+    KakaoApiResultModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repository import (
+    SyncKakaoApiRepository,
+)
+
 
 logger = logger_.getLogger(__name__)
 
@@ -34,12 +41,14 @@ class SubscriptionUseCase(BaseETLUseCase):
         self,
         subscription_repo: SyncSubscriptionRepository,
         subs_info_repo: SyncSubscriptionInfoRepository,
+        kakao_repo: SyncKakaoApiRepository,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self._subscription_repo: SyncSubscriptionRepository = subscription_repo
         self._subs_info_repo: SyncSubscriptionInfoRepository = subs_info_repo
+        self._kakao_repo: SyncKakaoApiRepository = kakao_repo
         self._transfer: TransformSubscription = TransformSubscription()
 
     def execute(self):
@@ -49,6 +58,36 @@ class SubscriptionUseCase(BaseETLUseCase):
         ] | None = self._subs_info_repo.find_to_update(
             target_model=SubscriptionInfoModel
         )
+
+        # 카카오 주소 데이터 불러오기
+        if subscription_infos:
+            address_data: dict[
+                str, list[int] | list[KakaoApiResultModel | None]
+            ] = self._transfer.get_kakao_address(
+                subs_infos=subscription_infos
+            )
+            subs_ids: list[int] = address_data.get("subs_ids")
+            kakao_addresses: list[KakaoApiResultModel | None] = address_data.get("kakao_addresses")
+
+            # kakao_api_results insert
+            self.__insert_to_datalake(
+                results=kakao_addresses
+            )
+
+            place_ids = list()
+            for kakao_address in kakao_addresses:
+                place_id: int | None = self._kakao_repo.find_to_place_id(kakao_orm=kakao_address)
+                place_ids.append(place_id)
+
+            self.__update_to_datalake(
+                filter=subs_ids, values=place_ids
+            )
+
+            for subscription_info in subscription_infos:
+                if subscription_info.subs_id in subs_ids:
+                    idx = subs_ids.index(subscription_info.subs_id)
+                    place_id = place_ids[idx]
+                    subscription_info.place_id = place_id
 
         results: dict[
             str, list[SubscriptionModel] | list[SubscriptionDetailModel]
@@ -145,3 +184,26 @@ class SubscriptionUseCase(BaseETLUseCase):
                     param=update_needed_target_entities[0],
                     reason=e,
                 )
+
+    def __insert_to_datalake(
+            self,
+            results: list[KakaoApiResultModel | None]
+    ):
+        for result in results:
+            if result:
+                exists_result: bool = self._kakao_repo.is_exists_by_origin_address(kakao_orm=result)
+                if not exists_result:
+                    # insert
+                    self._kakao_repo.save(kakao_orm=result)
+                else:
+                    pass
+            else:
+                pass
+
+    def __update_to_datalake(
+            self,
+            filter: list[int],
+            values: list[int],
+    ):
+        for i in range(len(filter)):
+            self._subs_info_repo.update_by_key_value(key=filter[i], value=values[i])

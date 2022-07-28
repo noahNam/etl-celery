@@ -255,13 +255,13 @@ class TransformPublicSales:
 
     def _get_start_date(self, date: str) -> str | None:
         if date and len(date) == 23:
-            return date[:10]
+            return date[:10].replace("-", "")
         else:
             return None
 
     def _get_end_date(self, date: str) -> str | None:
         if date and len(date) == 23:
-            return date[13:]
+            return date[13:].replace("-", "")
         else:
             return None
 
