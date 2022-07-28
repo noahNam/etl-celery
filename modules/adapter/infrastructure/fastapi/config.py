@@ -34,7 +34,7 @@ class Config(BaseSettings):
     # Celery
     BACKEND_RESULT = (
         os.environ.get("BACKEND_RESULT")
-        or "db+mysql+pymysql://antgirl:1234@localhost:3306/antgirl"
+        or "db+mysql+pymysql://apartalk_admin:!wjstngks117@localhost:3306/apartalk_data_lake"
     )
     TIMEZONE = "Asia/Seoul"
     CELERY_ENABLE_UTC = False
