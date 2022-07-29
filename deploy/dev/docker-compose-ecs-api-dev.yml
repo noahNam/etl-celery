@@ -8,10 +8,9 @@ services:
     logging:
       driver: awslogs
       options:
-        # FIX : Change log group
-        awslogs-group: toadhome/dev-antgirl-api-logs
+        awslogs-group: toadhome/dev-antgirl-beat-logs
         awslogs-region: ap-northeast-2
-        awslogs-stream-prefix: toadhome/dev-antgirl-api-logs
+        awslogs-stream-prefix: toadhome/dev-antgirl-beat-logs
         awslogs-create-group: "true"
 
   dev-antgirl-crawler:
@@ -20,10 +19,9 @@ services:
     logging:
       driver: awslogs
       options:
-        # FIX : Change log group
-        awslogs-group: toadhome/dev-antgirl-api-logs
+        awslogs-group: toadhome/dev-antgirl-crawler-logs
         awslogs-region: ap-northeast-2
-        awslogs-stream-prefix: toadhome/dev-antgirl-api-logs
+        awslogs-stream-prefix: toadhome/dev-antgirl-crawler-logs
         awslogs-create-group: "true"
 
   dev-antgirl-etl:
@@ -32,8 +30,7 @@ services:
     logging:
       driver: awslogs
       options:
-        # FIX : Change log group
-        awslogs-group: toadhome/dev-antgirl-api-logs
+        awslogs-group: toadhome/dev-antgirl-etl-logs
         awslogs-region: ap-northeast-2
-        awslogs-stream-prefix: toadhome/dev-antgirl-api-logs
+        awslogs-stream-prefix: toadhome/dev-antgirl-etl-logs
         awslogs-create-group: "true"
