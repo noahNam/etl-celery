@@ -12,25 +12,3 @@ services:
         awslogs-region: ap-northeast-2
         awslogs-stream-prefix: toadhome/dev-antgirl-beat-logs
         awslogs-create-group: "true"
-
-  dev-antgirl-crawler:
-    image: __ECR_ADDRESS__
-    command: "celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery worker --loglevel=info --queues=crawler -n crawler -P threads -c 1"
-    logging:
-      driver: awslogs
-      options:
-        awslogs-group: toadhome/dev-antgirl-crawler-logs
-        awslogs-region: ap-northeast-2
-        awslogs-stream-prefix: toadhome/dev-antgirl-crawler-logs
-        awslogs-create-group: "true"
-
-  dev-antgirl-etl:
-    image: __ECR_ADDRESS__
-    command: "celery -A modules.adapter.infrastructure.celery.etl_queue.etl_celery worker --loglevel=info --queues=etl -n etl -P threads -c 1"
-    logging:
-      driver: awslogs
-      options:
-        awslogs-group: toadhome/dev-antgirl-etl-logs
-        awslogs-region: ap-northeast-2
-        awslogs-stream-prefix: toadhome/dev-antgirl-etl-logs
-        awslogs-create-group: "true"
