@@ -6,7 +6,13 @@ task_definition:
     cpu_limit: 256
     mem_limit: 0.5GB
   services:
-    dev-tanos-api:
+    dev-antgirl-beat:
+      cpu_shares: 200
+      mem_limit: 0.4GB
+    dev-antgirl-crawler:
+      cpu_shares: 200
+      mem_limit: 0.4GB
+    dev-antgirl-etl:
       cpu_shares: 200
       mem_limit: 0.4GB
 run_params:
