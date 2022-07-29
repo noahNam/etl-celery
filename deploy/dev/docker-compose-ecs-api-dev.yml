@@ -13,8 +13,6 @@ services:
         awslogs-region: ap-northeast-2
         awslogs-stream-prefix: toadhome/dev-antgirl-api-logs
         awslogs-create-group: "true"
-    environment:
-    # Environment
 
   dev-antgirl-crawler:
     image: __ECR_ADDRESS__
@@ -27,8 +25,6 @@ services:
         awslogs-region: ap-northeast-2
         awslogs-stream-prefix: toadhome/dev-antgirl-api-logs
         awslogs-create-group: "true"
-    environment:
-    # Environment
 
   dev-antgirl-etl:
     image: __ECR_ADDRESS__
@@ -41,5 +37,3 @@ services:
         awslogs-region: ap-northeast-2
         awslogs-stream-prefix: toadhome/dev-antgirl-api-logs
         awslogs-create-group: "true"
-    environment:
-    # Environment
