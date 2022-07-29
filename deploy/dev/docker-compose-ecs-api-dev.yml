@@ -1,6 +1,6 @@
 version: "3"
 services:
-  dev-antgirl-beat:
+  dev-antgirl-api:
     image: __ECR_ADDRESS__
     ports:
       - "8000:8000"
@@ -8,7 +8,10 @@ services:
     logging:
       driver: awslogs
       options:
-        awslogs-group: toadhome/dev-antgirl-beat-logs
+        # FIX : Change log group
+        awslogs-group: toadhome/dev-antgirl-api-logs
         awslogs-region: ap-northeast-2
-        awslogs-stream-prefix: toadhome/dev-antgirl-beat-logs
+        awslogs-stream-prefix: toadhome/dev-antgirl-api-logs
         awslogs-create-group: "true"
+    environment:
+    # Environment
