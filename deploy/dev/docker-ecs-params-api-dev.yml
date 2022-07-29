@@ -9,12 +9,6 @@ task_definition:
     dev-antgirl-beat:
       cpu_shares: 200
       mem_limit: 0.4GB
-    dev-antgirl-crawler:
-      cpu_shares: 200
-      mem_limit: 0.4GB
-    dev-antgirl-etl:
-      cpu_shares: 200
-      mem_limit: 0.4GB
 run_params:
   network_configuration:
     awsvpc_configuration:
