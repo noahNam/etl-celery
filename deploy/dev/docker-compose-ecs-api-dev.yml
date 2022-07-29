@@ -1,6 +1,6 @@
 version: "3"
 services:
-  dev-antgirl-api:
+  dev-antgirl-beat:
     image: __ECR_ADDRESS__
     ports:
       - "8000:8000"
