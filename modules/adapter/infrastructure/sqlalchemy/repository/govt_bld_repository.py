@@ -135,6 +135,9 @@ class SyncGovtBldRepository(GovtBldRepository):
             filters.append(
                 and_(
                     GovtBldAreaInfoModel.update_needed == True,
+                    # house_id 일부만 필터하기
+                    GovtBldAreaInfoModel.house_id >= 1511,
+                    GovtBldAreaInfoModel.house_id <= 1520,
                 )
                 # 관련 쿼리 넣을지 확정 안됨.
                 # & not_(
