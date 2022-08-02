@@ -59,14 +59,14 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # crawler_tasks.start_crawler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
     sender.add_periodic_task(
-        schedule=crontab(hour=19, minute=0),
+        schedule=crontab(hour=19, minute=5),
         sig=crawler_tasks.start_crawler.s(topic=TopicEnum.CRAWL_APPLY_HOME.value),
         name="datalake_apply_home",
         queue="crawler"
     )
 
     sender.add_periodic_task(
-        schedule=crontab(hour=19, minute=10),
+        schedule=crontab(hour=19, minute=15),
         sig=etl_tasks.start_worker.s(topic=TopicEnum.ETL_WH_BASIC_INFOS.value),
         name="warehouse_basic_infos",
         queue="etl"
