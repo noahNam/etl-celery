@@ -52,7 +52,6 @@ def make_celery(app_config: Config):
 crawler_celery: Celery = make_celery(fastapi_config)
 
 
-# @crawler_celery.on_after_configure.connect
 @crawler_celery.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     from modules.adapter.presentation.cli import crawler_tasks
@@ -60,16 +59,16 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # crawler_tasks.start_crawler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
     sender.add_periodic_task(
-        schedule=crontab(hour=17, minute=1),
+        schedule=crontab(hour=18, minute=0),
         sig=crawler_tasks.start_crawler.s(topic=TopicEnum.CRAWL_APPLY_HOME.value),
         name="datalake_apply_home",
         queue="crawler"
     )
 
     sender.add_periodic_task(
-        schedule=crontab(hour=17, minute=20),
-        sig=etl_tasks.start_worker.s(topic=TopicEnum.ETL_MART_PRIVATE_SALE_DETAILS.value),
-        name="mart_private_sale_details",
+        schedule=crontab(hour=18, minute=10),
+        sig=etl_tasks.start_worker.s(topic=TopicEnum.ETL_WH_BASIC_INFOS.value),
+        name="warehouse_basic_infos",
         queue="etl"
     )
 

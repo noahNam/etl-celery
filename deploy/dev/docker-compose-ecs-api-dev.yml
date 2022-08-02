@@ -4,11 +4,11 @@ services:
     image: __ECR_ADDRESS__
     ports:
       - "8000:8000"
-    command: "celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery beat --loglevel=info --max-interval 10"
+    command: "supervisord -c supervisord.conf"
     logging:
       driver: awslogs
       options:
-        # FIX : Change log group
+        # FIX : Change log groupa
         awslogs-group: toadhome/dev-antgirl-api-logs
         awslogs-region: ap-northeast-2
         awslogs-stream-prefix: toadhome/dev-antgirl-api-logs
