@@ -214,10 +214,18 @@ class TransformSubscription:
         for subs_id in subs_ids:
             for subs_info in subs_infos:
                 if subs_info.subs_id == subs_id:
-                    if subs_info.origin_address:
-                        addresses.append(subs_info.origin_address)
-                    elif subs_info.new_address:
-                        addresses.append(subs_info.new_address)
+                    if subs_info.new_address:
+                        dic_data = dict(
+                            address=subs_info.new_address,
+                            name=subs_info.name
+                        )
+                        addresses.append(dic_data)
+                    elif subs_info.origin_address:
+                        dic_data = dict(
+                            address=subs_info.origin_address,
+                            name=subs_info.name
+                        )
+                        addresses.append(dic_data)
                     else:
                         addresses.append(None)
                     break
@@ -243,7 +251,10 @@ class TransformSubscription:
         return dict(subs_ids=subs_ids, kakao_addresses=kakao_addresses)
 
     def _get_kakao_key_usable_number(self) -> int:
-        test_address = "서울 강남구 광평로10길 15"
+        test_address = {
+            "address": "서울 강남구 광평로10길 15",
+            "name": ""
+        }
         all_key_cnt = len(KakaoApiEnum.KAKAO_API_KEYS.value)
         key_idx = None
         for i in range(all_key_cnt):
@@ -271,13 +282,11 @@ class TransformSubscription:
         addr = addr.replace('\u3000', ' ')
         return addr
 
-    def _request_kakao_api(
+    def __request_kakao_api(
             self,
             address: str,
             key_number: int
-    ) -> KakaoApiResultModel | None | int:
-        address: str = self.filter_address(addr=address)
-
+    ) -> KakaoApiResultModel | None:
         url: str = KakaoApiEnum.KAKAO_PLACE_API_URL_NO_PARAM.value
         headers: dict = {
             "Authorization": f"KakaoAK {KakaoApiEnum.KAKAO_API_KEYS.value[key_number]}"
@@ -287,17 +296,14 @@ class TransformSubscription:
 
         # kakao 응답에 문제가 있는지 확인
         if res.status_code in [429, 401]:
-            return res.status_code
+            return None
         else:
             kakao_addresses = res.json()["documents"]
-            if not kakao_addresses:
-                return None
-
             kakao_address = None
             for addr in kakao_addresses:
                 if (
-                    "아파트" in addr["category_name"]
-                    and "아파트상가" not in addr["category_name"]
+                        "아파트" in addr["category_name"]
+                        and "아파트상가" not in addr["category_name"]
                 ):
                     kakao_address = KakaoApiResultModel(
                         x_vl=addr["x"],
@@ -309,5 +315,23 @@ class TransformSubscription:
                         bld_name=addr["place_name"],
                     )
                     break
-
             return kakao_address
+
+    def _request_kakao_api(
+            self,
+            address: dict[str],
+            key_number: int
+    ) -> KakaoApiResultModel | None | int:
+        name: str = self.filter_address(addr=address.get("name"))
+        address: str = self.filter_address(addr=address.get("address"))
+
+        kakao_address: KakaoApiResultModel | None = self.__request_kakao_api(
+            address=address, key_number=key_number
+        )
+
+        if not kakao_address:
+            kakao_address: KakaoApiResultModel | None = self.__request_kakao_api(
+                address=name, key_number=key_number
+            )
+
+        return kakao_address

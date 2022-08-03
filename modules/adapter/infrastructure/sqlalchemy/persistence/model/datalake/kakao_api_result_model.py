@@ -27,6 +27,7 @@ class KakaoApiResultModel(datalake_base, TimestampMixin):
 
     def to_entity(self) -> KakaoApiResultEntity:
         return KakaoApiResultEntity(
+            id=self.id,
             x_vl=self.x_vl,
             y_vl=self.y_vl,
             jibun_address=self.jibun_address,

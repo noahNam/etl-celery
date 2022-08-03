@@ -30,6 +30,7 @@ class TransformPhotos:
                     is_thumbnail=target.is_thumbnail,
                     seq=target.seq,
                     is_available=True,
+                    update_needed=True,
                 )
                 results.append(result)
 

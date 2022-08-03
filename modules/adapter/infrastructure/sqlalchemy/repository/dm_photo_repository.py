@@ -19,7 +19,7 @@ logger = logger_.getLogger(__name__)
 
 
 class SyncDMPhotoRepository:
-    def save_public_sale_photos(
+    def upsert_public_sale_photos(
         self,
         public_sale_photos: list[MartPublicSalePhotoModel],
         public_sale_detail_photos: list[MartPublicSaleDetailPhotoModel],
@@ -49,6 +49,45 @@ class SyncDMPhotoRepository:
                 update(PublicSaleDetailPhotoModel)
                 .where(PublicSaleDetailPhotoModel.update_needed == True)
                 .values(update_needed=False)
+            )
+            session.commit()
+        except Exception as e:
+            logger.error(
+                f"[SyncPublicSaleRepository][save_all_update_needed][error : {e}]"
+            )
+            session.rollback()
+            raise Exception
+
+    def find_by_update_needed(
+            self,
+            target_model: type[MartPublicSalePhotoModel | MartPublicSaleDetailPhotoModel]
+    ) -> list[MartPublicSalePhotoModel] | list[MartPublicSaleDetailPhotoModel]:
+        try:
+            query = select(target_model).where(
+                    target_model.update_needed == True,
+            )
+            result = session.execute(query).scalars().all()
+            return result
+
+        except Exception as e:
+            logger.error(
+                f"[SyncPublicSaleRepository][save_all_update_needed][error : {e}]"
+            )
+            session.rollback()
+            raise Exception
+
+    def update_update_needed(self) -> None:
+        try:
+            session.execute(
+                update(MartPublicSalePhotoModel)
+                    .where(MartPublicSalePhotoModel.update_needed == True)
+                    .values(update_needed=False)
+            )
+
+            session.execute(
+                update(MartPublicSaleDetailPhotoModel)
+                    .where(MartPublicSaleDetailPhotoModel.update_needed == True)
+                    .values(update_needed=False)
             )
             session.commit()
         except Exception as e:
