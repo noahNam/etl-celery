@@ -4,6 +4,7 @@ services:
     image: __ECR_ADDRESS__
     ports:
       - "8000:8000"
+      - "9001:9001"
     command:  "supervisord -c supervisord.conf"
     logging:
       driver: awslogs
