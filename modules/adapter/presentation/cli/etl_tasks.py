@@ -128,6 +128,9 @@ def get_task(topic: str):
             topic=topic,
             basic_repo=SyncBasicRepository(),
             real_estate_repo=SyncRealEstateRepository(),
+            subs_repo=SyncSubscriptionRepository(),
+            dong_code_repo=SyncLegalDongCodeRepository(),
+            kakao_api=SyncKakaoApiRepository(),
             redis=redis,
         )
     elif (
@@ -247,6 +250,6 @@ def start_worker(topic):
         uc = get_task(topic=topic)
         uc.execute()
     except Exception as e:
-        logger.error(f"{topic } error : {e}")
+        logger.error(f"{topic} error : {e}")
     finally:
         session.remove()

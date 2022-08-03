@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 
 class KakaoApiResultEntity(BaseModel):
+    id: int
     x_vl: float
     y_vl: float
     road_address: str | None
