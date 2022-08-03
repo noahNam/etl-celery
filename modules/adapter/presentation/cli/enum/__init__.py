@@ -32,3 +32,5 @@ class TopicEnum(Enum):
 
     ETL_MART_PUBLIC_SALES = "antgirl.etl_mart_public_sales.v1"
     ETL_PUBLIC_SALE_PHOTOS = "antgirl.etl_mart_public_sale_photos.v1"
+
+    TEST_TASK = "antgirl.test_task.v1"
