@@ -4,8 +4,7 @@ services:
     image: __ECR_ADDRESS__
     ports:
       - "8000:8000"
-      - "9001:9001"
-    command:  "supervisord -c supervisord.conf"
+    command: "celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery beat -l info --auto-interval=10"
     logging:
       driver: awslogs
       options:

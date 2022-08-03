@@ -73,42 +73,42 @@ def setup_periodic_tasks(sender, **kwargs):
     # )
 
     sender.add_periodic_task(
-        schedule=crontab(hour=13, minute=45),
+        schedule=crontab(hour=15, minute=45),
         sig=crawler_tasks.start_crawler.s(topic=TopicEnum.TEST_TASK.value),
         name="task_from_crawler_queue_1",
         queue="crawler"
     )
 
     sender.add_periodic_task(
-        schedule=crontab(hour=13, minute=50),
+        schedule=crontab(hour=15, minute=50),
         sig=crawler_tasks.start_crawler.s(topic=TopicEnum.TEST_TASK.value),
         name="task_from_crawler_queue_2",
         queue="crawler"
     )
 
     sender.add_periodic_task(
-        schedule=crontab(hour=13, minute=55),
+        schedule=crontab(hour=15, minute=55),
         sig=etl_tasks.start_worker.s(topic=TopicEnum.TEST_TASK.value),
         name="task_from_etl_queue_1",
         queue="etl"
     )
 
     sender.add_periodic_task(
-        schedule=crontab(hour=14, minute=0),
+        schedule=crontab(hour=16, minute=0),
         sig=etl_tasks.start_worker.s(topic=TopicEnum.TEST_TASK.value),
         name="task_from_etl_queue_2",
         queue="etl"
     )
 
     sender.add_periodic_task(
-        schedule=crontab(hour=14, minute=5),
+        schedule=crontab(hour=16, minute=5),
         sig=crawler_tasks.start_crawler.s(topic=TopicEnum.TEST_TASK.value),
         name="task_from_crawler_queue_3",
         queue="crawler"
     )
 
     sender.add_periodic_task(
-        schedule=crontab(hour=14, minute=5),
+        schedule=crontab(hour=16, minute=5),
         sig=etl_tasks.start_worker.s(topic=TopicEnum.TEST_TASK.value),
         name="task_from_etl_queue_3",
         queue="etl"
