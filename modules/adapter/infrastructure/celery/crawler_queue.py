@@ -73,45 +73,11 @@ def setup_periodic_tasks(sender, **kwargs):
     # )
 
     sender.add_periodic_task(
-        schedule=crontab(hour=17, minute=0),
-        sig=crawler_tasks.start_crawler.s(topic=TopicEnum.TEST_TASK.value),
+        schedule=crontab(hour=11, minute=45),
+        sig=crawler_tasks.start_crawler.s(topic=TopicEnum.ETL_DL_SUBS_INFOS.value),
         name="task_from_crawler_queue_1",
         queue="crawler"
     )
 
-    sender.add_periodic_task(
-        schedule=crontab(hour=17, minute=5),
-        sig=crawler_tasks.start_crawler.s(topic=TopicEnum.TEST_TASK.value),
-        name="task_from_crawler_queue_2",
-        queue="crawler"
-    )
-
-    sender.add_periodic_task(
-        schedule=crontab(hour=17, minute=10),
-        sig=crawler_tasks.start_crawler.s(topic=TopicEnum.TEST_TASK.value),
-        name="task_from_crawler_queue_3",
-        queue="crawler"
-    )
-
-    sender.add_periodic_task(
-        schedule=crontab(hour=17, minute=15),
-        sig=crawler_tasks.start_crawler.s(topic=TopicEnum.TEST_TASK.value),
-        name="task_from_crawler_queue_4",
-        queue="crawler"
-    )
-
-    sender.add_periodic_task(
-        schedule=crontab(hour=17, minute=20),
-        sig=crawler_tasks.start_crawler.s(topic=TopicEnum.TEST_TASK.value),
-        name="task_from_crawler_queue_5",
-        queue="crawler"
-    )
-
-    sender.add_periodic_task(
-        schedule=crontab(hour=17, minute=25),
-        sig=crawler_tasks.start_crawler.s(topic=TopicEnum.TEST_TASK.value),
-        name="task_from_crawler_queue_6",
-        queue="crawler"
-    )
 # celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery flower --address=localhost --port=5555
 # celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery worker -B --loglevel=info -P threads -c 3
