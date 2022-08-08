@@ -239,7 +239,7 @@ class SyncBasicRepository(BasicRepository):
 
     def find_to_update(
         self,
-        target_model: Type[BasicInfoModel | DongInfoModel | TypeInfoModel],
+        target_model: Type[BasicInfoModel | MartDongInfoModel | MartTypeInfoModel],
     ) -> list[BasicInfoEntity | DongInfoEntity | TypeInfoEntity] | None:
         result_list = None
 

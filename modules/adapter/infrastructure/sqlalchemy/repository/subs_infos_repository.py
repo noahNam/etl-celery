@@ -290,3 +290,26 @@ class SyncSubscriptionInfoRepository(SubscriptionInfoRepository):
             )
             session.rollback()
             raise NotUniqueErrorException
+
+    def update_by_key_value(
+            self,
+            key: int,
+            value: int,
+    ) -> None:
+        try:
+            session.execute(
+                update(
+                    SubscriptionInfoModel
+                ).where(
+                    SubscriptionInfoModel.subs_id == key
+                ).values(
+                    place_id=value,
+                )
+            )
+            session.commit()
+        except exc.IntegrityError as e:
+            logger.error(
+                f"[SyncSubscriptionInfoRepository][update_by_key_value] target_model : error : {e}"
+            )
+            session.rollback()
+            raise NotUniqueErrorException

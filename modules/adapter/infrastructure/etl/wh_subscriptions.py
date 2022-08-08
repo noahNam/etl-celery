@@ -1,4 +1,10 @@
 from typing import Any
+from tqdm import tqdm
+import requests
+from modules.adapter.infrastructure.crawler.crawler.enum.kakao_enum import KakaoApiEnum
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datalake.kakao_api_result_model import (
+    KakaoApiResultModel,
+)
 
 from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.subs_entity import (
     SubscriptionInfoEntity,
@@ -35,7 +41,6 @@ class TransformSubscription:
         subs_id = None
 
         for target_entity in target_list:
-
             subscription_details.append(
                 SubscriptionDetailModel(
                     id=target_entity.id,
@@ -98,6 +103,7 @@ class TransformSubscription:
             subscriptions.append(
                 SubscriptionModel(
                     subs_id=target_entity.subs_id,
+                    place_id=target_entity.place_id,
                     offer_date=target_entity.offer_date,
                     notice_winner_date=target_entity.notice_winner_date,
                     name=target_entity.name,
@@ -191,3 +197,141 @@ class TransformSubscription:
         return dict(
             subscriptions=subscriptions, subscription_details=subscription_details
         )
+
+    def get_kakao_address(
+            self,
+            subs_infos: list[SubscriptionInfoEntity],
+    ) -> dict[str, list[int] | list[KakaoApiResultModel | None]]:
+        # 수정이 필요한 subs_id 추출
+        subs_ids = list()
+        for subs_info in subs_infos:
+            if not subs_info.place_id:
+                subs_ids.append(subs_info.subs_id)
+        subs_ids = list(set(subs_ids))
+
+        # kakao api에 전송할 주소값 추출
+        addresses = list()
+        for subs_id in subs_ids:
+            for subs_info in subs_infos:
+                if subs_info.subs_id == subs_id:
+                    if subs_info.new_address:
+                        dic_data = dict(
+                            address=subs_info.new_address,
+                            name=subs_info.name
+                        )
+                        addresses.append(dic_data)
+                    elif subs_info.origin_address:
+                        dic_data = dict(
+                            address=subs_info.origin_address,
+                            name=subs_info.name
+                        )
+                        addresses.append(dic_data)
+                    else:
+                        addresses.append(None)
+                    break
+
+        # kakao api request
+        kakao_addresses: list[KakaoApiResultModel | None] = list()
+        kakao_key_number: int = self._get_kakao_key_usable_number()
+        for i in tqdm(range(len(subs_ids)), desc="kakao_addresses", mininterval=1):
+            try:
+                response: KakaoApiResultModel | None = self._request_kakao_api(
+                    address=addresses[i], key_number=kakao_key_number
+                )
+                if response in [429, 401]:
+                    kakao_key_number = self._get_kakao_key_usable_number()
+
+                    response: KakaoApiResultModel | None = self._request_kakao_api(
+                        address=addresses[i], key_number=kakao_key_number
+                    )
+                kakao_addresses.append(response)
+            except Exception as e:
+                break
+
+        return dict(subs_ids=subs_ids, kakao_addresses=kakao_addresses)
+
+    def _get_kakao_key_usable_number(self) -> int:
+        test_address = {
+            "address": "서울 강남구 광평로10길 15",
+            "name": ""
+        }
+        all_key_cnt = len(KakaoApiEnum.KAKAO_API_KEYS.value)
+        key_idx = None
+        for i in range(all_key_cnt):
+            res = self._request_kakao_api(address=test_address, key_number=i)
+            if res != 429:
+                return i
+
+        if not key_idx:
+            raise Exception("kakao API limit has been exceeded")
+
+    def filter_address(
+            self,
+            addr: str
+    ) -> str:
+        addr = addr.replace('０', '0')
+        addr = addr.replace('１', '1')
+        addr = addr.replace('２', '2')
+        addr = addr.replace('３', '3')
+        addr = addr.replace('４', '4')
+        addr = addr.replace('５', '5')
+        addr = addr.replace('６', '6')
+        addr = addr.replace('７', '7')
+        addr = addr.replace('８', '8')
+        addr = addr.replace('９', '9')
+        addr = addr.replace('\u3000', ' ')
+        return addr
+
+    def __request_kakao_api(
+            self,
+            address: str,
+            key_number: int
+    ) -> KakaoApiResultModel | None:
+        url: str = KakaoApiEnum.KAKAO_PLACE_API_URL_NO_PARAM.value
+        headers: dict = {
+            "Authorization": f"KakaoAK {KakaoApiEnum.KAKAO_API_KEYS.value[key_number]}"
+        }
+        params = {"query": "{}".format(address)}
+        res = requests.get(url=url, params=params, headers=headers)
+
+        # kakao 응답에 문제가 있는지 확인
+        if res.status_code in [429, 401]:
+            return None
+        else:
+            kakao_addresses = res.json()["documents"]
+            kakao_address = None
+            for addr in kakao_addresses:
+                if (
+                        "아파트" in addr["category_name"]
+                        and "아파트상가" not in addr["category_name"]
+                ):
+                    kakao_address = KakaoApiResultModel(
+                        x_vl=addr["x"],
+                        y_vl=addr["y"],
+                        jibun_address=addr["address_name"],
+                        road_address=addr["road_address_name"],
+                        origin_jibun_address=address,
+                        origin_road_address=None,
+                        bld_name=addr["place_name"],
+                    )
+                    break
+            return kakao_address
+
+    def _request_kakao_api(
+            self,
+            address: dict[str],
+            key_number: int
+    ) -> KakaoApiResultModel | None | int:
+        name: str = self.filter_address(addr=address.get("name"))
+        address: str = self.filter_address(addr=address.get("address"))
+
+        kakao_address: KakaoApiResultModel | None = self.__request_kakao_api(
+            address=address, key_number=key_number
+        )
+
+        if not kakao_address:
+            kakao_address: KakaoApiResultModel | None = self.__request_kakao_api(
+                address=name, key_number=key_number
+            )
+
+        return kakao_address

@@ -99,6 +99,7 @@ class SubscriptionDetailModel(warehouse_base, TimestampMixin):
             id=self.id,
             subs_id=self.subs_id,
             area_type=self.area_type,
+            supply_price=self.supply_price,
             supply_area=self.supply_area,
             special_household=self.special_household,
             multi_children_household=self.multi_children_household,

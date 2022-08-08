@@ -71,6 +71,10 @@ class DongTypeUseCase(BaseETLUseCase):
         results: list[DongInfoModel | TypeInfoModel],
     ) -> None:
         for result in results:
+            is_exists_by_fk = self._private_sale_repo._get_is_exists_by_fk(value=result)
+            if not is_exists_by_fk:
+                continue
+
             exists_result: bool = self._private_sale_repo.exists_by_key(value=result)
 
             try:
@@ -85,7 +89,7 @@ class DongTypeUseCase(BaseETLUseCase):
 
                 # message publish to redis
                 ref_table = (
-                    "dong_infos_new" if isinstance(result, DongInfoModel) else "type_infos_new"
+                    "dong_infos" if isinstance(result, DongInfoModel) else "type_infos"
                 )
                 self._redis.set(
                     key=f"sync:{ref_table}:{result.id}",

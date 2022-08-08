@@ -64,14 +64,23 @@ class PublicSalePhotoUseCase(BaseETLUseCase):
             MartPublicSaleDetailPhotoModel
         ] = self._transfer.start_etl(target_list=public_sale_detail_photos)
 
-        self._dm_photo_repo.save_public_sale_photos(
+        self._dm_photo_repo.upsert_public_sale_photos(
             public_sale_photo_models, public_sale_detail_photo_models
+        )
+
+        public_sale_photo_models = self._dm_photo_repo.find_by_update_needed(
+            target_model=MartPublicSalePhotoModel
+        )
+        public_sale_detail_photo_models = self._dm_photo_repo.find_by_update_needed(
+            target_model=MartPublicSaleDetailPhotoModel
         )
 
         for public_sale_photo in public_sale_photo_models:
             self.redis_set(model=public_sale_photo)
         for public_sale_detail_photo in public_sale_detail_photo_models:
             self.redis_set(model=public_sale_detail_photo)
+
+        self._dm_photo_repo.update_update_needed()
 
     def redis_set(
         self, model: MartPublicSalePhotoModel | MartPublicSaleDetailPhotoModel
