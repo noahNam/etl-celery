@@ -41,29 +41,41 @@ class TransformPublicSales:
             )
             supply_household: int = self._string_to_int(subscription.supply_household)
 
+            special_supply_date: str = self._get_start_date(date=subscription.special_supply_date)
+            special_supply_etc_date: str = self._get_start_date(date=subscription.special_supply_etc_date)
+            special_etc_gyeonggi_date: str = self._get_start_date(date=subscription.special_etc_gyeonggi_date)
+
+            first_supply_date: str = self._get_start_date(date=subscription.first_supply_date)
+            first_supply_etc_date: str = self._get_start_date(date=subscription.first_supply_etc_date)
+            first_etc_gyeonggi_date: str = self._get_start_date(subscription.first_etc_gyeonggi_date)
+            second_supply_date: str = self._get_start_date(subscription.second_supply_date)
+            second_supply_etc_date: str = self._get_start_date(subscription.second_supply_etc_date)
+            second_etc_gyeonggi_date: str = self._get_start_date(subscription.second_etc_gyeonggi_date)
+            rent_type: str = self._get_rent_type(subscription.rent_type)
+
             public_sale = PublicSaleModel(
                 id=subscription.subs_id,
                 real_estate_id=subscription.place_id,
                 name=subscription.name,
                 region=subscription.region,
                 housing_category=subscription.housing_category,
-                rent_type=subscription.rent_type,
-                trade_type=None,
+                rent_type=rent_type,
+                trade_type="분양",
                 construct_company=subscription.construct_company,
                 supply_household=supply_household,
-                offer_date=subscription.offer_date,
+                offer_date=self._transform_date_form(subscription.offer_date),
                 subscription_start_date=subscription_start_date,
                 subscription_end_date=subscription_end_date,
-                special_supply_date=subscription.special_supply_date,
-                special_supply_etc_date=subscription.special_supply_etc_date,
-                special_etc_gyeonggi_date=subscription.special_etc_gyeonggi_date,
-                first_supply_date=subscription.first_supply_date,
-                first_supply_etc_date=subscription.first_supply_etc_date,
-                first_etc_gyeonggi_date=subscription.first_etc_gyeonggi_date,
-                second_supply_date=subscription.second_supply_date,
-                second_supply_etc_date=subscription.second_supply_etc_date,
-                second_etc_gyeonggi_date=subscription.second_etc_gyeonggi_date,
-                notice_winner_date=subscription.notice_winner_date,
+                special_supply_date=special_supply_date,
+                special_supply_etc_date=special_supply_etc_date,
+                special_etc_gyeonggi_date=special_etc_gyeonggi_date,
+                first_supply_date=first_supply_date,
+                first_supply_etc_date=first_supply_etc_date,
+                first_etc_gyeonggi_date=first_etc_gyeonggi_date,
+                second_supply_date=second_supply_date,
+                second_supply_etc_date=second_supply_etc_date,
+                second_etc_gyeonggi_date=second_etc_gyeonggi_date,
+                notice_winner_date=self._transform_date_form(subscription.notice_winner_date),
                 contract_start_date=contract_start_date,
                 contract_end_date=contract_end_date,
                 move_in_year=move_in_year,
@@ -86,19 +98,32 @@ class TransformPublicSales:
                 sale_limit=subscription.restriction_sale,
                 compulsory_residence=subscription.compulsory_residence,
                 hallway_type=subscription.hallway_type,
-                is_checked=False,
-                is_available=False,
+                is_checked=True,
+                is_available=True,
                 update_needed=True,
             )
             return_models.append(public_sale)
         return return_models
+
+    def _transform_date_form(
+        self,
+        date: str,
+    ) -> str | None:
+        if not date or date == '사업주체문의':
+            return None
+        else:
+            return date.replace("-", "")
+
 
     def start_transfer_public_sale_details(
         self, sub_details: list[SubDtToPublicDtEntity]
     ) -> list[PublicSaleDetailModel]:
         return_models = list()
         for sub_detail in sub_details:
-            area_type: str = self._get_area_type(raw_type=sub_detail.area_type)
+            area_type: str = self._get_area_type(
+                raw_type=sub_detail.area_type,
+                supply_area=sub_detail.supply_area,
+            )
             private_area: float = self._get_private_area(raw_type=sub_detail.area_type)
             acquisition_tax: int = self._calculate_house_acquisition_tax(
                 private_area=private_area, supply_price=sub_detail.supply_price
@@ -172,7 +197,7 @@ class TransformPublicSales:
                 newlywed_vol=self._str_to_float(value=sub_detail.newlywed_vol),
                 old_parent_vol=self._str_to_float(value=sub_detail.old_parent_vol),
                 first_life_vol=self._str_to_float(value=sub_detail.first_life_vol),
-                update_needed=False,
+                update_needed=True,
             )
             gyeonggi_area = SpecialSupplyResultModel(
                 public_sale_detail_id=sub_detail.id,
@@ -182,7 +207,7 @@ class TransformPublicSales:
                 newlywed_vol=sub_detail.newlywed_vol_etc_gyeonggi,
                 old_parent_vol=sub_detail.old_parent_vol_etc_gyeonggi,
                 first_life_vol=sub_detail.first_life_vol_etc_gyeonggi,
-                update_needed=False,
+                update_needed=True,
             )
             etc_area = SpecialSupplyResultModel(
                 public_sale_detail_id=sub_detail.id,
@@ -194,7 +219,7 @@ class TransformPublicSales:
                 newlywed_vol=self._str_to_float(value=sub_detail.newlywed_vol_etc),
                 old_parent_vol=self._str_to_float(value=sub_detail.old_parent_vol_etc),
                 first_life_vol=self._str_to_float(value=sub_detail.first_life_vol_etc),
-                update_needed=False,
+                update_needed=True,
             )
 
             return_models.append(area)
@@ -219,7 +244,7 @@ class TransformPublicSales:
                     value=sub_detail.first_cmptt_rate
                 ),
                 win_point=self._get_win_point(value=sub_detail.lowest_win_point),
-                update_needed=False,
+                update_needed=True,
             )
             gyeonggi_area = GeneralSupplyResultModel(
                 public_sale_detail_id=sub_detail.id,
@@ -234,7 +259,7 @@ class TransformPublicSales:
                 win_point=self._get_win_point(
                     value=sub_detail.lowest_win_point_gyeonggi
                 ),
-                update_needed=False,
+                update_needed=True,
             )
             etc_area = GeneralSupplyResultModel(
                 public_sale_detail_id=sub_detail.id,
@@ -245,7 +270,7 @@ class TransformPublicSales:
                     value=sub_detail.first_cmptt_rate_etc
                 ),
                 win_point=self._get_win_point(value=sub_detail.lowest_win_point_etc),
-                update_needed=False,
+                update_needed=True,
             )
             return_models.append(area)
             return_models.append(gyeonggi_area)
@@ -254,14 +279,14 @@ class TransformPublicSales:
         return return_models
 
     def _get_start_date(self, date: str) -> str | None:
-        if date and len(date) == 23:
-            return date[:10]
+        if date and len(date) == 23 and date != '사업주체문의':
+            return date[:10].replace("-", "")
         else:
             return None
 
     def _get_end_date(self, date: str) -> str | None:
-        if date and len(date) == 23:
-            return date[13:]
+        if date and len(date) == 23 and date != '사업주체문의':
+            return date[13:].replace("-", "")
         else:
             return None
 
@@ -271,9 +296,20 @@ class TransformPublicSales:
         else:
             return None
 
-    def _get_area_type(self, raw_type: str) -> str | None:
+    def _get_area_type(
+            self,
+            raw_type: str,
+            supply_area: float,
+    ) -> str | None:
         val = re.search("([a-zA-Z]+)", raw_type)
-        return val[0] if val else None
+        if val:
+            if not val[0]:
+                type_str = ''
+            else:
+                type_str = str(val[0])
+        else:
+            type_str = ''
+        return ''.join([str(int(supply_area)), type_str])
 
     def _get_private_area(self, raw_type: str) -> float:
         val = re.search("([0-9]+[.][0-9]+)", raw_type)
@@ -328,12 +364,12 @@ class TransformPublicSales:
                 tax_rate = (
                     (
                         supply_price
-                        * TaxEnum.PRICE_6_AREA_85.value[0]
-                        / TaxEnum.PRICE_6_AREA_85.value[1]
-                        - TaxEnum.PRICE_6_AREA_85.value[2]
+                        * TaxEnum.PRICE_9_AREA_85.value[0]
+                        / TaxEnum.PRICE_9_AREA_85.value[1]
+                        - TaxEnum.PRICE_9_AREA_85.value[2]
                     )
-                    * TaxEnum.PRICE_6_AREA_85.value[3]
-                    * TaxEnum.PRICE_6_AREA_85.value[4]
+                    * TaxEnum.PRICE_9_AREA_85.value[3]
+                    * TaxEnum.PRICE_9_AREA_85.value[4]
                 )
             else:
                 tax_rate = (
@@ -424,3 +460,17 @@ class TransformPublicSales:
             return int(re.sub(r"[^0-9]", "", string))
         else:
             return 0
+
+    def _get_rent_type(
+            self,
+            value: str
+    ) -> str | None:
+        if value:
+            if value == "분양주택":
+                return "분양"
+            elif value in ["분양전환 불가임대", "분양전환 가능임대"]:
+                return "임대"
+            else:
+                return None
+        else:
+            return None

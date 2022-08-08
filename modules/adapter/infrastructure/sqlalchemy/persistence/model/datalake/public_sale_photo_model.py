@@ -38,7 +38,7 @@ class PublicSalePhotoModel(datalake_base, TimestampMixin):
     def to_entity(self) -> PublicSalePhotoEntity:
         return PublicSalePhotoEntity(
             id=self.id,
-            sub_id=self.subs_id,
+            subs_id=self.subs_id,
             file_name=self.file_name,
             path=self.path,
             extension=self.extension,

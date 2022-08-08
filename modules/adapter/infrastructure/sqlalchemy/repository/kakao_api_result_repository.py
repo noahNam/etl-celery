@@ -114,3 +114,24 @@ class SyncKakaoApiRepository(KakaoApiRepository):
             jibun_address=queryset.jibun_address,
             bld_name=queryset.bld_name,
         )
+
+    def find_to_place_id(
+        self,
+        kakao_orm: KakaoApiResultModel | None,
+    ) -> int | None:
+        result = None
+        if kakao_orm:
+            query = (
+                select(KakaoApiResultModel)
+                .filter_by(
+                    origin_jibun_address=kakao_orm.origin_jibun_address,
+                    origin_road_address=kakao_orm.origin_road_address,
+                )
+                .limit(1)
+            )
+            result = session.execute(query).scalars().first()
+
+        if result:
+            return result.id
+        else:
+            return None

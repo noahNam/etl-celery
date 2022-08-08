@@ -17,6 +17,24 @@ from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository impor
 from modules.adapter.infrastructure.sqlalchemy.repository.real_estate_repository import (
     SyncRealEstateRepository,
 )
+from modules.adapter.infrastructure.sqlalchemy.repository.subscription_repository import (
+    SyncSubscriptionRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.subscription_model import (
+    SubscriptionModel,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.legal_dong_code_repository import (
+    SyncLegalDongCodeRepository,
+)
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.legal_dong_code_entity import (
+    LegalDongCodeEntity,
+)
+from modules.adapter.infrastructure.sqlalchemy.entity.datalake.v1.kakao_api_result_entity import (
+    KakaoApiResultEntity,
+)
+from modules.adapter.infrastructure.sqlalchemy.repository.kakao_api_result_repository import (
+    SyncKakaoApiRepository,
+)
 from modules.adapter.infrastructure.utils.log_helper import logger_
 from modules.application.use_case.etl import BaseETLUseCase
 
@@ -28,6 +46,9 @@ class RealEstateUseCase(BaseETLUseCase):
         self,
         basic_repo: SyncBasicRepository,
         real_estate_repo: SyncRealEstateRepository,
+        subs_repo: SyncSubscriptionRepository,
+        dong_code_repo: SyncLegalDongCodeRepository,
+        kakao_api: SyncKakaoApiRepository,
         redis: RedisClient,
         *args,
         **kwargs,
@@ -35,8 +56,12 @@ class RealEstateUseCase(BaseETLUseCase):
         super().__init__(*args, **kwargs)
         self._basic_repo: SyncBasicRepository = basic_repo
         self._real_estate_repo: SyncRealEstateRepository = real_estate_repo
+        self._subs_repo: SyncSubscriptionRepository = subs_repo
         self._transfer: TransformRealEstate = TransformRealEstate()
+        self._dong_code: SyncLegalDongCodeRepository = dong_code_repo
+        self._kakao_api: SyncKakaoApiRepository = kakao_api
         self._redis: RedisClient = redis
+
 
     def execute(self):
         """
@@ -47,8 +72,25 @@ class RealEstateUseCase(BaseETLUseCase):
         basic_infos: list[BasicInfoEntity] | None = self._basic_repo.find_to_update(
             target_model=BasicInfoModel
         )
+
+        subscriptions: list[SubscriptionModel] | None = self._subs_repo.find_by_update_needed(
+            model=SubscriptionModel
+        )
+        if subscriptions:
+            place_ids: list[int | None] = self._transfer.get_place_id(subscriptions=subscriptions)
+            kakao_api_results = list()
+            for place_id in place_ids:
+                kakao_api_result: KakaoApiResultEntity | None = self._kakao_api.find_by_id(id=place_id)
+                kakao_api_results.append(kakao_api_result)
+        else:
+            kakao_api_results = list()
+
+        legal_dong_codes: list[LegalDongCodeEntity] = self._dong_code.find_all()
+
         results: list[RealEstateModel] | None = self._transfer.start_etl(
-            target_list=basic_infos
+            basic_infos=basic_infos,
+            kakao_api_results=kakao_api_results,
+            legal_dong_codes=legal_dong_codes,
         )
 
         if results:
