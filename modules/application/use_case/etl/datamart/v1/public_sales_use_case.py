@@ -71,6 +71,15 @@ class PublicSaleUseCase(BaseETLUseCase):
         sub_details: list[
             SubDtToPublicDtEntity
         ] = self._subscription_repo.find_by_update_needed(model=SubscriptionDetailModel)
+
+        filtered_sub_details = list()
+        for sub_detail in sub_details:
+            for subscription in subscriptions:
+                if sub_detail.subs_id == subscription.subs_id:
+                    filtered_sub_details.append(sub_detail)
+                    break
+
+
         if not subscriptions:
             logger.info(
                 "[PublicSalesUseCase] There is nothing to update in subscription_details"
@@ -79,20 +88,20 @@ class PublicSaleUseCase(BaseETLUseCase):
             public_sale_details: list[
                 PublicSaleDetailModel
             ] = self._transfer.start_transfer_public_sale_details(
-                sub_details=sub_details
+                sub_details=filtered_sub_details
             )
             special_supply_results: list[
                 SpecialSupplyResultModel
             ] = self._transfer.start_transfer_special_supply_results(
-                sub_details=sub_details
+                sub_details=filtered_sub_details
             )
             general_supply_results: list[
                 GeneralSupplyResultModel
             ] = self._transfer.start_transfer_general_supply_results(
-                sub_details=sub_details
+                sub_details=filtered_sub_details
             )
 
-            sub_detail_ids: list[int] = self._transfer.get_ids(sub_details=sub_details)
+            sub_detail_ids: list[int] = self._transfer.get_ids(sub_details=filtered_sub_details)
             self.public_repo.save_public_sales(
                 public_sales=public_sales,
                 sub_ids=sub_ids,
@@ -102,6 +111,14 @@ class PublicSaleUseCase(BaseETLUseCase):
                 sub_detail_ids=sub_detail_ids,
             )
 
+            special_supply_results: list[
+                SpecialSupplyResultModel
+            ] = self.public_repo.find_by_updated_needed(SpecialSupplyResultModel)
+
+            general_supply_results: list[
+                GeneralSupplyResultModel
+            ] = self.public_repo.find_by_updated_needed(GeneralSupplyResultModel)
+
             for public_sale in public_sales:
                 self.redis_set(model=public_sale)
             for public_sale_detail in public_sale_details:
@@ -110,6 +127,8 @@ class PublicSaleUseCase(BaseETLUseCase):
                 self.redis_set(model=special_supply_result)
             for general_supply_result in general_supply_results:
                 self.redis_set(model=general_supply_result)
+
+            self.public_repo.update_by_update_needed()
 
     def redis_set(
         self,
@@ -123,25 +142,25 @@ class PublicSaleUseCase(BaseETLUseCase):
             ref_table = "public_sales"
             self._redis.set(
                 key=f"sync:{ref_table}:{model.id}",
-                value=json.dumps(model.to_dict(), ensure_ascii=False).encode("utf-8"),
+                value=json.dumps(model.to_dict(), ensure_ascii=False, default=str).encode("utf-8"),
             )
         elif isinstance(model, PublicSaleDetailModel):
             ref_table = "public_sale_details"
             self._redis.set(
                 key=f"sync:{ref_table}:{model.id}",
-                value=json.dumps(model.to_dict(), ensure_ascii=False).encode("utf-8"),
+                value=json.dumps(model.to_dict(), ensure_ascii=False, default=str).encode("utf-8"),
             )
         elif isinstance(model, SpecialSupplyResultModel):
             ref_table = "special_supply_results"
             self._redis.set(
                 key=f"sync:{ref_table}:{model.public_sale_detail_id}:{model.region}",
-                value=json.dumps(model.to_dict(), ensure_ascii=False).encode("utf-8"),
+                value=json.dumps(model.to_dict(), ensure_ascii=False, default=str).encode("utf-8"),
             )
         elif isinstance(model, GeneralSupplyResultModel):
             ref_table = "general_supply_results"
             self._redis.set(
                 key=f"sync:{ref_table}:{model.public_sale_detail_id}:{model.region}",
-                value=json.dumps(model.to_dict(), ensure_ascii=False).encode("utf-8"),
+                value=json.dumps(model.to_dict(), ensure_ascii=False, default=str).encode("utf-8"),
             )
         else:
             return None
