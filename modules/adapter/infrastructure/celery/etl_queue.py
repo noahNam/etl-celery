@@ -29,6 +29,7 @@ def make_celery(app_config: Config):
         timezone=app_config.TIMEZONE,
         enable_utc=app_config.CELERY_ENABLE_UTC,
         include=["modules.adapter.presentation.cli.etl_tasks"],
+        task_acks_late=True
     )
     app.conf.task_routes = {
         "modules.adapter.presentation.cli.etl_tasks.*": {
