@@ -252,7 +252,7 @@ class SyncBasicRepository(BasicRepository):
             if results:
                 result_list = [result.to_basic_info_entity() for result in results]
 
-        elif target_model == MartDongInfoModel:
+        elif target_model == DongInfoModel:
             query = select(DongInfoModel).where(
                 DongInfoModel.update_needed == True,
             )
@@ -260,7 +260,7 @@ class SyncBasicRepository(BasicRepository):
             if results:
                 result_list = [result.to_dong_info_entity() for result in results]
 
-        elif target_model == MartTypeInfoModel:
+        elif target_model == TypeInfoModel:
             query = select(TypeInfoModel).where(
                 TypeInfoModel.update_needed == True,
             )
