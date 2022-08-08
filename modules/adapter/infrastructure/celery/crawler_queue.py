@@ -29,7 +29,7 @@ def make_celery(app_config: Config):
         timezone=app_config.TIMEZONE,
         enable_utc=app_config.CELERY_ENABLE_UTC,
         include=["modules.adapter.presentation.cli.crawler_tasks", "modules.adapter.presentation.cli.etl_tasks"],
-
+        task_acks_late=True
     )
     app.conf.task_routes = {
         "modules.adapter.presentation.cli.crawler_tasks.*": {
@@ -73,8 +73,8 @@ def setup_periodic_tasks(sender, **kwargs):
     # )
 
     sender.add_periodic_task(
-        schedule=crontab(hour=11, minute=45),
-        sig=crawler_tasks.start_crawler.s(topic=TopicEnum.ETL_DL_SUBS_INFOS.value),
+        schedule=crontab(hour=17, minute=15),
+        sig=crawler_tasks.start_crawler.s(topic=TopicEnum.TEST_TASK.value),
         name="task_from_crawler_queue_1",
         queue="crawler"
     )
