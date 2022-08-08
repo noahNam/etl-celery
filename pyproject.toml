@@ -25,6 +25,8 @@ pandas = "^1.4.3"
 beautifulsoup4 = "^4.11.1"
 tqdm = "^4.64.0"
 webdriver-manager = "^3.8.2"
+simplejson = "^3.17.6"
+supervisor = "^4.2.4"
 
 [tool.poetry.dev-dependencies]
 aiosqlite = "^0.17.0"

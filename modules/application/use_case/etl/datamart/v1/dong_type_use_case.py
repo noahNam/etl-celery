@@ -1,4 +1,4 @@
-import json
+import simplejson
 
 from modules.adapter.infrastructure.etl.mart_dong_type_infos import (
     TransformDongTypeInfos,
@@ -8,12 +8,10 @@ from modules.adapter.infrastructure.sqlalchemy.entity.warehouse.v1.basic_info_en
     DongInfoEntity,
     TypeInfoEntity,
 )
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import (
-    DongInfoModel as MartDongInfoModel,
-)
-from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.type_info_model import (
-    TypeInfoModel as MartTypeInfoModel,
-)
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.dong_info_model import DongInfoModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.datamart.type_info_model import TypeInfoModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.dong_info_model import DongInfoModel as WHDongInfoModel
+from modules.adapter.infrastructure.sqlalchemy.persistence.model.warehouse.type_info_model import TypeInfoModel as WHTypeInfoModel
 from modules.adapter.infrastructure.sqlalchemy.repository.basic_repository import (
     SyncBasicRepository,
 )
@@ -44,9 +42,9 @@ class DongTypeUseCase(BaseETLUseCase):
     def execute(self):
         # 동 기본 정보
         dong_infos: list[DongInfoEntity] | None = self._basic_repo.find_to_update(
-            target_model=MartDongInfoModel
+            target_model=WHDongInfoModel
         )
-        results: list[MartDongInfoModel] | None = self._transfer.start_etl(
+        results: list[DongInfoModel] | None = self._transfer.start_etl(
             target_list=dong_infos
         )
 
@@ -55,10 +53,9 @@ class DongTypeUseCase(BaseETLUseCase):
 
         # 타입 기본 정보
         type_infos: list[TypeInfoEntity] | None = self._basic_repo.find_to_update(
-            target_model=MartTypeInfoModel
+            target_model=WHTypeInfoModel
         )
-
-        results: list[MartTypeInfoModel] | None = self._transfer.start_etl(
+        results: list[TypeInfoModel] | None = self._transfer.start_etl(
             target_list=type_infos
         )
 
@@ -71,7 +68,7 @@ class DongTypeUseCase(BaseETLUseCase):
 
     def __upsert_to_datamart(
         self,
-        results: list[MartDongInfoModel | MartTypeInfoModel],
+        results: list[DongInfoModel | TypeInfoModel],
     ) -> None:
         for result in results:
             is_exists_by_fk = self._private_sale_repo._get_is_exists_by_fk(value=result)
@@ -92,11 +89,11 @@ class DongTypeUseCase(BaseETLUseCase):
 
                 # message publish to redis
                 ref_table = (
-                    "dong_infos" if isinstance(result, MartDongInfoModel) else "type_infos"
+                    "dong_infos" if isinstance(result, DongInfoModel) else "type_infos"
                 )
                 self._redis.set(
                     key=f"sync:{ref_table}:{result.id}",
-                    value=json.dumps(result.to_dict(), ensure_ascii=False, default=str).encode(
+                    value=simplejson.dumps(result.to_dict(), ensure_ascii=False, use_decimal=True).encode(
                         "utf-8"
                     ),
                 )
@@ -107,7 +104,7 @@ class DongTypeUseCase(BaseETLUseCase):
                 self._save_crawling_failure(
                     failure_value=result.id,
                     ref_table="dong_infos"
-                    if isinstance(result, MartDongInfoModel)
+                    if isinstance(result, DongInfoModel)
                     else "type_infos",
                     param=result,
                     reason=e,

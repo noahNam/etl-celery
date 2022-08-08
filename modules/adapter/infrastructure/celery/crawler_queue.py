@@ -28,8 +28,21 @@ def make_celery(app_config: Config):
         broker=app_config.REDIS_URL,
         timezone=app_config.TIMEZONE,
         enable_utc=app_config.CELERY_ENABLE_UTC,
-        include=["modules.adapter.presentation.cli.crawler_tasks"],
+        include=["modules.adapter.presentation.cli.crawler_tasks", "modules.adapter.presentation.cli.etl_tasks"],
+
     )
+    app.conf.task_routes = {
+        "modules.adapter.presentation.cli.crawler_tasks.*": {
+            "queue": "crawler"
+        },
+        "modules.adapter.presentation.cli.etl_tasks.*": {
+            "queue": "etl"
+        },
+        "app.commands.tasks.*": {
+            "queue": "tanos"
+        },
+    }
+
     init_broker()
     init_db()
 
@@ -39,22 +52,32 @@ def make_celery(app_config: Config):
 crawler_celery: Celery = make_celery(fastapi_config)
 
 
-@crawler_celery.on_after_configure.connect
+@crawler_celery.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     from modules.adapter.presentation.cli import crawler_tasks
-
-    # sender.add_periodic_task(
-    #     10.0,
-    #     tasks.start_crawler.s(topic=TopicEnum.CRAWL_KAPT.value),
-    #     name='warehouse',
-    # )
+    from modules.adapter.presentation.cli import etl_tasks
 
     # crawler_tasks.start_crawler.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
-    sender.add_periodic_task(
-        crontab(hour=19, minute=00),
-        kwargs={"topic": TopicEnum.CRAWL_APPLY_HOME.value},
-    )
+    # sender.add_periodic_task(
+    #     schedule=crontab(hour=11, minute=25),
+    #     sig=crawler_tasks.start_crawler.s(topic=TopicEnum.CRAWL_APPLY_HOME.value),
+    #     name="datalake_apply_home",
+    #     queue="crawler"
+    # )
+    #
+    # sender.add_periodic_task(
+    #     schedule=crontab(hour=11, minute=30),
+    #     sig=etl_tasks.start_worker.s(topic=TopicEnum.ETL_WH_BASIC_INFOS.value),
+    #     name="warehouse_basic_infos",
+    #     queue="etl"
+    # )
 
+    sender.add_periodic_task(
+        schedule=crontab(hour=11, minute=45),
+        sig=crawler_tasks.start_crawler.s(topic=TopicEnum.ETL_DL_SUBS_INFOS.value),
+        name="task_from_crawler_queue_1",
+        queue="crawler"
+    )
 
 # celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery flower --address=localhost --port=5555
 # celery -A modules.adapter.infrastructure.celery.crawler_queue.crawler_celery worker -B --loglevel=info -P threads -c 3
