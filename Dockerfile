@@ -70,7 +70,10 @@ ENV APP_DIR /server
 COPY core ${APP_DIR}/core
 COPY modules ${APP_DIR}/modules
 COPY exceptions ${APP_DIR}/exceptions
+COPY tests ${APP_DIR}/tests
+COPY supervisord.conf ${APP_DIR}/
 # COPY application.py celery_app.py newrelic.ini ${APP_DIR}/
 
 EXPOSE 8000
+EXPOSE 9001
 WORKDIR ${APP_DIR}/

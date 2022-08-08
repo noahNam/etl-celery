@@ -27,6 +27,7 @@ from modules.application.use_case.crawling.legal_dong_code.v1.legal_code_use_cas
 from modules.application.use_case.crawling.subscription_info.v1.subs_info_use_case import (
     SubscriptionInfoUseCase,
 )
+from tests.unit.modules.application.use_case.crawling.kapt.v1.test_use_case import TestTaskUseCase
 
 
 def get_task(topic: str):
@@ -45,6 +46,8 @@ def get_task(topic: str):
         return GovtDealUseCase(topic=topic, repo=SyncLegalDongCodeRepository())
     elif topic == TopicEnum.CRAWL_APPLY_HOME.value:
         return SubscriptionInfoUseCase(topic=topic, repo=SyncKaptRepository())
+    elif topic == TopicEnum.TEST_TASK.value:
+        return TestTaskUseCase(topic=topic, repo=SyncKaptRepository())
 
 
 @crawler_celery.task

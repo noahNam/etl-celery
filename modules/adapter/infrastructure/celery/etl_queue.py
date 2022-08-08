@@ -29,6 +29,12 @@ def make_celery(app_config: Config):
         enable_utc=app_config.CELERY_ENABLE_UTC,
         include=["modules.adapter.presentation.cli.etl_tasks"],
     )
+    app.conf.task_routes = {
+        "modules.adapter.presentation.cli.etl_tasks.*": {
+            "queue": "etl"
+        }
+    }
+
     init_broker()
     init_db()
 
@@ -38,48 +44,10 @@ def make_celery(app_config: Config):
 etl_celery: Celery = make_celery(fastapi_config)
 
 
-@etl_celery.on_after_configure.connect
+@etl_celery.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
-    from modules.adapter.presentation.cli import etl_tasks
+    pass
 
-    # sender.add_periodic_task(
-    #     10.0,
-    #     etl_tasks.start_worker.s(topic=TopicEnum.ETL_WH_BASIC_INFOS.value),
-    #     name=TopicEnum.ETL_WH_BASIC_INFOS.value,
-    # )
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_BASIC_INFOS.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_DL_SUBS_INFOS.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_SUBS_INFOS.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_REAL_ESTATES.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PRIVATE_SALES.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_DONG_TYPE_INFOS.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PRIVATE_SALE_DETAILS.value)
-
-    # etl_tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAPT.value})
-    # etl_tasks.start_worker.apply_async(kwargs={"topic": TopicEnum.CRAWL_KAKAO_API.value})
-    # etl_tasks.start_worker.apply_async(
-    #     kwargs={"topic": TopicEnum.CRAWL_LEGAL_DONG_CODE.value}
-    # )
-    # etl_tasks.start_worker.apply_async(
-    #     kwargs={"topic": TopicEnum.ETL_WH_BASIC_INFOS.value}
-    # )
-
-    # # DL 아파트 실거래가 매핑테이블
-    # etl_tasks.start_worker.delay(
-    #     topic=TopicEnum.ETL_DL_BLD_MAPPING_RESULTS.value
-    # )  # 실거래가, kapt, kakao데이터 수집 이후
-
-    # DW 아파트 실거래가
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_APT_DEALS.value)  # 매핑테이블 이후, 건축물대장 업데이트 이후
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_APT_RENTS.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_OFCTL_DEALS.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_OFCTL_RENTS.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_RIGHT_LOG_OUTS.value)
-    #
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_WH_UPDATE_SUPPLY_AREA.value)  # 실거래가 이후, 건축물대장 이후
-
-    etl_tasks.start_worker.delay(topic=TopicEnum.ETL_MART_PUBLIC_SALES.value)
-    # etl_tasks.start_worker.delay(topic=TopicEnum.ETL_PUBLIC_SALE_PHOTOS.value)
 
 
 # celery -A modules.adapter.infrastructure.celery.etl_queue.celery flower --address=localhost --port=5555

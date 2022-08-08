@@ -6,7 +6,7 @@ task_definition:
     cpu_limit: 1024
     mem_limit: 2GB
   services:
-    prod-tanos-api:
+    prod-anrtgirl-api:
       cpu_shares: 700
       mem_limit: 1.5GB
 run_params:
