@@ -59,3 +59,14 @@ class TransformDongTypeInfos:
                 )
             )
         return result
+
+    def filter_by_fk(
+        self,
+        type_infos: list[TypeInfoEntity] | None,
+        filter_list: list[DongInfoEntity] | None,
+    ) -> list[TypeInfoEntity] | None:
+        if not type_infos or not filter_list:
+            return None
+
+
+

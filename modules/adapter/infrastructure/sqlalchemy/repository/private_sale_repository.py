@@ -192,3 +192,22 @@ class SyncPrivateSaleRepository:
             )
             session.rollback()
             raise
+
+    def _get_is_exists_by_fk(
+            self,
+            value: DongInfoModel | TypeInfoModel,
+    ) -> bool:
+        if isinstance(value, DongInfoModel):
+            query = select(PrivateSaleModel.id).where(PrivateSaleModel.id == value.private_sale_id)
+            result = session.execute(query).scalars().first()
+
+        elif isinstance(value, TypeInfoModel):
+            query = select(DongInfoModel.id).where(DongInfoModel.id == value.dong_id)
+            result = session.execute(query).scalars().first()
+        else:
+            result = None
+
+        if result:
+            return True
+        else:
+            return False

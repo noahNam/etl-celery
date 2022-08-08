@@ -1,6 +1,6 @@
 from typing import Type
 
-from sqlalchemy import exc, select, update
+from sqlalchemy import exc, select, update, and_
 
 from core.domain.warehouse.subscription.interface.subscription_info_repository import (
     SubscriptionRepository,
@@ -212,15 +212,23 @@ class SyncSubscriptionRepository(SubscriptionRepository):
     def find_by_update_needed(
         self, model: Type[SubscriptionModel | SubscriptionDetailModel]
     ) -> list[SubsToPublicEntity] | list[SubDtToPublicDtEntity] | None:
-        query = select(model)
-        results = session.execute(query).scalars().all()
 
-        if results:
-            if isinstance(results[0], SubscriptionModel):
+        if model == SubscriptionModel:
+            query = select(model).where(
+                and_(
+                    model.place_id != None,
+                    model.update_needed == True
+                     )
+            )
+            results = session.execute(query).scalars().all()
+            if results:
                 return [result.to_entity_for_public_sales() for result in results]
-            elif isinstance(results[0], SubscriptionDetailModel):
-                return [
-                    result.to_entity_for_public_sale_details() for result in results
-                ]
+            else:
+                return None
+
+        elif model == SubscriptionDetailModel:
+            query = select(model).where(model.update_needed == True)
+            results = session.execute(query).scalars().all()
+            return [result.to_entity_for_public_sale_details() for result in results]
         else:
             return None

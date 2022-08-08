@@ -276,3 +276,50 @@ class SyncPublicSaleRepository:
             return True
         else:
             return False
+
+    def find_by_updated_needed(
+        self,
+        target_model: type[SpecialSupplyResultModel | GeneralSupplyResultModel]
+    ) -> list[SpecialSupplyResultModel] | list[GeneralSupplyResultModel]:
+        try:
+            query = select(target_model).where(
+                target_model.update_needed == True,
+            )
+            result = session.execute(query).scalars().all()
+            return result
+
+        except Exception as e:
+            logger.error(
+                f"[SyncPublicSaleRepository][save_all_update_needed][error : {e}]"
+            )
+            session.rollback()
+            raise Exception
+
+    def update_by_update_needed(
+            self
+    ) -> None:
+        try:
+            models = [
+                PublicSaleModel,
+                PublicSaleDetailModel,
+                SpecialSupplyResultModel,
+                GeneralSupplyResultModel,
+            ]
+            for model in models:
+                session.execute(
+                    update(
+                        model
+                    ).where(
+                        model.update_needed == True,
+                    ).values(
+                        update_needed=False
+                    )
+                )
+            session.commit()
+
+        except Exception as e:
+            logger.error(
+                f"[SyncPublicSaleRepository][save_all_update_needed][error : {e}]"
+            )
+            session.rollback()
+            raise Exception
