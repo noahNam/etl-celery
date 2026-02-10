@@ -28,14 +28,11 @@ class Config(BaseSettings):
     REDIS_NODE_HOST_2: str | None = os.environ.get("REDIS_NODE_HOST_2")
 
     # Jwt
-    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or "hawaii"
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or ""
     JWT_ALGORITHM = os.environ.get("JWT_ALGORITHMS") or "HS256"
 
     # Celery
-    BACKEND_RESULT = (
-        os.environ.get("BACKEND_RESULT")
-        or "db+mysql+pymysql://apartalk_admin:***REMOVED***@localhost:3306/apartalk_data_lake"
-    )
+    BACKEND_RESULT = os.environ.get("BACKEND_RESULT") or ""
     TIMEZONE = "Asia/Seoul"
     CELERY_ENABLE_UTC = False
 
@@ -44,18 +41,18 @@ class Config(BaseSettings):
 
 
 class LocalConfig(Config):
-    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or "***REMOVED***"
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or ""
     DATA_LAKE_URL: str = os.getenv(
         "DEV_DATA_LAKE_URL",
-        "mysql+pymysql://apartalk_admin:***REMOVED***@localhost:3306/apartalk_data_lake",
+        "mysql+pymysql://apartalk_admin@localhost:3306/apartalk_data_lake",
     )
     DATA_WAREHOUSE_URL: str = os.getenv(
         "DEV_DATA_WAREHOUSE_URL",
-        "mysql+pymysql://apartalk_admin:***REMOVED***@localhost:3306/apartalk_data_warehouse",
+        "mysql+pymysql://apartalk_admin@localhost:3306/apartalk_data_warehouse",
     )
     DATA_MART_URL: str = os.getenv(
         "DEV_DATA_MART_URL",
-        "mysql+pymysql://apartalk_admin:***REMOVED***@localhost:3306/apartalk_data_mart",
+        "mysql+pymysql://apartalk_admin@localhost:3306/apartalk_data_mart",
     )
 
 
